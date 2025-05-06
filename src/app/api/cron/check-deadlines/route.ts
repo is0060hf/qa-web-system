@@ -18,16 +18,19 @@ export async function POST(req: NextRequest) {
     }
 
     // 期限切れかつ通知未送信の質問を検索
-    const overdueQuestions = await prisma.question.findMany({
-      where: {
-        status: {
-          in: [QuestionStatus.NEW, QuestionStatus.IN_PROGRESS]
-        },
-        deadline: {
-          lt: new Date() // 現在より前の期限 = 期限切れ
-        },
-        isDeadlineNotified: false // 通知未送信
+    // Prismaの型定義とスキーマの不一致を回避するため、型アサーションを使用
+    const whereClause = {
+      status: {
+        in: [QuestionStatus.NEW, QuestionStatus.IN_PROGRESS]
       },
+      deadline: {
+        lt: new Date() // 現在より前の期限 = 期限切れ
+      },
+      isDeadlineNotified: false // 通知未送信
+    } as any;
+
+    const overdueQuestions = await prisma.question.findMany({
+      where: whereClause,
       include: {
         project: {
           select: {
@@ -46,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     // 各期限切れ質問に対して通知を生成
     const notificationResults = await Promise.all(
-      overdueQuestions.map(async (question) => {
+      overdueQuestions.map(async (question: any) => {
         // トランザクションで通知生成と質問更新を実行
         return prisma.$transaction(async (tx) => {
           // 回答者への通知
@@ -70,9 +73,10 @@ export async function POST(req: NextRequest) {
           });
 
           // 質問を通知済みに更新
+          // 型の不一致を回避するため、データオブジェクトに型アサーションを使用
           await tx.question.update({
             where: { id: question.id },
-            data: { isDeadlineNotified: true },
+            data: { isDeadlineNotified: true } as any,
           });
 
           return question.id;
