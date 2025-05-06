@@ -1,11 +1,9 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Noto_Sans_JP } from 'next/font/google';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from './theme';
 import AuthProvider from './auth-provider';
 import { AccessibilityProvider } from '../components/providers/AccessibilityProvider';
+import ThemeRegistry from '../components/providers/ThemeRegistry';
 
 // フォント設定
 const inter = Inter({
@@ -27,8 +25,10 @@ export const metadata: Metadata = {
   // アクセシビリティ関連のメタデータ
   applicationName: '質問管理Webシステム',
   authors: [{ name: 'システム管理者' }],
-  colorScheme: 'light',
-  themeColor: '#1976d2', // Material UIのプライマリカラー
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1976d2',
 };
 
 export default function RootLayout({
@@ -40,14 +40,13 @@ export default function RootLayout({
     <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
       <body>
         <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
+          <ThemeRegistry>
             <AccessibilityProvider>
               <main id="main-content">
                 {children}
               </main>
             </AccessibilityProvider>
-          </ThemeProvider>
+          </ThemeRegistry>
         </AuthProvider>
       </body>
     </html>

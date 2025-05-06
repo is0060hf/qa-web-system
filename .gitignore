@@ -3,3 +3,4 @@
 /.env.prod
 /.env.test
 node_modules
+/.next
