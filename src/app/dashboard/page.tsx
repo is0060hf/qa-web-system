@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Grid,
   Paper,
@@ -16,6 +16,8 @@ import {
   Chip,
   Button,
   Badge,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Assignment as AssignmentIcon,
@@ -24,49 +26,99 @@ import {
   Warning as WarningIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../components/layout/DashboardLayout';
+import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
+import {
+  AssignedQuestion,
+  CreatedQuestion,
+  RecentProject,
+  MockDashboardData
+} from '@/mocks/dashboard';
 
-// サンプルデータ
-const assignedQuestions = [
-  {
-    id: '1',
-    title: 'プロジェクトXで発生したエラーについて',
-    project: 'プロジェクトX',
-    deadline: '2023-08-15',
-    status: '回答中',
-  },
-  {
-    id: '2',
-    title: 'デプロイパイプラインのトラブルシューティング',
-    project: 'プロジェクトY',
-    deadline: '2023-08-20',
-    status: '回答中',
-  },
-];
+// StatCardの型定義
+interface StatCardProps {
+  title: string;
+  value: number;
+  description: string;
+  bgcolor: string;
+}
 
-const createdQuestions = [
-  {
-    id: '3',
-    title: '新規機能の実装方法について',
-    project: 'プロジェクトZ',
-    createdAt: '2023-08-01',
-    status: '承認待ち',
-  },
-  {
-    id: '4',
-    title: 'パフォーマンス最適化の方法',
-    project: 'プロジェクトX',
-    createdAt: '2023-08-05',
-    status: 'クローズ',
-  },
-];
+// 統計情報カードコンポーネント - メモ化して再レンダリングを防止
+const StatCard = React.memo<StatCardProps>(({ title, value, description, bgcolor }) => (
+  <Paper
+    elevation={0}
+    sx={{
+      p: 2,
+      display: 'flex',
+      flexDirection: 'column',
+      height: 140,
+      borderRadius: 2,
+      bgcolor,
+      color: 'white',
+    }}
+  >
+    <Typography variant="h6" gutterBottom>
+      {title}
+    </Typography>
+    <Typography variant="h3" component="div" sx={{ mt: 'auto' }}>
+      {value}
+    </Typography>
+    <Typography variant="body2" sx={{ mt: 1 }}>
+      {description}
+    </Typography>
+  </Paper>
+));
 
-const recentProjects = [
-  { id: '1', name: 'プロジェクトX', questionsCount: 10, answersCount: 8 },
-  { id: '2', name: 'プロジェクトY', questionsCount: 5, answersCount: 3 },
-  { id: '3', name: 'プロジェクトZ', questionsCount: 7, answersCount: 5 },
-];
+StatCard.displayName = 'StatCard';
 
 export default function Dashboard() {
+  // データフェッチング関数をメモ化して安定させる
+  const fetchDashboardData = useCallback(() => {
+    return fetchData<MockDashboardData>('dashboard');
+  }, []);
+  
+  // ダッシュボードデータの取得
+  const { 
+    data, 
+    isLoading, 
+    error
+  } = useDataFetching<MockDashboardData>(
+    fetchDashboardData,
+    {
+      stats: {
+        assignedQuestions: 0,
+        completedQuestions: 0,
+        nearDeadlineQuestions: 0,
+        overdueQuestions: 0,
+      },
+      assignedQuestions: [],
+      createdQuestions: [],
+      recentProjects: [],
+    }
+  );
+  
+  // データを変更しない場合はメモ化して再計算を防止
+  const { stats, assignedQuestions, createdQuestions, recentProjects } = useMemo(() => data, [data]);
+  
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <CircularProgress />
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <Box sx={{ mb: 4 }}>
@@ -81,103 +133,39 @@ export default function Dashboard() {
       <Grid container spacing={3}>
         {/* 統計カード */}
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 140,
-              borderRadius: 2,
-              bgcolor: 'primary.light',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              割り当て質問
-            </Typography>
-            <Typography variant="h3" component="div" sx={{ mt: 'auto' }}>
-              2
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              回答が必要な質問: 2件
-            </Typography>
-          </Paper>
+          <StatCard 
+            title="割り当て質問"
+            value={stats.assignedQuestions}
+            description={`回答が必要な質問: ${stats.assignedQuestions}件`}
+            bgcolor="primary.light"
+          />
         </Grid>
         
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 140,
-              borderRadius: 2,
-              bgcolor: 'success.light',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              完了質問
-            </Typography>
-            <Typography variant="h3" component="div" sx={{ mt: 'auto' }}>
-              15
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              これまでに回答した質問: 15件
-            </Typography>
-          </Paper>
+          <StatCard 
+            title="完了質問"
+            value={stats.completedQuestions}
+            description={`これまでに回答した質問: ${stats.completedQuestions}件`}
+            bgcolor="success.light"
+          />
         </Grid>
         
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 140,
-              borderRadius: 2,
-              bgcolor: 'warning.light',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              期限間近
-            </Typography>
-            <Typography variant="h3" component="div" sx={{ mt: 'auto' }}>
-              1
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              期限が3日以内の質問: 1件
-            </Typography>
-          </Paper>
+          <StatCard 
+            title="期限間近"
+            value={stats.nearDeadlineQuestions}
+            description={`期限が3日以内の質問: ${stats.nearDeadlineQuestions}件`}
+            bgcolor="warning.light"
+          />
         </Grid>
         
         <Grid item xs={12} sm={6} md={3}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              height: 140,
-              borderRadius: 2,
-              bgcolor: 'error.light',
-              color: 'white',
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              期限超過
-            </Typography>
-            <Typography variant="h3" component="div" sx={{ mt: 'auto' }}>
-              0
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              期限を過ぎた質問: 0件
-            </Typography>
-          </Paper>
+          <StatCard 
+            title="期限超過"
+            value={stats.overdueQuestions}
+            description={`期限を過ぎた質問: ${stats.overdueQuestions}件`}
+            bgcolor="error.light"
+          />
         </Grid>
 
         {/* 担当質問 */}
@@ -193,61 +181,69 @@ export default function Dashboard() {
             />
             <Divider />
             <CardContent sx={{ p: 0 }}>
-              <List>
-                {assignedQuestions.map((question, index) => (
-                  <Box key={question.id}>
-                    <ListItemButton
-                      component="a" 
-                      href={`/questions/${question.id}`}
-                      sx={{ 
-                        px: 3, 
-                        py: 2,
-                        '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' } 
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                            <Badge 
-                              color={
-                                new Date(question.deadline) < new Date() 
-                                  ? 'error' 
-                                  : new Date(question.deadline) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) 
-                                    ? 'warning' 
-                                    : 'primary'
-                              }
-                              variant="dot"
-                              sx={{ mr: 1 }}
-                            >
-                              <AssignmentIcon />
-                            </Badge>
-                            <Typography variant="subtitle1">{question.title}</Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box>
-                              <Typography variant="body2" component="span">
-                                {question.project}
-                              </Typography>
-                              <Chip 
-                                label={question.status} 
-                                size="small" 
-                                color="primary"
-                                sx={{ ml: 1 }}
-                              />
+              {assignedQuestions.length > 0 ? (
+                <List>
+                  {assignedQuestions.map((question, index) => (
+                    <Box key={question.id}>
+                      <ListItemButton
+                        component="a" 
+                        href={`/questions/${question.id}`}
+                        sx={{ 
+                          px: 3, 
+                          py: 2,
+                          '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' } 
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                              <Badge 
+                                color={
+                                  new Date(question.deadline) < new Date() 
+                                    ? 'error' 
+                                    : new Date(question.deadline) < new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) 
+                                      ? 'warning' 
+                                      : 'primary'
+                                }
+                                variant="dot"
+                                sx={{ mr: 1 }}
+                              >
+                                <AssignmentIcon />
+                              </Badge>
+                              <Typography variant="subtitle1">{question.title}</Typography>
                             </Box>
-                            <Typography variant="body2">
-                              期限: {new Date(question.deadline).toLocaleDateString('ja-JP')}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </ListItemButton>
-                    {index < assignedQuestions.length - 1 && <Divider />}
-                  </Box>
-                ))}
-              </List>
+                          }
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Box>
+                                <Typography variant="body2" component="span">
+                                  {question.project}
+                                </Typography>
+                                <Chip 
+                                  label={question.status} 
+                                  size="small" 
+                                  color="primary"
+                                  sx={{ ml: 1 }}
+                                />
+                              </Box>
+                              <Typography variant="body2">
+                                期限: {new Date(question.deadline).toLocaleDateString('ja-JP')}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItemButton>
+                      {index < assignedQuestions.length - 1 && <Divider />}
+                    </Box>
+                  ))}
+                </List>
+              ) : (
+                <Box sx={{ p: 3, textAlign: 'center' }}>
+                  <Typography variant="body1" color="text.secondary">
+                    担当している質問はありません
+                  </Typography>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -265,46 +261,23 @@ export default function Dashboard() {
             />
             <Divider />
             <CardContent sx={{ p: 0 }}>
-              <List>
-                {createdQuestions.map((question, index) => (
-                  <Box key={question.id}>
-                    <ListItemButton
-                      component="a" 
-                      href={`/questions/${question.id}`}
-                      sx={{ 
-                        px: 3, 
-                        py: 2,
-                        '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' } 
-                      }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                            <Badge 
-                              color={
-                                question.status === 'クローズ' 
-                                  ? 'success' 
-                                  : question.status === '承認待ち' 
-                                    ? 'warning' 
-                                    : 'primary'
-                              }
-                              variant="dot"
-                              sx={{ mr: 1 }}
-                            >
-                              <AssignmentIcon />
-                            </Badge>
-                            <Typography variant="subtitle1">{question.title}</Typography>
-                          </Box>
-                        }
-                        secondary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box>
-                              <Typography variant="body2" component="span">
-                                {question.project}
-                              </Typography>
-                              <Chip 
-                                label={question.status} 
-                                size="small" 
+              {createdQuestions.length > 0 ? (
+                <List>
+                  {createdQuestions.map((question, index) => (
+                    <Box key={question.id}>
+                      <ListItemButton
+                        component="a" 
+                        href={`/questions/${question.id}`}
+                        sx={{ 
+                          px: 3, 
+                          py: 2,
+                          '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' } 
+                        }}
+                      >
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                              <Badge 
                                 color={
                                   question.status === 'クローズ' 
                                     ? 'success' 
@@ -312,20 +285,51 @@ export default function Dashboard() {
                                       ? 'warning' 
                                       : 'primary'
                                 }
-                                sx={{ ml: 1 }}
-                              />
+                                variant="dot"
+                                sx={{ mr: 1 }}
+                              >
+                                <AssignmentIcon />
+                              </Badge>
+                              <Typography variant="subtitle1">{question.title}</Typography>
                             </Box>
-                            <Typography variant="body2">
-                              作成日: {new Date(question.createdAt).toLocaleDateString('ja-JP')}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </ListItemButton>
-                    {index < createdQuestions.length - 1 && <Divider />}
-                  </Box>
-                ))}
-              </List>
+                          }
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Box>
+                                <Typography variant="body2" component="span">
+                                  {question.project}
+                                </Typography>
+                                <Chip 
+                                  label={question.status} 
+                                  size="small" 
+                                  color={
+                                    question.status === 'クローズ' 
+                                      ? 'success' 
+                                      : question.status === '承認待ち' 
+                                        ? 'warning' 
+                                        : 'primary'
+                                  }
+                                  sx={{ ml: 1 }}
+                                />
+                              </Box>
+                              <Typography variant="body2">
+                                作成日: {new Date(question.createdAt).toLocaleDateString('ja-JP')}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItemButton>
+                      {index < createdQuestions.length - 1 && <Divider />}
+                    </Box>
+                  ))}
+                </List>
+              ) : (
+                <Box sx={{ p: 3, textAlign: 'center' }}>
+                  <Typography variant="body1" color="text.secondary">
+                    作成した質問はありません
+                  </Typography>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>
@@ -342,42 +346,50 @@ export default function Dashboard() {
               }
             />
             <Divider />
-            <Grid container sx={{ p: 2 }}>
-              {recentProjects.map((project) => (
-                <Grid item xs={12} sm={6} md={4} key={project.id}>
-                  <Paper 
-                    elevation={0} 
-                    sx={{ 
-                      m: 1, 
-                      p: 2, 
-                      borderRadius: 2, 
-                      border: '1px solid', 
-                      borderColor: 'divider',
-                      transition: 'all 0.3s',
-                      '&:hover': {
-                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                        borderColor: 'primary.main',
-                      }
-                    }}
-                    component="a"
-                    href={`/projects/${project.id}`}
-                    style={{ textDecoration: 'none', display: 'block' }}
-                  >
-                    <Typography variant="h6" gutterBottom>
-                      {project.name}
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        質問: {project.questionsCount}
+            {recentProjects.length > 0 ? (
+              <Grid container sx={{ p: 2 }}>
+                {recentProjects.map((project) => (
+                  <Grid key={project.id} item xs={12} sm={6} md={4}>
+                    <Paper 
+                      elevation={0} 
+                      sx={{ 
+                        m: 1, 
+                        p: 2, 
+                        borderRadius: 2, 
+                        border: '1px solid', 
+                        borderColor: 'divider',
+                        transition: 'all 0.3s',
+                        '&:hover': {
+                          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                          borderColor: 'primary.main',
+                        }
+                      }}
+                      component="a"
+                      href={`/projects/${project.id}`}
+                      style={{ textDecoration: 'none', display: 'block' }}
+                    >
+                      <Typography variant="h6" gutterBottom>
+                        {project.name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        回答: {project.answersCount}
-                      </Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
-              ))}
-            </Grid>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          質問: {project.questionsCount}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          回答: {project.answersCount}
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body1" color="text.secondary">
+                  最近のプロジェクトはありません
+                </Typography>
+              </Box>
+            )}
           </Card>
         </Grid>
       </Grid>

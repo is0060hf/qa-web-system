@@ -330,4 +330,93 @@
    7.3.3. 継続的改善プロセス構築 [未着手]
    7.3.4. コスト監視体制構築 [未着手]
       7.3.4.1. 予算アラート設定 [未着手]
-      7.3.4.2. リソース使用量レビュー計画 [未着手] 
+      7.3.4.2. リソース使用量レビュー計画 [未着手]
+
+## モックデータからAPIデータ取得への移行タスク
+
+### 背景
+現在、アプリケーション内の多くのコンポーネントでモックデータが直接使用されており、データベースが空であってもユーザー情報や質問、プロジェクト情報などが表示されている状態です。これをNODE_ENV環境変数を参照して、テスト環境ではモックデータを使用し、開発環境や本番環境では実際のAPIを呼び出すように修正する必要があります。
+
+### モックデータ使用箇所一覧
+
+#### フロントエンドコンポーネント
+1. **質問関連**
+   - `src/app/questions/page.tsx` - 質問一覧表示用のモックデータ
+   - `src/app/questions/[id]/page.tsx` - 質問詳細表示用のモックデータ
+
+2. **プロジェクト関連**
+   - `src/app/projects/page.tsx` - プロジェクト一覧表示用のモックデータ
+   - `src/app/projects/[id]/page.tsx` - プロジェクト詳細表示用のモックデータ
+
+3. **ダッシュボード関連**
+   - `src/app/dashboard/page.tsx` - ダッシュボード表示用のモックデータ（割り当て質問、作成質問、最近のプロジェクト）
+
+#### テスト関連
+- `src/__tests__/` ディレクトリ内の各種テストファイル
+- `jest/setupTests.js` - テスト環境設定
+
+### 実装タスク
+
+1. **環境変数に基づくAPI呼び出し切り替え機能の実装**
+   - 共通のフェッチユーティリティ関数を作成または拡張
+   - NODE_ENV環境変数に基づいて適切なデータ取得方法を選択する仕組み実装
+
+2. **質問関連コンポーネントの修正**
+   - `src/app/questions/page.tsx` - APIからの質問一覧取得実装
+   - `src/app/questions/[id]/page.tsx` - APIからの質問詳細取得実装
+
+3. **プロジェクト関連コンポーネントの修正**
+   - `src/app/projects/page.tsx` - APIからのプロジェクト一覧取得実装
+   - `src/app/projects/[id]/page.tsx` - APIからのプロジェクト詳細取得実装
+
+4. **ダッシュボードコンポーネントの修正**
+   - `src/app/dashboard/page.tsx` - APIからのダッシュボードデータ取得実装
+
+5. **テスト環境の調整**
+   - テスト実行時に確実にモックデータが使用されるよう設定調整
+
+### 実装例（疑似コード）
+
+```typescript
+// データ取得ユーティリティ
+export const fetchData = async (endpoint: string, options = {}) => {
+  // テスト環境ではモックデータを返す
+  if (process.env.NODE_ENV === 'test') {
+    return getMockData(endpoint);
+  }
+  
+  // それ以外の環境では実際のAPIを呼び出す
+  const response = await fetch(`/api/${endpoint}`, options);
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.statusText}`);
+  }
+  return response.json();
+};
+
+// モックデータ取得関数
+const getMockData = (endpoint: string) => {
+  // エンドポイントに応じたモックデータを返す
+  switch (endpoint) {
+    case 'questions':
+      return mockQuestions;
+    case 'projects':
+      return mockProjects;
+    // その他のエンドポイント...
+    default:
+      return [];
+  }
+};
+```
+
+### スケジュール
+- 共通ユーティリティ修正: 1日
+- 質問関連コンポーネント修正: 2日
+- プロジェクト関連コンポーネント修正: 2日
+- ダッシュボード修正: 1日
+- テスト調整と動作確認: 2日
+
+### 注意点
+- API呼び出し中のローディング状態の適切な処理
+- エラーハンドリングの実装
+- パフォーマンス最適化（必要に応じてキャッシュの実装）
+- テスト環境での一貫性の確保 

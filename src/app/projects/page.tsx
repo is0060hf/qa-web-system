@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -13,74 +13,29 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Add as AddIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import DataTable from '../components/common/DataTable';
-
-// モックデータ
-const mockProjects = [
-  {
-    id: 'proj1',
-    name: 'プロジェクトA',
-    description: 'ウェブアプリケーションの開発プロジェクト',
-    members: 5,
-    questions: 12,
-    status: 'アクティブ',
-    updatedAt: '2023-08-01',
-  },
-  {
-    id: 'proj2',
-    name: 'プロジェクトB',
-    description: 'モバイルアプリの開発と保守',
-    members: 8,
-    questions: 24,
-    status: 'アクティブ',
-    updatedAt: '2023-07-28',
-  },
-  {
-    id: 'proj3',
-    name: 'プロジェクトC',
-    description: 'レガシーシステムの刷新',
-    members: 12,
-    questions: 45,
-    status: 'アクティブ',
-    updatedAt: '2023-07-25',
-  },
-  {
-    id: 'proj4',
-    name: 'プロジェクトD',
-    description: 'マーケティングサイトのリニューアル',
-    members: 3,
-    questions: 8,
-    status: '完了',
-    updatedAt: '2023-06-15',
-  },
-  {
-    id: 'proj5',
-    name: 'プロジェクトE',
-    description: 'インフラ構築と移行',
-    members: 4,
-    questions: 16,
-    status: '一時停止',
-    updatedAt: '2023-07-10',
-  },
-];
+import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
+import { MockProject } from '@/mocks/projects';
 
 // テーブルのカラム定義
 const columns = [
   { id: 'name', label: 'プロジェクト名', minWidth: 170 },
   { id: 'description', label: '説明', minWidth: 250 },
   {
-    id: 'members',
+    id: 'members_count',
     label: 'メンバー数',
     minWidth: 100,
     align: 'right' as const,
   },
   {
-    id: 'questions',
+    id: 'questions_count',
     label: '質問数',
     minWidth: 100,
     align: 'right' as const,
@@ -119,18 +74,35 @@ const columns = [
 export default function ProjectsPage() {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>('全て');
+
+  // クエリパラメータの準備
+  const getQueryParams = () => ({
+    status: statusFilter !== '全て' ? statusFilter : '',
+  });
+
+  // プロジェクトデータの取得
+  const { 
+    data: projects, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useDataFetching<MockProject[]>(
+    () => fetchData<MockProject[]>('projects', { params: getQueryParams() }),
+    []
+  );
   
   const handleStatusFilterChange = (event: SelectChangeEvent) => {
     setStatusFilter(event.target.value);
   };
+
+  // フィルター値が変更されたらデータを再取得
+  useEffect(() => {
+    refetch();
+  }, [statusFilter, refetch]);
   
   const handleRowClick = (row: any) => {
     router.push(`/projects/${row.id}`);
   };
-  
-  const filteredProjects = statusFilter === '全て'
-    ? mockProjects
-    : mockProjects.filter(project => project.status === statusFilter);
   
   return (
     <DashboardLayout>
@@ -168,13 +140,23 @@ export default function ProjectsPage() {
         </Grid>
       </Grid>
       
-      <DataTable
-        columns={columns}
-        data={filteredProjects}
-        title="プロジェクト一覧"
-        searchPlaceholder="プロジェクトを検索..."
-        onRowClick={handleRowClick}
-      />
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={projects}
+          title="プロジェクト一覧"
+          searchPlaceholder="プロジェクトを検索..."
+          onRowClick={handleRowClick}
+        />
+      )}
     </DashboardLayout>
   );
 } 

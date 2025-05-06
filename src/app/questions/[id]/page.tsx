@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -30,6 +30,8 @@ import {
   Stack,
   AvatarGroup,
   Tooltip,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -44,6 +46,8 @@ import {
   Tag as TagIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
+import { MockQuestion } from '@/mocks/questions';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -74,143 +78,71 @@ function a11yProps(index: number) {
   };
 }
 
-// モックデータ
-const mockQuestion = {
-  id: 'q1',
-  title: 'ログイン機能の実装について',
-  description: `
-# ログイン機能の実装について
-
-現在、ログイン機能の実装を担当しておりますが、以下の点について確認させてください。
-
-## 実装予定の内容
-1. メールアドレスとパスワードによる認証
-2. ソーシャルログイン（Google、Githubを予定）
-3. トークンベースの認証（JWT）
-
-## 質問内容
-- トークンの有効期限は何時間が適切でしょうか？
-- リフレッシュトークンの実装は必要でしょうか？
-- パスワードのハッシュ化には何を使うべきでしょうか？（bcryptを検討中）
-- 2要素認証の導入予定はありますか？
-
-よろしくお願いいたします。
-  `,
-  project: 'プロジェクトA',
-  project_id: 'proj1',
-  status: '回答中',
-  priority: '高',
-  assignees: [
-    { id: 'user1', name: '鈴木 一郎', role: 'プロジェクトマネージャー', avatar: '' },
-    { id: 'user2', name: '佐藤 二郎', role: 'フロントエンドエンジニア', avatar: '' },
-  ],
-  createdBy: 'user3',
-  createdByName: '田中 三郎',
-  deadline: '2023-08-15',
-  createdAt: '2023-07-25',
-  updatedAt: '2023-08-01',
-  tags: ['認証', 'セキュリティ', 'API'],
-  answers: [
-    {
-      id: 'a1',
-      content: `
-# ログイン機能についての回答
-
-ご質問いただきありがとうございます。以下、回答いたします。
-
-## トークンの有効期限
-通常、JWTの有効期限は用途によって異なりますが：
-- アクセストークン: 15分〜1時間が一般的
-- リフレッシュトークン: 1日〜2週間が一般的
-
-ユーザー体験とセキュリティのバランスを考えると、アクセストークンは1時間、リフレッシュトークンは2週間が良いでしょう。
-
-## リフレッシュトークンの実装
-はい、実装をお勧めします。短い有効期限のアクセストークンとより長い有効期限のリフレッシュトークンの組み合わせが最も安全です。
-
-## パスワードのハッシュ化
-bcryptは良い選択です。以下の理由でお勧めします：
-- 意図的に遅い処理速度でブルートフォース攻撃に強い
-- ソルトが組み込まれている
-- 広く使われており、十分に検証されている
-
-## 2要素認証
-セキュリティ要件が高い場合は導入をお勧めします。以下の選択肢があります：
-- SMS
-- 認証アプリ（Google Authenticatorなど）
-- メール
-
-認証アプリが最も安全でおすすめです。
-
-実装についてさらにご質問があればお知らせください。
-      `,
-      createdBy: 'user1',
-      createdByName: '鈴木 一郎',
-      createdAt: '2023-07-27',
-      updatedAt: '2023-07-27',
-      isAccepted: false,
-    },
-  ],
-  comments: [
-    {
-      id: 'c1',
-      content: 'トークンの有効期限については、開発段階では長めに設定しても良いかもしれません。本番環境では短くすることを推奨します。',
-      createdBy: 'user2',
-      createdByName: '佐藤 二郎',
-      createdAt: '2023-07-26',
-    },
-    {
-      id: 'c2',
-      content: '2要素認証については、要件定義でオプション機能として検討されていましたが、必須ではありません。まずは基本認証の実装を優先しましょう。',
-      createdBy: 'user1',
-      createdByName: '鈴木 一郎',
-      createdAt: '2023-07-28',
-    },
-  ],
-  attachments: [
-    {
-      id: 'file1',
-      name: '認証フロー図.pdf',
-      size: '243 KB',
-      type: 'application/pdf',
-      url: '#',
-      uploadedBy: 'user3',
-      uploadedAt: '2023-07-25',
-    },
-  ],
-};
-
 export default function QuestionDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [comment, setComment] = useState('');
 
+  // 質問データの取得
+  const { 
+    data: question, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useDataFetching<MockQuestion | null>(
+    () => fetchData<MockQuestion>(`questions/${params.id}`),
+    null
+  );
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleDelete = () => {
-    // 実際には削除のAPIコールが必要
-    setOpenDeleteDialog(false);
-    router.push('/questions');
+  const handleDelete = async () => {
+    try {
+      // 実際には削除のAPIコールが必要
+      await fetchData(`questions/${params.id}`, { method: 'DELETE' });
+      setOpenDeleteDialog(false);
+      router.push('/questions');
+    } catch (err) {
+      console.error('質問削除エラー:', err);
+      // エラー処理
+    }
   };
 
   const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setComment(event.target.value);
   };
 
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (comment.trim()) {
-      // 実際にはコメント送信のAPIコールが必要
-      console.log('Comment submitted:', comment);
-      setComment('');
+      try {
+        // 実際にはコメント送信のAPIコールが必要
+        await fetchData(`questions/${params.id}/comments`, {
+          method: 'POST',
+          body: { content: comment },
+        });
+        setComment('');
+        refetch(); // データを再取得
+      } catch (err) {
+        console.error('コメント送信エラー:', err);
+        // エラー処理
+      }
     }
   };
 
-  const handleAcceptAnswer = (answerId: string) => {
-    // 実際には回答承認のAPIコールが必要
-    console.log('Answer accepted:', answerId);
+  const handleAcceptAnswer = async (answerId: string) => {
+    try {
+      // 実際には回答承認のAPIコールが必要
+      await fetchData(`questions/${params.id}/answers/${answerId}/accept`, {
+        method: 'PATCH',
+      });
+      refetch(); // データを再取得
+    } catch (err) {
+      console.error('回答承認エラー:', err);
+      // エラー処理
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -226,27 +158,63 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
     }
   };
 
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <CircularProgress />
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+        <Button variant="outlined" onClick={() => router.push('/questions')}>
+          質問一覧に戻る
+        </Button>
+      </DashboardLayout>
+    );
+  }
+
+  if (!question) {
+    return (
+      <DashboardLayout>
+        <Alert severity="warning" sx={{ mb: 4 }}>
+          質問が見つかりませんでした
+        </Alert>
+        <Button variant="outlined" onClick={() => router.push('/questions')}>
+          質問一覧に戻る
+        </Button>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <Box sx={{ mb: 2, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 2 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            {mockQuestion.title}
+            {question.title}
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
             <Chip 
               icon={<AccessTimeIcon />}
-              label={`期限: ${new Date(mockQuestion.deadline).toLocaleDateString('ja-JP')}`}
+              label={`期限: ${new Date(question.deadline).toLocaleDateString('ja-JP')}`}
               variant="outlined"
-              color={new Date(mockQuestion.deadline) < new Date() ? 'error' : 'default'}
+              color={new Date(question.deadline) < new Date() ? 'error' : 'default'}
             />
             <Chip 
-              label={mockQuestion.status} 
-              color={getStatusColor(mockQuestion.status) as any}
+              label={question.status} 
+              color={getStatusColor(question.status) as any}
             />
             <Chip 
               icon={<PersonIcon />}
-              label={`作成者: ${mockQuestion.createdByName}`}
+              label={`作成者: ${question.createdByName}`}
               variant="outlined"
             />
           </Box>
@@ -255,7 +223,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
               担当者:
             </Typography>
             <AvatarGroup max={3}>
-              {mockQuestion.assignees.map((user) => (
+              {question.assignees.map((user) => (
                 <Tooltip key={user.id} title={user.name}>
                   <Avatar sx={{ width: 28, height: 28, fontSize: '0.875rem' }}>
                     {user.name.charAt(0)}
@@ -265,7 +233,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
             </AvatarGroup>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {mockQuestion.tags.map(tag => (
+            {question.tags?.map(tag => (
               <Chip 
                 key={tag}
                 icon={<TagIcon />}
@@ -305,15 +273,15 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="question tabs">
           <Tab label="質問内容" {...a11yProps(0)} />
-          <Tab label={`回答 (${mockQuestion.answers.length})`} {...a11yProps(1)} />
-          <Tab label={`コメント (${mockQuestion.comments.length})`} {...a11yProps(2)} />
-          <Tab label={`添付ファイル (${mockQuestion.attachments.length})`} {...a11yProps(3)} />
+          <Tab label={`回答 (${question.answers?.length || 0})`} {...a11yProps(1)} />
+          <Tab label={`コメント (${question.comments?.length || 0})`} {...a11yProps(2)} />
+          <Tab label={`添付ファイル (${question.attachments?.length || 0})`} {...a11yProps(3)} />
         </Tabs>
       </Box>
 
       <TabPanel value={tabValue} index={0}>
         <Paper sx={{ p: 3, borderRadius: 2 }}>
-          <div dangerouslySetInnerHTML={{ __html: mockQuestion.description.replace(/\n/g, '<br />') }} />
+          <div dangerouslySetInnerHTML={{ __html: question.description?.replace(/\n/g, '<br />') || '' }} />
         </Paper>
       </TabPanel>
 
@@ -329,9 +297,9 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           </Button>
         </Box>
         
-        {mockQuestion.answers.length > 0 ? (
+        {question.answers && question.answers.length > 0 ? (
           <Stack spacing={3}>
-            {mockQuestion.answers.map((answer) => (
+            {question.answers.map((answer) => (
               <Card key={answer.id} elevation={0} sx={{ borderRadius: 2 }}>
                 <CardHeader
                   avatar={
@@ -407,9 +375,9 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           />
         </Box>
         
-        {mockQuestion.comments.length > 0 ? (
+        {question.comments && question.comments.length > 0 ? (
           <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-            {mockQuestion.comments.map((commentItem, index) => (
+            {question.comments.map((commentItem, index) => (
               <Box key={commentItem.id}>
                 <ListItem alignItems="flex-start" sx={{ py: 2 }}>
                   <ListItemAvatar>
@@ -449,7 +417,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
                     }
                   />
                 </ListItem>
-                {index < mockQuestion.comments.length - 1 && <Divider variant="inset" component="li" />}
+                {index < question.comments.length - 1 && <Divider variant="inset" component="li" />}
               </Box>
             ))}
           </List>
@@ -473,9 +441,9 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           </Button>
         </Box>
         
-        {mockQuestion.attachments.length > 0 ? (
+        {question.attachments && question.attachments.length > 0 ? (
           <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-            {mockQuestion.attachments.map((file, index) => (
+            {question.attachments.map((file, index) => (
               <Box key={file.id}>
                 <ListItem
                   alignItems="flex-start"
@@ -514,7 +482,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
                     }
                   />
                 </ListItem>
-                {index < mockQuestion.attachments.length - 1 && <Divider variant="inset" component="li" />}
+                {index < question.attachments.length - 1 && <Divider variant="inset" component="li" />}
               </Box>
             ))}
           </List>
@@ -539,7 +507,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            「{mockQuestion.title}」を削除すると、すべての回答やコメントも削除されます。この操作は元に戻せません。
+            「{question.title}」を削除すると、すべての回答やコメントも削除されます。この操作は元に戻せません。
           </DialogContentText>
         </DialogContent>
         <DialogActions>
