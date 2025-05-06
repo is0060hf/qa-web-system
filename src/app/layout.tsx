@@ -4,13 +4,20 @@ import { Inter, Noto_Sans_JP } from 'next/font/google';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
+import AuthProvider from './auth-provider';
 
 // フォント設定
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const notoSansJP = Noto_Sans_JP({ 
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const notoSansJP = Noto_Sans_JP({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
-  variable: '--font-noto-sans-jp'
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
 });
 
 export const metadata: Metadata = {
@@ -26,10 +33,12 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${inter.variable} ${notoSansJP.variable}`}>
       <body>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
