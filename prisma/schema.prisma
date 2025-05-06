@@ -79,6 +79,8 @@ model User {
   answers        Answer[]       // Answers created by the user
   notifications  Notification[] // Notifications for the user
   formTemplates  AnswerFormTemplate[] // Answer form templates created by the user
+  uploadedFiles  MediaFile[]    // Files uploaded by the user
+  sentInvitations Invitation[]  @relation("SentInvitations") // Invitations sent by the user
 }
 
 model Project {
@@ -176,25 +178,43 @@ model Answer {
 
   question    Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
   creator     User       @relation(fields: [creatorId], references: [id])
-  attachments Attachment[]
+  mediaFiles  AnswerMediaFile[] // Relation to media files through join table
   formData    AnswerFormData[] // Data for custom form fields, if applicable
 
   @@index([questionId])
   @@index([creatorId])
 }
 
-model Attachment {
-  id        String   @id @default(cuid())
-  answerId  String
-  fileName  String
-  fileType  String   // e.g., 'image/png', 'video/mp4'
-  fileSize  Int      // In bytes
-  storageUrl String  // URL from Vercel Blob
-  createdAt DateTime @default(now())
+// New MediaFile model to implement media pool concept
+model MediaFile {
+  id            String     @id @default(cuid())
+  fileName      String
+  fileType      String     // e.g., 'image/png', 'video/mp4'
+  fileSize      Int        // In bytes
+  storageUrl    String     // URL from Vercel Blob
+  uploaderId    String     // User who uploaded the file
+  createdAt     DateTime   @default(now())
 
-  answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  uploader      User       @relation(fields: [uploaderId], references: [id])
+  answers       AnswerMediaFile[] // Relation to answers through join table
+  formData      AnswerFormData[] // Relation to form data
 
+  @@index([uploaderId])
+}
+
+// Join table for many-to-many relation between Answer and MediaFile
+model AnswerMediaFile {
+  id          String     @id @default(cuid())
+  answerId    String
+  mediaFileId String
+  createdAt   DateTime   @default(now())
+
+  answer      Answer     @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  mediaFile   MediaFile  @relation(fields: [mediaFileId], references: [id])
+
+  @@unique([answerId, mediaFileId])
   @@index([answerId])
+  @@index([mediaFileId])
 }
 
 model AnswerForm {
@@ -230,15 +250,16 @@ model AnswerFormData {
   answerId          String
   formFieldId       String
   value             String?         // For TEXT, NUMBER, RADIO, TEXTAREA
-  fileAttachmentId  String?         @unique // Link to Attachment for FILE type
+  mediaFileId       String?         // Link to MediaFile for FILE type
   createdAt         DateTime        @default(now())
 
   answer            Answer          @relation(fields: [answerId], references: [id], onDelete: Cascade)
   formField         AnswerFormField @relation(fields: [formFieldId], references: [id], onDelete: Cascade)
-  fileAttachment    Attachment?     @relation(fields: [fileAttachmentId], references: [id])
+  mediaFile         MediaFile?      @relation(fields: [mediaFileId], references: [id])
 
   @@index([answerId])
   @@index([formFieldId])
+  @@index([mediaFileId])
 }
 
 model AnswerFormTemplate {
@@ -256,15 +277,17 @@ model AnswerFormTemplate {
 }
 
 model Notification {
-  id          String           @id @default(cuid())
-  userId      String           // Recipient user
-  type        NotificationType
-  message     String
-  relatedId   String?          // ID of related entity (e.g., Question ID)
-  isRead      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  id                 String           @id @default(cuid())
+  userId             String           // Recipient user
+  type               NotificationType
+  message            String
+  relatedId          String?          // ID of related entity (e.g., Question ID)
+  isRead             Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  // New field to track if deadline notification was already sent
+  isDeadlineNotified Boolean          @default(false)
 
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([isRead])
@@ -281,11 +304,12 @@ model Invitation {
   createdAt DateTime         @default(now())
 
   project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  // inviter User // Relation might be complex if inviter leaves project
+  inviter   User             @relation("SentInvitations", fields: [inviterId], references: [id])
 
   @@index([email])
   @@index([projectId])
   @@index([token])
+  @@index([inviterId])
 }
 
 

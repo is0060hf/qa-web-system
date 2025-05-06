@@ -502,34 +502,36 @@
 
 *   **Method:** `DELETE`
 *   **Path:** `/api/questions/{questionId}`
-*   **Description:** 質問を削除します。
+*   **Description:** 質問を削除します。ステータスにかかわらず、質問者本人またはAdmin権限を持つユーザーかその質問が属するプロジェクトのプロジェクト管理者のみが削除可能です。
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Question Creator, Project Manager, ADMIN
 *   **URL Parameters:** `questionId`
 *   **Success Response:** `204 No Content`
 *   **Error Response:** `401 Unauthorized`, `403 Forbidden`, `404 Not Found`
 
-### 7.8. 会話からの質問作成
+### 7.8. 回答から新規質問作成
 
 *   **Method:** `POST`
-*   **Path:** `/api/questions/from-answer`
-*   **Description:** 特定の回答を基に新しい質問を作成します。
+*   **Path:** `/api/questions/{questionId}/answers/{answerId}/create-question`
+*   **Description:** 特定の回答の内容を引用して、新しい質問を作成します。
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Project Member, Project Manager, ADMIN
+*   **URL Parameters:** `questionId`, `answerId`
 *   **Request Body:**
     ```json
     {
-      "answerId": "source_answer_cuid",
-      "title": "New Question Title based on Answer",
-      "assigneeId": "new_responder_cuid",
+      "title": "New Question Title",
+      "content": "Optional additional content",
+      "assigneeId": "responder_user_cuid",
       "deadline": "iso_timestamp_or_null",
-      "priority": "MEDIUM",
-      "tagIds": []
-      // Optionally add more content or specify a form
+      "priority": "MEDIUM", // HIGHEST, HIGH, MEDIUM, LOW
+      "tagIds": ["tag_cuid_1", "tag_cuid_2"],
+      "projectId": "project_cuid", // Optional, defaults to original question's project
+      "includeOriginalContent": true // Whether to include the original answer content in the new question
     }
     ```
-*   **Success Response:** `201 Created` (作成された新しい質問情報)
-*   **Error Response:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found` (Answer or Assignee not found)
+*   **Success Response:** `201 Created` (作成された質問情報)
+*   **Error Response:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found` (Question, Answer, Project, Assignee, Tags not found)
 
 ## 8. 回答 (Answers)
 
