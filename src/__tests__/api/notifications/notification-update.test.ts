@@ -10,7 +10,7 @@ const mockUser: User = {
   name: 'テストユーザー',
   email: 'test@example.com',
   role: Role.USER,
-  password: 'hashedpassword',
+  passwordHash: 'hashedpassword',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -20,7 +20,7 @@ const mockOtherUser: User = {
   name: '別のユーザー',
   email: 'other@example.com',
   role: Role.USER,
-  password: 'hashedpassword',
+  passwordHash: 'hashedpassword',
   createdAt: new Date(),
   updatedAt: new Date(),
 };

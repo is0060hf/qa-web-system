@@ -10,7 +10,7 @@ const mockUser: User = {
   name: 'テストユーザー',
   email: 'test@example.com',
   role: Role.USER,
-  password: 'hashedpassword',
+  passwordHash: 'hashedpassword',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -99,8 +99,10 @@ describe('通知一覧取得API', () => {
       // getUserFromRequestのモック
       jest.spyOn(apiUtils, 'getUserFromRequest').mockReturnValue(mockUser);
 
-      // 未読通知のみをフィルタリング
-      const unreadNotifications = mockNotifications.filter(n => !n.isRead);
+      // 未読通知のみをフィルタリングし、createdAtの降順で並べる
+      const unreadNotifications = mockNotifications
+        .filter(n => !n.isRead)
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
       // Prismaモック
       prismaMock.notification.findMany.mockResolvedValue(
@@ -119,6 +121,7 @@ describe('通知一覧取得API', () => {
       // レスポンス検証
       expect(response.status).toBe(200);
       expect(data.notifications).toHaveLength(2); // 未読通知は2件
+      // 日付降順なので、notification3（2023-01-03）が最初、notification1（2023-01-01）が次
       expect(data.notifications[0].id).toBe('notification3');
       expect(data.notifications[1].id).toBe('notification1');
       expect(data.totalUnread).toBe(2);
