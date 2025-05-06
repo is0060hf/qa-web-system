@@ -129,17 +129,18 @@ model ProjectTag {
 }
 
 model Question {
-  id          String           @id @default(cuid())
-  title       String
-  content     String
-  status      QuestionStatus   @default(NEW)
-  priority    QuestionPriority @default(MEDIUM)
-  deadline    DateTime?
-  projectId   String
-  creatorId   String           // Questioner
-  assigneeId  String           // Responder (only one)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id                 String           @id @default(cuid())
+  title              String
+  content            String
+  status             QuestionStatus   @default(NEW)
+  priority           QuestionPriority @default(MEDIUM)
+  deadline           DateTime?
+  projectId          String
+  creatorId          String           // Questioner
+  assigneeId         String           // Responder (only one)
+  isDeadlineNotified Boolean          @default(false) // 期限超過通知が送信されたかどうか
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   creator     User             @relation("CreatedQuestions", fields: [creatorId], references: [id])
@@ -284,8 +285,6 @@ model Notification {
   relatedId          String?          // ID of related entity (e.g., Question ID)
   isRead             Boolean          @default(false)
   createdAt          DateTime         @default(now())
-  // New field to track if deadline notification was already sent
-  isDeadlineNotified Boolean          @default(false)
 
   user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
