@@ -1,0 +1,291 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Neon PostgreSQL connection string
+}
+
+// Enum for global user roles
+enum Role {
+  ADMIN
+  USER
+}
+
+// Enum for project-specific user roles
+enum ProjectRole {
+  MANAGER
+  MEMBER
+}
+
+// Enum for question status
+enum QuestionStatus {
+  NEW
+  IN_PROGRESS
+  PENDING_APPROVAL
+  CLOSED
+}
+
+// Enum for question priority
+enum QuestionPriority {
+  HIGHEST
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// Enum for notification types
+enum NotificationType {
+  ASSIGNEE_DEADLINE_EXCEEDED
+  REQUESTER_DEADLINE_EXCEEDED
+  NEW_QUESTION_ASSIGNED
+  NEW_ANSWER_POSTED
+  ANSWERED_QUESTION_CLOSED
+}
+
+// Enum for invitation status
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Enum for Answer Form Field types
+enum FormFieldType {
+  TEXT
+  NUMBER
+  RADIO
+  FILE
+  TEXTAREA
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String
+  name           String?
+  role           Role          @default(USER)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  projects       ProjectMember[] // Projects the user is a member of
+  createdProjects Project[]      @relation("CreatedProjects") // Projects created by the user
+  createdQuestions Question[]    @relation("CreatedQuestions") // Questions created by the user
+  assignedQuestions Question[]   @relation("AssignedQuestions") // Questions assigned to the user
+  answers        Answer[]       // Answers created by the user
+  notifications  Notification[] // Notifications for the user
+  formTemplates  AnswerFormTemplate[] // Answer form templates created by the user
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  creatorId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  creator     User          @relation("CreatedProjects", fields: [creatorId], references: [id])
+  members     ProjectMember[]
+  tags        ProjectTag[]
+  questions   Question[]
+  invitations Invitation[]
+
+  @@index([creatorId])
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  projectId String
+  userId    String
+  role      ProjectRole @default(MEMBER)
+  joinedAt  DateTime    @default(now())
+
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model ProjectTag {
+  id        String     @id @default(cuid())
+  name      String
+  projectId String
+  createdAt DateTime   @default(now())
+
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  questions QuestionTag[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model Question {
+  id          String           @id @default(cuid())
+  title       String
+  content     String
+  status      QuestionStatus   @default(NEW)
+  priority    QuestionPriority @default(MEDIUM)
+  deadline    DateTime?
+  projectId   String
+  creatorId   String           // Questioner
+  assigneeId  String           // Responder (only one)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator     User             @relation("CreatedQuestions", fields: [creatorId], references: [id])
+  assignee    User             @relation("AssignedQuestions", fields: [assigneeId], references: [id])
+  tags        QuestionTag[]
+  answers     Answer[]
+  answerForm  AnswerForm?      // Optional custom answer form
+
+  @@index([projectId])
+  @@index([creatorId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([deadline])
+}
+
+model QuestionTag {
+  id         String     @id @default(cuid())
+  questionId String
+  tagId      String
+
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  tag        ProjectTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, tagId])
+  @@index([questionId])
+  @@index([tagId])
+}
+
+model Answer {
+  id          String     @id @default(cuid())
+  content     String
+  questionId  String
+  creatorId   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  question    Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  creator     User       @relation(fields: [creatorId], references: [id])
+  attachments Attachment[]
+  formData    AnswerFormData[] // Data for custom form fields, if applicable
+
+  @@index([questionId])
+  @@index([creatorId])
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  answerId  String
+  fileName  String
+  fileType  String   // e.g., 'image/png', 'video/mp4'
+  fileSize  Int      // In bytes
+  storageUrl String  // URL from Vercel Blob
+  createdAt DateTime @default(now())
+
+  answer    Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  @@index([answerId])
+}
+
+model AnswerForm {
+  id          String            @id @default(cuid())
+  questionId  String            @unique // One form per question
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  question    Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  fields      AnswerFormField[]
+
+  @@index([questionId])
+}
+
+model AnswerFormField {
+  id           String        @id @default(cuid())
+  answerFormId String
+  label        String
+  fieldType    FormFieldType
+  options      String[]      // For RADIO type
+  isRequired   Boolean       @default(false)
+  order        Int           // Display order
+  createdAt    DateTime      @default(now())
+
+  answerForm   AnswerForm    @relation(fields: [answerFormId], references: [id], onDelete: Cascade)
+  data         AnswerFormData[]
+
+  @@index([answerFormId])
+}
+
+model AnswerFormData {
+  id                String          @id @default(cuid())
+  answerId          String
+  formFieldId       String
+  value             String?         // For TEXT, NUMBER, RADIO, TEXTAREA
+  fileAttachmentId  String?         @unique // Link to Attachment for FILE type
+  createdAt         DateTime        @default(now())
+
+  answer            Answer          @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  formField         AnswerFormField @relation(fields: [formFieldId], references: [id], onDelete: Cascade)
+  fileAttachment    Attachment?     @relation(fields: [fileAttachmentId], references: [id])
+
+  @@index([answerId])
+  @@index([formFieldId])
+}
+
+model AnswerFormTemplate {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  creatorId   String
+  fieldsJson  Json      // Store field definitions as JSON
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  creator     User      @relation(fields: [creatorId], references: [id])
+
+  @@index([creatorId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String           // Recipient user
+  type        NotificationType
+  message     String
+  relatedId   String?          // ID of related entity (e.g., Question ID)
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  email     String           // Email of the invited user
+  projectId String
+  inviterId String           // User who sent the invitation
+  status    InvitationStatus @default(PENDING)
+  token     String           @unique // Unique token for the invitation link
+  expiresAt DateTime
+  createdAt DateTime         @default(now())
+
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // inviter User // Relation might be complex if inviter leaves project
+
+  @@index([email])
+  @@index([projectId])
+  @@index([token])
+}
+
+
