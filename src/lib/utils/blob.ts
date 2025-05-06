@@ -1,5 +1,10 @@
 import { PutBlobResult, del, list, put } from '@vercel/blob';
 
+// 環境変数からトークンを取得して明示的に設定
+const blobOptions: Record<string, any> = {
+  token: process.env.BLOB_READ_WRITE_TOKEN,
+};
+
 /**
  * ファイルをVercel Blobにアップロード
  * @param file アップロードするファイル
@@ -23,7 +28,7 @@ export async function uploadFile(
     ? `${options.directory}/${filename}` 
     : filename;
 
-  return await put(path, file, { access });
+  return await put(path, file, { access, ...blobOptions });
 }
 
 /**
@@ -33,7 +38,7 @@ export async function uploadFile(
  */
 export async function deleteFile(url: string): Promise<boolean> {
   try {
-    await del(url);
+    await del(url, blobOptions);
     return true;
   } catch (error) {
     console.error('ファイル削除エラー:', error);
@@ -47,8 +52,8 @@ export async function deleteFile(url: string): Promise<boolean> {
  * @returns ファイル一覧
  */
 export async function listFiles(directory?: string) {
-  const options = directory ? { prefix: directory } : undefined;
-  return await list(options);
+  const listOptions = directory ? { prefix: directory } : undefined;
+  return await list({ ...listOptions, ...blobOptions });
 }
 
 /**

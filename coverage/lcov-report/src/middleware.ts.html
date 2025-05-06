@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/22</span>
             </div>
         
             
@@ -137,17 +137,7 @@
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -158,13 +148,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -180,6 +175,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -211,9 +211,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { NextResponse } from 'next/server';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-<span class="cstat-no" title="statement not covered" >import { getTokenFromHeader, verifyToken } from './lib/auth';</span>
+import { getTokenFromHeader, verifyToken } from './lib/auth';
 &nbsp;
 // 認証が必要なAPIパス
 const AUTH_REQUIRED_PATHS = <span class="cstat-no" title="statement not covered" >[</span>
@@ -232,21 +232,21 @@ const PUBLIC_PATHS = <span class="cstat-no" title="statement not covered" >[</sp
   '/api/auth/reset-password',
 ];
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export function <span class="fstat-no" title="function not covered" >m</span>iddleware(</span>request: NextRequest) {
+export function <span class="fstat-no" title="function not covered" >middleware(</span>request: NextRequest) {
   const { pathname } = <span class="cstat-no" title="statement not covered" >request.nextUrl;</span>
 &nbsp;
   // APIエンドポイントでない場合はスキップ
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!pathname.startsWith('/api/')) {</span>
+<span class="cstat-no" title="statement not covered" >  if (!pathname.startsWith('/api/')) {</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.next();</span>
   }
 &nbsp;
   // 認証不要なパスの場合はスキップ
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path)))</span> {</span>
+<span class="cstat-no" title="statement not covered" >  if (PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >pa</span>th =&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path))</span>) {</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.next();</span>
   }
 &nbsp;
   // 認証が必要なパスでない場合はスキップ
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!AUTH_REQUIRED_PATHS.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path)))</span> {</span>
+<span class="cstat-no" title="statement not covered" >  if (!AUTH_REQUIRED_PATHS.some(<span class="fstat-no" title="function not covered" >pa</span>th =&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path))</span>) {</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.next();</span>
   }
 &nbsp;
@@ -254,7 +254,7 @@ const PUBLIC_PATHS = <span class="cstat-no" title="statement not covered" >[</sp
   const authorization = <span class="cstat-no" title="statement not covered" >request.headers.get('authorization');</span>
   const token = <span class="cstat-no" title="statement not covered" >getTokenFromHeader(authorization || '');</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!token) {</span>
+<span class="cstat-no" title="statement not covered" >  if (!token) {</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
       { error: 'Authentication required' },
       { status: 401 }
@@ -263,7 +263,7 @@ const PUBLIC_PATHS = <span class="cstat-no" title="statement not covered" >[</sp
 &nbsp;
   // トークンの検証
   const payload = <span class="cstat-no" title="statement not covered" >verifyToken(token);</span>
-<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!payload) {</span>
+<span class="cstat-no" title="statement not covered" >  if (!payload) {</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
       { error: 'Invalid token' },
       { status: 401 }
@@ -283,7 +283,7 @@ const PUBLIC_PATHS = <span class="cstat-no" title="statement not covered" >[</sp
   });
 }
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >config = {</span>
+export const config = <span class="cstat-no" title="statement not covered" >{</span>
   matcher: '/api/:path*',
 }; </pre></td></tr></table></pre>
 
@@ -292,7 +292,7 @@ export const <span class="cstat-no" title="statement not covered" >config = {</s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T15:00:34.038Z
+                at 2025-05-06T20:09:27.800Z
             </div>
         <script src="../prettify.js"></script>
         <script>

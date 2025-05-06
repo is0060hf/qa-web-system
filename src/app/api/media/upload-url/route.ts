@@ -17,6 +17,7 @@ interface ExtendedPutOptions {
   handleUploadUrl: boolean;
   contentType: string;
   multipart: boolean;
+  token?: string;
 }
 
 // アップロード用署名付きURL生成
@@ -61,7 +62,8 @@ export async function POST(req: NextRequest) {
       access: 'public',
       handleUploadUrl: true,
       contentType,
-      multipart: true
+      multipart: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN
     } as ExtendedPutOptions) as PresignedUrlResult;
 
     return NextResponse.json({

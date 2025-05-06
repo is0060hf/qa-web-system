@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/82</span>
+                <span class='fraction'>0/66</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/33</span>
+                <span class='fraction'>0/48</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/75</span>
+                <span class='fraction'>0/66</span>
             </div>
         
             
@@ -357,21 +357,21 @@
 <a name='L292'></a><a href='#L292'>292</a>
 <a name='L293'></a><a href='#L293'>293</a>
 <a name='L294'></a><a href='#L294'>294</a>
-<a name='L295'></a><a href='#L295'>295</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L295'></a><a href='#L295'>295</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -528,11 +528,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -651,71 +651,71 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { NextRequest, NextResponse } from 'next/server';</span>
-<span class="cstat-no" title="statement not covered" >import prisma from '@/lib/db';</span>
-<span class="cstat-no" title="statement not covered" >import { getUserFromRequest } from '@/lib/utils/api';</span>
-<span class="cstat-no" title="statement not covered" >import { validateRequest } from '@/lib/utils/api';</span>
-<span class="cstat-no" title="statement not covered" >import { createQuestionSchema } from '@/lib/validations/question';</span>
-<span class="cstat-no" title="statement not covered" >import { canAccessProject } from '@/lib/utils/auth';</span>
-<span class="cstat-no" title="statement not covered" >import { Role } from '@prisma/client';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/db';
+import { getUserFromRequest } from '@/lib/utils/api';
+import { validateRequest } from '@/lib/utils/api';
+import { createQuestionSchema } from '@/lib/validations/question';
+import { canAccessProject } from '@/lib/utils/auth';
+import { Role } from '@prisma/client';
 &nbsp;
 // プロジェクト内の質問一覧取得
-<span class="cstat-no" title="statement not covered" >export async function <span class="fstat-no" title="function not covered" >G</span>ET(</span>
+export async function <span class="fstat-no" title="function not covered" >GET(</span>
   req: NextRequest,
-  { params<span class="cstat-no" title="statement not covered" > }: { params: { projectId: string } }</span>
+  { params }: { params: { projectId: string } }
 ) {
-  try {
-    const <span class="cstat-no" title="statement not covered" >user = getUserFromRequest(req);</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const <span class="cstat-no" title="statement not covered" >projectId = params.projectId;</span>
+    const projectId = <span class="cstat-no" title="statement not covered" >params.projectId;</span>
 &nbsp;
     // プロジェクトへのアクセス権をチェック
-    const <span class="cstat-no" title="statement not covered" >accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span></span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
+    const accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span>
+<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // クエリパラメータの取得
-    const { <span class="cstat-no" title="statement not covered" >searchParams } = r</span>eq.nextUrl;
-    const <span class="cstat-no" title="statement not covered" >status = searchParams.get('status');</span>
-    const <span class="cstat-no" title="statement not covered" >assigneeId = searchParams.get('assigneeId');</span>
-    const <span class="cstat-no" title="statement not covered" >creatorId = searchParams.get('creatorId');</span>
-    const <span class="cstat-no" title="statement not covered" >priority = searchParams.get('priority');</span>
-    const <span class="cstat-no" title="statement not covered" >tag = searchParams.get('tag');</span>
-    const <span class="cstat-no" title="statement not covered" >overdue = searchParams.get('overdue');</span>
-    const <span class="cstat-no" title="statement not covered" >search = searchParams.get('search'); </span>// キーワード検索
+    const { searchParams } = <span class="cstat-no" title="statement not covered" >req.nextUrl;</span>
+    const status = <span class="cstat-no" title="statement not covered" >searchParams.get('status');</span>
+    const assigneeId = <span class="cstat-no" title="statement not covered" >searchParams.get('assigneeId');</span>
+    const creatorId = <span class="cstat-no" title="statement not covered" >searchParams.get('creatorId');</span>
+    const priority = <span class="cstat-no" title="statement not covered" >searchParams.get('priority');</span>
+    const tag = <span class="cstat-no" title="statement not covered" >searchParams.get('tag');</span>
+    const overdue = <span class="cstat-no" title="statement not covered" >searchParams.get('overdue');</span>
+    const search = <span class="cstat-no" title="statement not covered" >searchParams.get('search');</span> // キーワード検索
 &nbsp;
     // フィルタリング条件の構築
-    const <span class="cstat-no" title="statement not covered" >where: any = {</span>
+    const where: any = <span class="cstat-no" title="statement not covered" >{</span>
       projectId,
     };
 &nbsp;
     // ステータスでフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (status) {</span>
+<span class="cstat-no" title="statement not covered" >    if (status) {</span>
 <span class="cstat-no" title="statement not covered" >      where.status = status;</span>
     }
 &nbsp;
     // 回答者でフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (assigneeId) {</span>
+<span class="cstat-no" title="statement not covered" >    if (assigneeId) {</span>
 <span class="cstat-no" title="statement not covered" >      where.assigneeId = assigneeId;</span>
     }
 &nbsp;
     // 質問者でフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (creatorId) {</span>
+<span class="cstat-no" title="statement not covered" >    if (creatorId) {</span>
 <span class="cstat-no" title="statement not covered" >      where.creatorId = creatorId;</span>
     }
 &nbsp;
     // 優先度でフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (priority) {</span>
+<span class="cstat-no" title="statement not covered" >    if (priority) {</span>
 <span class="cstat-no" title="statement not covered" >      where.priority = priority;</span>
     }
 &nbsp;
     // タグでフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (tag) {</span>
+<span class="cstat-no" title="statement not covered" >    if (tag) {</span>
 <span class="cstat-no" title="statement not covered" >      where.tags = {</span>
         some: {
           tag: {
@@ -726,7 +726,7 @@
     }
 &nbsp;
     // 期限切れでフィルタリング
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (overdue === 'true') {</span>
+<span class="cstat-no" title="statement not covered" >    if (overdue === 'true') {</span>
 <span class="cstat-no" title="statement not covered" >      where.deadline = {</span>
         lt: new Date(),
       };
@@ -736,7 +736,7 @@
     }
 &nbsp;
     // キーワード検索
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (search) {</span>
+<span class="cstat-no" title="statement not covered" >    if (search) {</span>
 <span class="cstat-no" title="statement not covered" >      where.OR = [</span>
         {
           title: {
@@ -764,12 +764,12 @@
     }
 &nbsp;
     // 通常のユーザーは自分に関連する質問のみ表示（AdminとプロジェクトManager以外）
-    const <span class="cstat-no" title="statement not covered" >isAdmin = user.role === Role.ADMIN;</span>
-    const <span class="cstat-no" title="statement not covered" >isProjectManager = accessCheck.project.members.some(</span>
+    const isAdmin = <span class="cstat-no" title="statement not covered" >user.role === Role.ADMIN;</span>
+    const isProjectManager = <span class="cstat-no" title="statement not covered" >accessCheck.project.members.some(</span>
 <span class="fstat-no" title="function not covered" >      (m</span>: any) =&gt; <span class="cstat-no" title="statement not covered" >m.role === 'MANAGER' &amp;&amp; m.userId === user.id</span>
     ) || accessCheck.project.creatorId === user.id;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin &amp;&amp; !isProjectManager) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!isAdmin &amp;&amp; !isProjectManager) {</span>
 <span class="cstat-no" title="statement not covered" >      where.OR = [</span>
         { creatorId: user.id }, // 自分が作成した質問
         { assigneeId: user.id }, // 自分に割り当てられた質問
@@ -777,7 +777,7 @@
     }
 &nbsp;
     // 質問一覧取得
-    const <span class="cstat-no" title="statement not covered" >questions = <span class="cstat-no" title="statement not covered" >await prisma.question.findMany({</span></span>
+    const questions = <span class="cstat-no" title="statement not covered" >await prisma.question.findMany({</span>
       where,
       include: {
         creator: {
@@ -822,35 +822,35 @@
 }
 &nbsp;
 // 質問作成
-<span class="cstat-no" title="statement not covered" >export async function <span class="fstat-no" title="function not covered" >P</span>OST(</span>
+export async function <span class="fstat-no" title="function not covered" >POST(</span>
   req: NextRequest,
-  { params<span class="cstat-no" title="statement not covered" > }: { params: { projectId: string } }</span>
+  { params }: { params: { projectId: string } }
 ) {
-  try {
-    const <span class="cstat-no" title="statement not covered" >user = getUserFromRequest(req);</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const <span class="cstat-no" title="statement not covered" >projectId = params.projectId;</span>
+    const projectId = <span class="cstat-no" title="statement not covered" >params.projectId;</span>
 &nbsp;
     // プロジェクトへのアクセス権をチェック
-    const <span class="cstat-no" title="statement not covered" >accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span></span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
+    const accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span>
+<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // リクエストデータのバリデーション
-    const <span class="cstat-no" title="statement not covered" >validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, createQuestionSchema);</span></span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
+    const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, createQuestionSchema);</span>
+<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
-    const <span class="cstat-no" title="statement not covered" >{ title, content, assigneeId, deadline, priority, tagIds } = v</span>alidation.data;
+    const { title, content, assigneeId, deadline, priority, tagIds } = <span class="cstat-no" title="statement not covered" >validation.data;</span>
 &nbsp;
     // 回答者がプロジェクトメンバーであることを確認
-    const <span class="cstat-no" title="statement not covered" >assigneeMembership = <span class="cstat-no" title="statement not covered" >await prisma.projectMember.findUnique({</span></span>
+    const assigneeMembership = <span class="cstat-no" title="statement not covered" >await prisma.projectMember.findUnique({</span>
       where: {
         projectId_userId: {
           projectId,
@@ -859,7 +859,7 @@
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!assigneeMembership) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!assigneeMembership) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '指定された回答者はプロジェクトメンバーではありません' },
         { status: 400 }
@@ -867,15 +867,15 @@
     }
 &nbsp;
     // タグの存在確認
-    if (<span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>tagIds </span>&amp;&amp; tagIds.length &gt; 0) {
-      const <span class="cstat-no" title="statement not covered" >existingTags = <span class="cstat-no" title="statement not covered" >await prisma.projectTag.findMany({</span></span>
+<span class="cstat-no" title="statement not covered" >    if (tagIds &amp;&amp; tagIds.length &gt; 0) {</span>
+      const existingTags = <span class="cstat-no" title="statement not covered" >await prisma.projectTag.findMany({</span>
         where: {
           id: { in: tagIds },
           projectId,
         },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (existingTags.length !== tagIds.length) {</span>
+<span class="cstat-no" title="statement not covered" >      if (existingTags.length !== tagIds.length) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '一部の指定されたタグが存在しないか、このプロジェクトに属していません' },
           { status: 400 }
@@ -884,7 +884,7 @@
     }
 &nbsp;
     // 質問作成
-    const <span class="cstat-no" title="statement not covered" >question = <span class="cstat-no" title="statement not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >await prisma.question.create({</span></span></span>
+    const question = <span class="cstat-no" title="statement not covered" >await prisma.question.create({</span>
       data: {
         title,
         content,
@@ -897,7 +897,7 @@
         ...(tagIds &amp;&amp; tagIds.length &gt; 0
           ? {
               tags: {
-                create: tagIds.map(<span class="fstat-no" title="function not covered" >(t</span>agId) =&gt; <span class="cstat-no" title="statement not covered" >({</span>
+                create: tagIds.map(<span class="fstat-no" title="function not covered" >(t</span>agId) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
                   tag: { connect: { id: tagId } },
                 })),
               },
@@ -952,7 +952,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T15:00:34.038Z
+                at 2025-05-06T20:09:27.800Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>

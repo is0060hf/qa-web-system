@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/25</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
@@ -127,18 +127,8 @@
 <a name='L62'></a><a href='#L62'>62</a>
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,12 +137,13 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -165,6 +156,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -191,45 +191,45 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { NextResponse } from 'next/server';</span>
-<span class="cstat-no" title="statement not covered" >import { hashPassword } from '@/lib/auth';</span>
-<span class="cstat-no" title="statement not covered" >import prisma from '@/lib/db';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextResponse } from 'next/server';
+import { hashPassword } from '@/lib/auth';
+import prisma from '@/lib/db';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export async function <span class="fstat-no" title="function not covered" >P</span>OST(</span>request: Request) {
-  try {
-    const <span class="cstat-no" title="statement not covered" >body = <span class="cstat-no" title="statement not covered" >await request.json();</span></span>
-    const { <span class="cstat-no" title="statement not covered" >email, password, name } = b</span>ody;
+export async function <span class="fstat-no" title="function not covered" >POST(</span>request: Request) {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const body = <span class="cstat-no" title="statement not covered" >await request.json();</span>
+    const { email, password, name } = <span class="cstat-no" title="statement not covered" >body;</span>
 &nbsp;
     // バリデーション
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!email || !password) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!email || !password) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'メールアドレスとパスワードは必須です' }, { status: 400 });</span>
     }
 &nbsp;
     // メールアドレスの形式チェック
-    const <span class="cstat-no" title="statement not covered" >emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;</span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!emailRegex.test(email)) {</span>
+    const emailRegex = <span class="cstat-no" title="statement not covered" >/^[^\s@]+@[^\s@]+\.[^\s@]+$/;</span>
+<span class="cstat-no" title="statement not covered" >    if (!emailRegex.test(email)) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '有効なメールアドレスを入力してください' }, { status: 400 });</span>
     }
 &nbsp;
     // パスワードの長さチェック
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (password.length &lt; 8) {</span>
+<span class="cstat-no" title="statement not covered" >    if (password.length &lt; 8) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'パスワードは8文字以上である必要があります' }, { status: 400 });</span>
     }
 &nbsp;
     // 既存ユーザーのチェック
-    const <span class="cstat-no" title="statement not covered" >existingUser = <span class="cstat-no" title="statement not covered" >await prisma.user.findUnique({</span></span>
+    const existingUser = <span class="cstat-no" title="statement not covered" >await prisma.user.findUnique({</span>
       where: { email },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingUser) {</span>
+<span class="cstat-no" title="statement not covered" >    if (existingUser) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'このメールアドレスは既に使用されています' }, { status: 409 });</span>
     }
 &nbsp;
     // パスワードのハッシュ化
-    const <span class="cstat-no" title="statement not covered" >hashedPassword = <span class="cstat-no" title="statement not covered" >await hashPassword(password);</span></span>
+    const hashedPassword = <span class="cstat-no" title="statement not covered" >await hashPassword(password);</span>
 &nbsp;
     // ユーザー作成
-    const <span class="cstat-no" title="statement not covered" >newUser = <span class="cstat-no" title="statement not covered" >await prisma.user.create({</span></span>
+    const newUser = <span class="cstat-no" title="statement not covered" >await prisma.user.create({</span>
       data: {
         email,
         passwordHash: hashedPassword,
@@ -262,7 +262,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T15:00:34.038Z
+                at 2025-05-06T20:09:27.800Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

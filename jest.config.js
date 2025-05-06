@@ -2,17 +2,33 @@
 /** @type {import('jest').Config} */
 const config = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
-  testMatch: ['**/__tests__/**/*.test.ts'],
+  // テスト環境を jsdom に変更 (ブラウザのような DOM API を提供)
+  testEnvironment: 'jsdom',
+  // テストファイルパターンを更新
+  testMatch: [
+    '**/__tests__/**/*.test.ts',
+    '**/__tests__/**/*.test.tsx' // React コンポーネントのテスト
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@/../jest/(.*)$': '<rootDir>/jest/$1'
+    '^@/../jest/(.*)$': '<rootDir>/jest/$1',
+    // CSS モジュールとアセットのモック
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/jest/fileMock.js'
   },
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
+    '^.+\\.(ts|tsx|js|jsx)$': ['babel-jest', {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        ['@babel/preset-react', { runtime: 'automatic' }],
+        '@babel/preset-typescript',
+      ],
     }],
   },
+  transformIgnorePatterns: [
+    // node_modules 内のファイルもトランスパイルする
+    "node_modules/(?!@mui|react-query|react-dnd)"
+  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverage: true,
   coverageDirectory: 'coverage',
@@ -22,11 +38,9 @@ const config = {
     '!src/**/_*.{ts,tsx}',
     '!**/node_modules/**',
     '!**/vendor/**',
-    // Reactコンポーネントを除外（フロントエンド開発時に再度含める）
+    // フロントエンドコンポーネントを含めるように修正
     '!src/app/page.tsx',
     '!src/app/layout.tsx',
-    '!src/app/components/**',
-    '!src/app/hooks/**'
   ],
   coverageThreshold: {
     global: {
@@ -41,7 +55,10 @@ const config = {
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
   ],
-  setupFilesAfterEnv: ['<rootDir>/jest/setupTests.js'],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest/setupTests.js',
+    '<rootDir>/jest/setupTestsReact.js' // React Testing Library の設定ファイル
+  ],
 };
 
 module.exports = config; 

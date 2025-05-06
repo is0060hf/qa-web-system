@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
@@ -115,27 +115,8 @@
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
 <a name='L52'></a><a href='#L52'>52</a>
-<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L53'></a><a href='#L53'>53</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -144,6 +125,25 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,40 +167,40 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >import { NextResponse } from 'next/server';</span>
-<span class="cstat-no" title="statement not covered" >import { verifyPassword, generateToken } from '@/lib/auth';</span>
-<span class="cstat-no" title="statement not covered" >import prisma from '@/lib/db';</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextResponse } from 'next/server';
+import { verifyPassword, generateToken } from '@/lib/auth';
+import prisma from '@/lib/db';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >export async function <span class="fstat-no" title="function not covered" >P</span>OST(</span>request: Request) {
-  try {
-    const <span class="cstat-no" title="statement not covered" >body = <span class="cstat-no" title="statement not covered" >await request.json();</span></span>
-    const { <span class="cstat-no" title="statement not covered" >email, password } = b</span>ody;
+export async function <span class="fstat-no" title="function not covered" >POST(</span>request: Request) {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const body = <span class="cstat-no" title="statement not covered" >await request.json();</span>
+    const { email, password } = <span class="cstat-no" title="statement not covered" >body;</span>
 &nbsp;
     // バリデーション
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!email || !password) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!email || !password) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'メールアドレスとパスワードは必須です' }, { status: 400 });</span>
     }
 &nbsp;
     // ユーザー検索
-    const <span class="cstat-no" title="statement not covered" >user = <span class="cstat-no" title="statement not covered" >await prisma.user.findUnique({</span></span>
+    const user = <span class="cstat-no" title="statement not covered" >await prisma.user.findUnique({</span>
       where: { email },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'メールアドレスまたはパスワードが正しくありません' }, { status: 401 });</span>
     }
 &nbsp;
     // パスワード検証
-    const <span class="cstat-no" title="statement not covered" >isValidPassword = <span class="cstat-no" title="statement not covered" >await verifyPassword(password, user.passwordHash);</span></span>
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isValidPassword) {</span>
+    const isValidPassword = <span class="cstat-no" title="statement not covered" >await verifyPassword(password, user.passwordHash);</span>
+<span class="cstat-no" title="statement not covered" >    if (!isValidPassword) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'メールアドレスまたはパスワードが正しくありません' }, { status: 401 });</span>
     }
 &nbsp;
     // JWTトークン生成
-    const <span class="cstat-no" title="statement not covered" >token = generateToken(user);</span>
+    const token = <span class="cstat-no" title="statement not covered" >generateToken(user);</span>
 &nbsp;
     // ユーザー情報を返す（パスワードハッシュは除外）
-    const <span class="cstat-no" title="statement not covered" >userData = {</span>
+    const userData = <span class="cstat-no" title="statement not covered" >{</span>
       id: user.id,
       email: user.email,
       name: user.name,
@@ -226,7 +226,7 @@
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T15:00:34.038Z
+                at 2025-05-06T20:09:27.800Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
