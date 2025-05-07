@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { fetchData } from '@/lib/utils/fetchData';
 
 // 通知の型定義
 export interface Notification {
@@ -36,17 +37,14 @@ export const useNotificationStore = create<NotificationState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const queryParams = new URLSearchParams();
-      if (unreadOnly) queryParams.set('unreadOnly', 'true');
-      if (limit) queryParams.set('limit', limit.toString());
+      const params: Record<string, string> = {};
+      if (unreadOnly) params.unreadOnly = 'true';
+      if (limit) params.limit = limit.toString();
       
-      const response = await fetch(`/api/notifications?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('通知の取得に失敗しました');
-      }
-      
-      const data = await response.json();
+      const data = await fetchData<{
+        notifications: Notification[];
+        unreadCount: number;
+      }>('notifications', { params });
       
       set({ 
         notifications: data.notifications,
@@ -64,13 +62,9 @@ export const useNotificationStore = create<NotificationState>()((set, get) => ({
   // 特定の通知を既読にする
   markAsRead: async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
+      await fetchData<{ success: boolean }>(`notifications/${notificationId}/read`, {
+        method: 'PATCH'
       });
-      
-      if (!response.ok) {
-        throw new Error('通知の既読処理に失敗しました');
-      }
       
       // 状態を更新
       set(state => ({
@@ -90,13 +84,9 @@ export const useNotificationStore = create<NotificationState>()((set, get) => ({
   // 全ての通知を既読にする
   markAllAsRead: async () => {
     try {
-      const response = await fetch('/api/notifications/read-all', {
-        method: 'POST',
+      await fetchData<{ success: boolean }>('notifications/read-all', {
+        method: 'POST'
       });
-      
-      if (!response.ok) {
-        throw new Error('全通知の既読処理に失敗しました');
-      }
       
       // 状態を更新
       set(state => ({
@@ -115,13 +105,9 @@ export const useNotificationStore = create<NotificationState>()((set, get) => ({
   // 未読通知数を更新
   refreshUnreadCount: async () => {
     try {
-      const response = await fetch('/api/notifications?limit=0');
-      
-      if (!response.ok) {
-        throw new Error('未読通知数の取得に失敗しました');
-      }
-      
-      const data = await response.json();
+      const data = await fetchData<{ unreadCount: number }>('notifications', {
+        params: { limit: '0' }
+      });
       
       set({ unreadCount: data.unreadCount });
     } catch (error) {

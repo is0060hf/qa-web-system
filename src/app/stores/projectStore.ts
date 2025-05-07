@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { fetchData } from '@/lib/utils/fetchData';
 
 // タグの型定義
 export interface Tag {
@@ -81,18 +82,13 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const queryParams = new URLSearchParams();
-      queryParams.set('page', page.toString());
-      queryParams.set('limit', limit.toString());
-      if (search) queryParams.set('search', search);
-      
-      const response = await fetch(`/api/projects?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('プロジェクトの取得に失敗しました');
-      }
-      
-      const data = await response.json();
+      const data = await fetchData<{projects: Project[], total: number}>('projects', {
+        params: {
+          page: page.toString(),
+          limit: limit.toString(),
+          ...(search && { search })
+        }
+      });
       
       set({ 
         projects: data.projects,
@@ -112,13 +108,7 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const response = await fetch(`/api/projects/${projectId}`);
-      
-      if (!response.ok) {
-        throw new Error('プロジェクト詳細の取得に失敗しました');
-      }
-      
-      const projectData = await response.json();
+      const projectData = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
       
       set({ selectedProject: projectData, isLoading: false });
     } catch (error) {
@@ -135,18 +125,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const response = await fetch('/api/projects', {
+      const newProject = await fetchData<Project>('projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: data
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'プロジェクトの作成に失敗しました');
-      }
-      
-      const newProject = await response.json();
       
       // プロジェクト一覧を更新
       set(state => ({
@@ -170,18 +152,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const response = await fetch(`/api/projects/${projectId}`, {
+      const updatedProject = await fetchData<Project>(`projects/${projectId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: data
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'プロジェクトの更新に失敗しました');
-      }
-      
-      const updatedProject = await response.json();
       
       // プロジェクト一覧とselectedProjectを更新
       set(state => ({
@@ -207,13 +181,9 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
+      await fetchData<{ success: boolean }>(`projects/${projectId}`, {
+        method: 'DELETE'
       });
-      
-      if (!response.ok) {
-        throw new Error('プロジェクトの削除に失敗しました');
-      }
       
       // プロジェクト一覧から削除
       set(state => ({
@@ -234,13 +204,7 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトのタグを取得
   fetchProjectTags: async (projectId: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/tags`);
-      
-      if (!response.ok) {
-        throw new Error('プロジェクトタグの取得に失敗しました');
-      }
-      
-      const tags = await response.json();
+      const tags = await fetchData<Tag[]>(`projects/${projectId}/tags`, {});
       
       // selectedProjectがある場合は更新
       set(state => {
@@ -265,18 +229,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトにタグを作成
   createProjectTag: async (projectId: string, name: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/tags`, {
+      const newTag = await fetchData<Tag>(`projects/${projectId}/tags`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: { name }
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'タグの作成に失敗しました');
-      }
-      
-      const newTag = await response.json();
       
       // selectedProjectのタグリストを更新
       set(state => {
@@ -300,18 +256,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトのタグを更新
   updateProjectTag: async (projectId: string, tagId: string, name: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/tags/${tagId}`, {
+      const updatedTag = await fetchData<Tag>(`projects/${projectId}/tags/${tagId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
+        body: { name }
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'タグの更新に失敗しました');
-      }
-      
-      const updatedTag = await response.json();
       
       // selectedProjectのタグリストを更新
       set(state => {
@@ -337,13 +285,9 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトのタグを削除
   deleteProjectTag: async (projectId: string, tagId: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/tags/${tagId}`, {
-        method: 'DELETE',
+      await fetchData<{ success: boolean }>(`projects/${projectId}/tags/${tagId}`, {
+        method: 'DELETE'
       });
-      
-      if (!response.ok) {
-        throw new Error('タグの削除に失敗しました');
-      }
       
       // selectedProjectのタグリストを更新
       set(state => {
@@ -365,16 +309,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // ユーザーをプロジェクトに招待（既存ユーザー）
   inviteUserToProject: async (projectId: string, userId: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/invitations`, {
+      await fetchData<{ success: boolean }>(`projects/${projectId}/invitations`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: { userId }
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'ユーザーの招待に失敗しました');
-      }
     } catch (error) {
       throw error;
     }
@@ -383,16 +321,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // メールでユーザーをプロジェクトに招待（新規ユーザー）
   inviteUserByEmail: async (projectId: string, email: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/invitations`, {
+      await fetchData<{ success: boolean }>(`projects/${projectId}/invitations`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: { email }
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'ユーザーの招待に失敗しました');
-      }
     } catch (error) {
       throw error;
     }
@@ -401,17 +333,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトメンバーの役割を更新
   updateMemberRole: async (projectId: string, memberId: string, role: 'MANAGER' | 'MEMBER') => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/members/${memberId}`, {
+      await fetchData<ProjectMember>(`projects/${projectId}/members/${memberId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role }),
+        body: { role }
       });
-      
-      if (!response.ok) {
-        throw new Error('メンバーの役割更新に失敗しました');
-      }
-      
-      const updatedMember = await response.json();
       
       // selectedProjectのメンバーリストを更新
       set(state => {
@@ -435,13 +360,9 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
   // プロジェクトからメンバーを削除
   removeMember: async (projectId: string, memberId: string) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/members/${memberId}`, {
-        method: 'DELETE',
+      await fetchData<{ success: boolean }>(`projects/${projectId}/members/${memberId}`, {
+        method: 'DELETE'
       });
-      
-      if (!response.ok) {
-        throw new Error('メンバーの削除に失敗しました');
-      }
       
       // selectedProjectのメンバーリストを更新
       set(state => {

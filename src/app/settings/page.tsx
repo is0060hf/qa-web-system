@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Box, Typography, CircularProgress, Divider } from '@mui/material';
 import UserSettingsForm, { UserSettingsData, PasswordChangeData } from '../components/users/UserSettingsForm';
 import AccessibilitySettingsForm from '../components/users/AccessibilitySettingsForm';
+import { fetchData } from '@/lib/utils/fetchData';
 
 export default function SettingsPage() {
   // ユーザーデータの状態
@@ -23,13 +24,8 @@ export default function SettingsPage() {
     const fetchUserData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/auth/me');
+        const data = await fetchData<{name: string; email: string}>('auth/me', {});
         
-        if (!response.ok) {
-          throw new Error('ユーザー情報の取得に失敗しました');
-        }
-        
-        const data = await response.json();
         setUserData({
           name: data.name || '',
           email: data.email
@@ -52,21 +48,12 @@ export default function SettingsPage() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/users/me', {
+      const updatedUser = await fetchData<{name: string; email: string}>('users/me', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+        body: data
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'プロフィールの更新に失敗しました');
-      }
-      
       // 成功したらユーザーデータを更新
-      const updatedUser = await response.json();
       setUserData(prev => ({
         ...prev!,
         name: updatedUser.name
@@ -93,21 +80,13 @@ export default function SettingsPage() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/users/change-password', {
+      await fetchData<{success: boolean}>('users/change-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+        body: {
           currentPassword: data.currentPassword,
           newPassword: data.newPassword
-        })
+        }
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'パスワードの変更に失敗しました');
-      }
       
       setSuccessMessage('パスワードを変更しました');
       

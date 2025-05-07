@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -26,6 +26,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -37,6 +39,7 @@ import {
   HelpOutline as HelpOutlineIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
+import { fetchData } from '@/lib/utils/fetchData';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,42 +70,78 @@ function a11yProps(index: number) {
   };
 }
 
-// モックデータ
-const mockProject = {
-  id: 'proj1',
-  name: 'プロジェクトA',
-  description: 'ウェブアプリケーションの開発プロジェクト。新規機能の開発と既存機能の改善を行います。バグ修正や技術的な質問もこちらで対応します。',
-  members: [
-    { id: 'user1', name: '鈴木 一郎', role: 'プロジェクトマネージャー', avatar: '' },
-    { id: 'user2', name: '佐藤 二郎', role: 'フロントエンドエンジニア', avatar: '' },
-    { id: 'user3', name: '田中 三郎', role: 'バックエンドエンジニア', avatar: '' },
-    { id: 'user4', name: '高橋 四郎', role: 'デザイナー', avatar: '' },
-    { id: 'user5', name: '伊藤 五郎', role: 'QAエンジニア', avatar: '' },
-  ],
-  questions: [
-    { id: 'q1', title: 'ログイン機能の実装について', status: '回答中', createdBy: 'user2', createdAt: '2023-07-25' },
-    { id: 'q2', title: 'APIのレスポンス形式の統一', status: '承認待ち', createdBy: 'user3', createdAt: '2023-07-28' },
-    { id: 'q3', title: 'デザインガイドラインの適用方法', status: 'クローズ', createdBy: 'user4', createdAt: '2023-07-20' },
-    { id: 'q4', title: 'テストケースの追加について', status: '回答中', createdBy: 'user5', createdAt: '2023-08-01' },
-  ],
-  status: 'アクティブ',
-  createdAt: '2023-06-15',
-  updatedAt: '2023-08-01',
-};
+// プロジェクトの型定義
+interface ProjectMember {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: string;
+  joinedAt: string;
+}
+
+interface Question {
+  id: string;
+  title: string;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+}
+
+interface ProjectDetails {
+  id: string;
+  name: string;
+  description: string;
+  members: ProjectMember[];
+  questions?: Question[];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  memberCount: number;
+}
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [project, setProject] = useState<ProjectDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // プロジェクト詳細データを取得
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchData<ProjectDetails>(`projects/${params.id}`, {});
+        setProject(data);
+      } catch (err) {
+        console.error('Failed to fetch project data:', err);
+        setError(err instanceof Error ? err.message : 'プロジェクト情報の取得に失敗しました');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [params.id]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleDelete = () => {
-    // 実際には削除のAPIコールが必要
-    setOpenDeleteDialog(false);
-    router.push('/projects');
+  const handleDelete = async () => {
+    try {
+      await fetchData<{ success: boolean }>(`projects/${params.id}`, {
+        method: 'DELETE'
+      });
+      setOpenDeleteDialog(false);
+      router.push('/projects');
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      setError(err instanceof Error ? err.message : 'プロジェクトの削除に失敗しました');
+      setOpenDeleteDialog(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -121,30 +160,58 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const getQuestionStatusColor = (status: string) => {
     switch (status) {
       case '回答中':
+      case 'IN_PROGRESS':
         return 'primary';
       case '承認待ち':
+      case 'PENDING_APPROVAL':
         return 'warning';
       case 'クローズ':
+      case 'CLOSED':
         return 'success';
+      case 'NEW':
+        return 'info';
       default:
         return 'default';
     }
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+          <CircularProgress />
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <DashboardLayout>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error || 'プロジェクト情報を取得できませんでした'}
+        </Alert>
+        <Button variant="outlined" onClick={() => router.push('/projects')}>
+          プロジェクト一覧に戻る
+        </Button>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant="h4" component="h1" gutterBottom>
-            {mockProject.name}
+            {project.name}
           </Typography>
           <Chip 
-            label={mockProject.status} 
-            color={getStatusColor(mockProject.status) as any}
+            label={project.status} 
+            color={getStatusColor(project.status) as any}
             sx={{ mr: 1 }}
           />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            最終更新日: {new Date(mockProject.updatedAt).toLocaleDateString('ja-JP')}
+            最終更新日: {new Date(project.updatedAt).toLocaleDateString('ja-JP')}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -182,7 +249,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
       <Paper sx={{ mb: 4, p: 3, borderRadius: 2 }}>
         <Typography variant="body1" paragraph>
-          {mockProject.description}
+          {project.description}
         </Typography>
       </Paper>
 
@@ -203,25 +270,25 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <CardContent>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ width: 150 }}>プロジェクトID:</Typography>
-                  <Typography variant="body2">{mockProject.id}</Typography>
+                  <Typography variant="body2">{project.id}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ width: 150 }}>作成日:</Typography>
-                  <Typography variant="body2">{new Date(mockProject.createdAt).toLocaleDateString('ja-JP')}</Typography>
+                  <Typography variant="body2">{new Date(project.createdAt).toLocaleDateString('ja-JP')}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ width: 150 }}>メンバー数:</Typography>
-                  <Typography variant="body2">{mockProject.members.length}人</Typography>
+                  <Typography variant="body2">{project.memberCount || project.members.length}人</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ width: 150 }}>質問数:</Typography>
-                  <Typography variant="body2">{mockProject.questions.length}件</Typography>
+                  <Typography variant="body2">{project.questions?.length || 0}件</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography variant="subtitle2" sx={{ width: 150 }}>ステータス:</Typography>
                   <Chip 
-                    label={mockProject.status} 
-                    color={getStatusColor(mockProject.status) as any}
+                    label={project.status} 
+                    color={getStatusColor(project.status) as any}
                     size="small"
                   />
                 </Box>
@@ -246,33 +313,39 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
               <Divider />
               <CardContent sx={{ p: 0 }}>
                 <List>
-                  {mockProject.questions.slice(0, 3).map((question, index) => (
-                    <Box key={question.id}>
-                      <ListItem
-                        button
-                        onClick={() => router.push(`/questions/${question.id}`)}
-                        sx={{ px: 3, py: 2 }}
-                        secondaryAction={
-                          <Chip 
-                            label={question.status} 
-                            color={getQuestionStatusColor(question.status) as any}
-                            size="small"
+                  {project.questions && project.questions.length > 0 ? (
+                    project.questions.slice(0, 3).map((question, index) => (
+                      <Box key={question.id}>
+                        <ListItem
+                          button
+                          onClick={() => router.push(`/questions/${question.id}`)}
+                          sx={{ px: 3, py: 2 }}
+                          secondaryAction={
+                            <Chip 
+                              label={question.status} 
+                              color={getQuestionStatusColor(question.status) as any}
+                              size="small"
+                            />
+                          }
+                        >
+                          <ListItemAvatar>
+                            <Avatar sx={{ bgcolor: 'primary.main' }}>
+                              <AssignmentIcon />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={question.title}
+                            secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
                           />
-                        }
-                      >
-                        <ListItemAvatar>
-                          <Avatar sx={{ bgcolor: 'primary.main' }}>
-                            <AssignmentIcon />
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={question.title}
-                          secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
-                        />
-                      </ListItem>
-                      {index < 2 && <Divider variant="inset" component="li" />}
-                    </Box>
-                  ))}
+                        </ListItem>
+                        {index < Math.min(project.questions.length - 1, 2) && <Divider variant="inset" component="li" />}
+                      </Box>
+                    ))
+                  ) : (
+                    <ListItem sx={{ px: 3, py: 2 }}>
+                      <ListItemText primary="質問がありません" />
+                    </ListItem>
+                  )}
                 </List>
               </CardContent>
             </Card>
@@ -292,27 +365,33 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         </Box>
         <Paper elevation={0} sx={{ borderRadius: 2 }}>
           <List>
-            {mockProject.members.map((member, index) => (
-              <Box key={member.id}>
-                <ListItem
-                  sx={{ px: 3, py: 2 }}
-                  secondaryAction={
-                    <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar>{member.name.charAt(0)}</Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={member.name}
-                    secondary={member.role}
-                  />
-                </ListItem>
-                {index < mockProject.members.length - 1 && <Divider variant="inset" component="li" />}
-              </Box>
-            ))}
+            {project.members.length > 0 ? (
+              project.members.map((member, index) => (
+                <Box key={member.id}>
+                  <ListItem
+                    sx={{ px: 3, py: 2 }}
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete">
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemAvatar>
+                      <Avatar>{member.userName.charAt(0)}</Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={member.userName}
+                      secondary={member.role}
+                    />
+                  </ListItem>
+                  {index < project.members.length - 1 && <Divider variant="inset" component="li" />}
+                </Box>
+              ))
+            ) : (
+              <ListItem sx={{ px: 3, py: 2 }}>
+                <ListItemText primary="メンバーがいません" />
+              </ListItem>
+            )}
           </List>
         </Paper>
       </TabPanel>
@@ -329,33 +408,39 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         </Box>
         <Paper elevation={0} sx={{ borderRadius: 2 }}>
           <List>
-            {mockProject.questions.map((question, index) => (
-              <Box key={question.id}>
-                <ListItem
-                  button
-                  onClick={() => router.push(`/questions/${question.id}`)}
-                  sx={{ px: 3, py: 2 }}
-                  secondaryAction={
-                    <Chip 
-                      label={question.status} 
-                      color={getQuestionStatusColor(question.status) as any}
-                      size="small"
+            {project.questions && project.questions.length > 0 ? (
+              project.questions.map((question, index) => (
+                <Box key={question.id}>
+                  <ListItem
+                    button
+                    onClick={() => router.push(`/questions/${question.id}`)}
+                    sx={{ px: 3, py: 2 }}
+                    secondaryAction={
+                      <Chip 
+                        label={question.status} 
+                        color={getQuestionStatusColor(question.status) as any}
+                        size="small"
+                      />
+                    }
+                  >
+                    <ListItemAvatar>
+                      <Avatar sx={{ bgcolor: 'primary.main' }}>
+                        <AssignmentIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={question.title}
+                      secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
                     />
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      <AssignmentIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={question.title}
-                    secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
-                  />
-                </ListItem>
-                {index < mockProject.questions.length - 1 && <Divider variant="inset" component="li" />}
-              </Box>
-            ))}
+                  </ListItem>
+                  {index < project.questions.length - 1 && <Divider variant="inset" component="li" />}
+                </Box>
+              ))
+            ) : (
+              <ListItem sx={{ px: 3, py: 2 }}>
+                <ListItemText primary="質問がありません" />
+              </ListItem>
+            )}
           </List>
         </Paper>
       </TabPanel>
@@ -372,7 +457,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            「{mockProject.name}」を削除すると、すべての質問や関連データも削除されます。この操作は元に戻せません。
+            「{project.name}」を削除すると、すべての質問や関連データも削除されます。この操作は元に戻せません。
           </DialogContentText>
         </DialogContent>
         <DialogActions>

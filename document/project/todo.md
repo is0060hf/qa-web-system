@@ -104,3 +104,48 @@
   - [x] ダークモードテーマ作成
   - [x] テーマ切替機能
   - [x] ユーザー設定の保存
+
+## モックデータ対応箇所（API呼び出し）
+
+- [x] src/hooks/useAuth.ts: 認証フックでのAPI呼び出し
+- [x] src/app/components/notifications/NotificationsPage.tsx: 通知一覧画面
+- [x] src/app/components/layout/Header.tsx: ヘッダーの通知関連
+- [x] src/app/components/layout/Sidebar.tsx: サイドバーの通知カウント
+- [x] src/app/stores/authStore.ts: 認証ストア
+- [x] src/app/stores/projectStore.ts: プロジェクトストア
+- [x] src/app/stores/notificationStore.ts: 通知ストア
+- [ ] src/app/stores/questionStore.ts: 質問ストア（存在する場合）
+- [x] src/app/admin/users/page.tsx: ユーザー管理画面
+- [x] src/app/settings/page.tsx: ユーザー設定画面
+- [ ] src/app/search/page.tsx: 検索画面
+- [x] src/app/projects/page.tsx: プロジェクト一覧画面
+- [x] src/app/projects/[id]/page.tsx: プロジェクト詳細画面
+- [ ] src/app/projects/create/page.tsx: プロジェクト作成画面
+- [ ] src/app/questions/page.tsx: 質問一覧画面
+- [ ] src/app/questions/[id]/page.tsx: 質問詳細画面
+- [ ] src/app/questions/create/page.tsx: 質問作成画面
+
+### 認証関連コンポーネント
+- [x] src/app/components/auth/LoginForm.tsx: ログインフォーム
+- [x] src/app/components/auth/RegisterForm.tsx: ユーザー登録フォーム
+- [ ] src/app/components/auth/PasswordResetForm.tsx: パスワードリセットフォーム
+
+### 質問関連コンポーネント
+- [ ] src/app/components/questions/QuestionList.tsx: 質問一覧表示
+- [ ] src/app/components/questions/QuestionForm.tsx: 質問作成・編集フォーム
+- [ ] src/app/components/questions/AnswerForm.tsx: 回答投稿フォーム
+- [ ] src/app/components/questions/QuestionDetail.tsx: 質問詳細表示
+
+### プロジェクト関連コンポーネント
+- [ ] src/app/components/projects/ProjectList.tsx: プロジェクト一覧表示
+- [ ] src/app/components/projects/ProjectForm.tsx: プロジェクト作成・編集フォーム
+- [ ] src/app/components/projects/ProjectMembersList.tsx: プロジェクトメンバー管理
+- [ ] src/app/components/projects/ProjectTagsManager.tsx: プロジェクトタグ管理
+
+### ユーザー関連コンポーネント
+- [ ] src/app/components/users/UserList.tsx: ユーザー一覧表示
+- [ ] src/app/components/users/ProfileSettings.tsx: プロフィール設定
+
+### 検索関連コンポーネント
+- [ ] src/app/components/search/SearchForm.tsx: 検索フォーム
+- [ ] src/app/components/search/SearchResults.tsx: 検索結果表示

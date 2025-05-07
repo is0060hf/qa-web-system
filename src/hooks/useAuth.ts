@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchData } from '@/lib/utils/fetchData';
 
 export type User = {
   id: string;
@@ -17,9 +18,9 @@ export function useAuth() {
     // ユーザー情報を取得
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/users/me');
-        if (res.ok) {
-          const userData = await res.json();
+        // fetch APIの代わりにfetchData関数を使用
+        const userData = await fetchData<User>('auth/me', {});
+        if (userData) {
           setUser(userData);
         } else {
           setUser(null);
@@ -38,10 +39,12 @@ export function useAuth() {
   // ログアウト処理
   const logout = async () => {
     try {
-      const res = await fetch('/api/auth/logout', {
+      // fetch APIの代わりにfetchData関数を使用
+      const response = await fetchData<{ success: boolean }>('auth/logout', {
         method: 'POST',
       });
-      if (res.ok) {
+      
+      if (response.success) {
         setUser(null);
         router.push('/login');
       }

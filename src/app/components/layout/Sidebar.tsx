@@ -33,6 +33,7 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchData } from '@/lib/utils/fetchData';
 
 const drawerWidth = 240;
 
@@ -108,11 +109,11 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-        const response = await fetch('/api/notifications?limit=0');
-        if (response.ok) {
-          const data = await response.json();
-          setUnreadCount(data.unreadCount);
-        }
+        // 直接fetchの代わりにfetchData関数を使用
+        const data = await fetchData<{ unreadCount: number }>('notifications', {
+          params: { limit: '0' }
+        });
+        setUnreadCount(data.unreadCount);
       } catch (error) {
         console.error('Failed to fetch unread notifications count:', error);
       }

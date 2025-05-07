@@ -32,6 +32,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
 // ダークモード切替ボタンをインポート
 import ThemeToggleButton from '../../../components/theme/ThemeToggleButton';
+// fetchData関数をインポート
+import { fetchData } from '@/lib/utils/fetchData';
 
 // 通知の種類
 enum NotificationType {
@@ -50,6 +52,15 @@ interface Notification {
   relatedId?: string; // 関連するエンティティのID（主に質問ID）
   isRead: boolean;
   createdAt: string; // ISO文字列
+}
+
+// API レスポンス型
+interface NotificationsResponse {
+  notifications: Notification[];
+  unreadCount: number;
+  total: number;
+  page: number;
+  limit: number;
 }
 
 interface HeaderProps {
@@ -72,12 +83,14 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const fetchNotifications = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/notifications?limit=5&unreadOnly=true');
-      if (!response.ok) {
-        throw new Error('通知の取得に失敗しました');
-      }
+      // 直接fetch ではなく fetchData 関数を使用
+      const data = await fetchData<NotificationsResponse>('notifications', {
+        params: {
+          limit: '5',
+          unreadOnly: 'true'
+        }
+      });
       
-      const data = await response.json();
       setNotifications(data.notifications);
       setUnreadCount(data.unreadCount);
     } catch (error) {
@@ -90,16 +103,10 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   // 通知を既読にする
   const markAsRead = async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      // 直接fetch ではなく fetchData 関数を使用
+      await fetchData<{ success: boolean; id: string }>(`notifications/${notificationId}/read`, {
+        method: 'PATCH'
       });
-      
-      if (!response.ok) {
-        throw new Error('既読処理に失敗しました');
-      }
       
       // 既読状態を更新
       setNotifications(prev => 
@@ -118,16 +125,10 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const markAllAsRead = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/notifications/read-all', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      // 直接fetch ではなく fetchData 関数を使用
+      await fetchData<{ success: boolean; updatedCount: number }>('notifications/read-all', {
+        method: 'POST'
       });
-      
-      if (!response.ok) {
-        throw new Error('既読処理に失敗しました');
-      }
       
       // 通知を再取得
       fetchNotifications();

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserRole, ProjectRole } from '../components/auth/withRoleCheck';
+import { fetchData } from '@/lib/utils/fetchData';
 
 // ユーザーの型定義
 export interface User {
@@ -51,18 +52,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const response = await fetch('/api/auth/login', {
+          const data = await fetchData<{ user: User; token: string }>('auth/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: { email, password }
           });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'ログインに失敗しました');
-          }
-          
-          const data = await response.json();
           
           set({ 
             user: data.user,
@@ -83,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
       
       // ログアウト処理
       logout: () => {
-        fetch('/api/auth/logout', { method: 'POST' })
+        fetchData<{ success: boolean }>('auth/logout', { method: 'POST' })
           .catch(console.error); // エラーを無視（ベストエフォート）
         
         set({ 
@@ -99,16 +92,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const response = await fetch('/api/auth/register', {
+          await fetchData<{ id: string; email: string }>('auth/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
+            body: { name, email, password }
           });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'ユーザー登録に失敗しました');
-          }
           
           // 登録成功後、自動的にログイン
           await get().login(email, password);
@@ -126,16 +113,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const response = await fetch('/api/auth/request-password-reset', {
+          await fetchData<{ success: boolean; message: string }>('auth/request-password-reset', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            body: { email }
           });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'パスワードリセット要求に失敗しました');
-          }
           
           set({ isLoading: false });
         } catch (error) {
@@ -152,16 +133,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const response = await fetch('/api/auth/reset-password', {
+          await fetchData<{ success: boolean; message: string }>('auth/reset-password', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token, newPassword }),
+            body: { token, newPassword }
           });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'パスワードリセットに失敗しました');
-          }
           
           set({ isLoading: false });
         } catch (error) {
@@ -178,18 +153,10 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true, error: null });
           
-          const response = await fetch('/api/users/me', {
+          const updatedUserData = await fetchData<User>('users/me', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData),
+            body: userData
           });
-          
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'ユーザー情報の更新に失敗しました');
-          }
-          
-          const updatedUserData = await response.json();
           
           set(state => ({ 
             user: state.user ? { ...state.user, ...updatedUserData } : null,
@@ -209,26 +176,24 @@ export const useAuthStore = create<AuthState>()(
         try {
           set({ isLoading: true });
           
-          const response = await fetch('/api/auth/me');
-          
-          if (!response.ok) {
-            if (response.status === 401) {
-              // 認証エラーの場合はユーザー情報をクリア
+          try {
+            const userData = await fetchData<User>('auth/me', {});
+            
+            set({ 
+              user: userData,
+              isLoading: false
+            });
+            
+            // プロジェクトメンバーシップを取得
+            get().fetchProjectMemberships();
+          } catch (error) {
+            // 認証エラーの場合はユーザー情報をクリア
+            if (error instanceof Error && error.message.includes('401')) {
               set({ user: null, token: null, isLoading: false });
               return;
             }
-            throw new Error('ユーザー情報の取得に失敗しました');
+            throw error;
           }
-          
-          const userData = await response.json();
-          
-          set({ 
-            user: userData,
-            isLoading: false
-          });
-          
-          // プロジェクトメンバーシップを取得
-          get().fetchProjectMemberships();
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'ユーザー情報の取得に失敗しました',
@@ -243,13 +208,7 @@ export const useAuthStore = create<AuthState>()(
           const user = get().user;
           if (!user) return; // ユーザーがログインしていない場合は何もしない
           
-          const response = await fetch('/api/users/me/projects');
-          
-          if (!response.ok) {
-            throw new Error('プロジェクトメンバーシップの取得に失敗しました');
-          }
-          
-          const memberships = await response.json();
+          const memberships = await fetchData<ProjectMember[]>('users/me/projects', {});
           
           set({ projectMemberships: memberships });
         } catch (error) {

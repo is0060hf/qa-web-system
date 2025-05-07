@@ -9,6 +9,7 @@ import {
   Paper
 } from '@mui/material';
 import NotificationList, { Notification, NotificationType } from './NotificationList';
+import { fetchData } from '@/lib/utils/fetchData';
 
 // APIから取得する通知データの型
 interface NotificationsResponse {
@@ -38,22 +39,14 @@ export default function NotificationsPage() {
     setError(null);
     
     try {
-      const queryParams = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: pageSize.toString()
+      // 直接fetchではなく、fetchData関数を使用
+      const data = await fetchData<NotificationsResponse>('notifications', {
+        params: {
+          page: currentPage.toString(),
+          limit: pageSize.toString(),
+          ...(unreadOnly && { unreadOnly: 'true' })
+        }
       });
-      
-      if (unreadOnly) {
-        queryParams.append('unreadOnly', 'true');
-      }
-      
-      const response = await fetch(`/api/notifications?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('通知の取得に失敗しました');
-      }
-      
-      const data: NotificationsResponse = await response.json();
       
       setNotifications(data.notifications);
       setUnreadCount(data.unreadCount);
@@ -83,16 +76,10 @@ export default function NotificationsPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/notifications/read-all', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      // 直接fetchではなく、fetchData関数を使用
+      const response = await fetchData<{ success: boolean; updatedCount: number }>('notifications/read-all', {
+        method: 'POST'
       });
-      
-      if (!response.ok) {
-        throw new Error('既読処理に失敗しました');
-      }
       
       // 成功したら通知を再取得
       fetchNotifications();
@@ -108,17 +95,10 @@ export default function NotificationsPage() {
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.isRead) {
       try {
-        // 既読にするAPIを呼び出し
-        const response = await fetch(`/api/notifications/${notification.id}/read`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+        // 直接fetchではなく、fetchData関数を使用
+        await fetchData<{ success: boolean; id: string }>(`notifications/${notification.id}/read`, {
+          method: 'PATCH'
         });
-        
-        if (!response.ok) {
-          throw new Error('既読処理に失敗しました');
-        }
         
         // 既読状態を更新（APIから再取得しない場合）
         setNotifications(prevNotifications => 

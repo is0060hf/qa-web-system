@@ -27,6 +27,7 @@ import { Search as SearchIcon, Delete as DeleteIcon, Edit as EditIcon } from '@m
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils/format';
+import { fetchData } from '@/lib/utils/fetchData';
 
 type User = {
   id: string;
@@ -75,18 +76,18 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     setLoading2(true);
     try {
-      const searchQuery = searchText ? `&search=${encodeURIComponent(searchText)}` : '';
-      const res = await fetch(
-        `/api/users?page=${page + 1}&limit=${pageSize}${searchQuery}`
-      );
+      const params: Record<string, string> = {
+        page: (page + 1).toString(),
+        limit: pageSize.toString()
+      };
       
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users);
-        setTotalUsers(data.total);
-      } else {
-        showSnackbar('ユーザー情報の取得に失敗しました', 'error');
+      if (searchText) {
+        params.search = searchText;
       }
+      
+      const data = await fetchData<{users: User[], total: number}>('users', { params });
+      setUsers(data.users);
+      setTotalUsers(data.total);
     } catch (error) {
       console.error('Failed to fetch users:', error);
       showSnackbar('ユーザー情報の取得中にエラーが発生しました', 'error');
@@ -200,27 +201,19 @@ export default function UserManagement() {
     if (!selectedUser) return;
     
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}`, {
+      await fetchData<User>(`users/${selectedUser.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           role: newRole,
           name: newName,
-        }),
+        }
       });
       
-      if (res.ok) {
-        showSnackbar('ユーザー情報を更新しました', 'success');
-        fetchUsers();
-      } else {
-        const data = await res.json();
-        showSnackbar(data.error || 'ユーザー情報の更新に失敗しました', 'error');
-      }
+      showSnackbar('ユーザー情報を更新しました', 'success');
+      fetchUsers();
     } catch (error) {
       console.error('Failed to update user:', error);
-      showSnackbar('ユーザー情報の更新中にエラーが発生しました', 'error');
+      showSnackbar(error instanceof Error ? error.message : 'ユーザー情報の更新中にエラーが発生しました', 'error');
     } finally {
       handleEditDialogClose();
     }
@@ -230,20 +223,15 @@ export default function UserManagement() {
     if (!userToDelete) return;
     
     try {
-      const res = await fetch(`/api/users/${userToDelete.id}`, {
-        method: 'DELETE',
+      await fetchData<{ success: boolean }>(`users/${userToDelete.id}`, {
+        method: 'DELETE'
       });
       
-      if (res.ok) {
-        showSnackbar('ユーザーを削除しました', 'success');
-        fetchUsers();
-      } else {
-        const data = await res.json();
-        showSnackbar(data.error || 'ユーザーの削除に失敗しました', 'error');
-      }
+      showSnackbar('ユーザーを削除しました', 'success');
+      fetchUsers();
     } catch (error) {
       console.error('Failed to delete user:', error);
-      showSnackbar('ユーザーの削除中にエラーが発生しました', 'error');
+      showSnackbar(error instanceof Error ? error.message : 'ユーザーの削除中にエラーが発生しました', 'error');
     } finally {
       handleDeleteDialogClose();
     }
