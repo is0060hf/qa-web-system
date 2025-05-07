@@ -114,38 +114,69 @@
 - [x] src/app/stores/authStore.ts: 認証ストア
 - [x] src/app/stores/projectStore.ts: プロジェクトストア
 - [x] src/app/stores/notificationStore.ts: 通知ストア
-- [ ] src/app/stores/questionStore.ts: 質問ストア（存在する場合）
+- [x] src/app/stores/questionStore.ts: 質問ストア（存在しない）
 - [x] src/app/admin/users/page.tsx: ユーザー管理画面
 - [x] src/app/settings/page.tsx: ユーザー設定画面
-- [ ] src/app/search/page.tsx: 検索画面
+- [x] src/app/search/page.tsx: 検索画面（実装なし）
 - [x] src/app/projects/page.tsx: プロジェクト一覧画面
 - [x] src/app/projects/[id]/page.tsx: プロジェクト詳細画面
-- [ ] src/app/projects/create/page.tsx: プロジェクト作成画面
-- [ ] src/app/questions/page.tsx: 質問一覧画面
-- [ ] src/app/questions/[id]/page.tsx: 質問詳細画面
-- [ ] src/app/questions/create/page.tsx: 質問作成画面
+- [x] src/app/projects/create/page.tsx: プロジェクト作成画面（存在しない）
+- [x] src/app/questions/page.tsx: 質問一覧画面
+- [x] src/app/questions/[id]/page.tsx: 質問詳細画面
+- [x] src/app/questions/create/page.tsx: 質問作成画面
+
+### 直接fetchを使用している要対応箇所
+- [x] src/app/search/page.tsx
+  - [x] プロジェクト一覧取得: `await fetch('/api/projects')` → `fetchData<any>('projects')`に修正済み
+  - [x] ユーザー一覧取得: `await fetch('/api/users?limit=100')` → `fetchData<any>('users', { params })`に修正済み
+  - [x] タグ一覧取得: `await fetch(/api/projects/${projectId}/tags)` → `fetchData<any>('projects/${projectId}/tags')`に修正済み
+  - [x] 質問一覧検索: `await fetch(/api/questions?${queryParams})` → `fetchData<any>('questions', { params })`に修正済み
+- [x] src/app/settings/page.tsx
+  - [x] ユーザー情報取得: `await fetch('/api/auth/me')` → すでに`fetchData<{name: string; email: string}>('auth/me')`を使用
+  - [x] ユーザー情報更新: `await fetch('/api/users/me')` → すでに`fetchData<{name: string; email: string}>('users/me', {...})`を使用
+  - [x] パスワード変更: `await fetch('/api/users/change-password')` → すでに`fetchData<{success: boolean}>('users/change-password', {...})`を使用
+- [x] src/app/stores/authStore.ts
+  - [x] ログイン: `await fetch('/api/auth/login')` → すでに`fetchData<{ user: User; token: string }>('auth/login', {...})`を使用
+  - [x] 登録: `await fetch('/api/auth/register')` → すでに`fetchData<{ id: string; email: string }>('auth/register', {...})`を使用
+  - [x] パスワードリセット関連: 複数の関数 → すべての関数でfetchDataを使用済み
+  - [x] ユーザー情報取得: `await fetch('/api/auth/me')` → すでに`fetchData<User>('auth/me', {})`を使用
+  - [x] ユーザープロジェクト取得: `await fetch('/api/users/me/projects')` → すでに`fetchData<ProjectMember[]>('users/me/projects', {})`を使用
+- [x] src/app/stores/notificationStore.ts
+  - [x] 通知一覧取得・既読設定: 複数の関数 → すべての関数でfetchDataを使用済み
+- [x] src/app/stores/projectStore.ts
+  - [x] プロジェクト一覧/詳細/作成/更新: 複数の関数 → すべての関数でfetchDataを使用済み
+  - [x] タグ管理: 複数の関数 → すべての関数でfetchDataを使用済み
+  - [x] メンバー招待/管理: 複数の関数 → すべての関数でfetchDataを使用済み
+
+### 対応状況まとめ
+- [x] src/app/search/page.tsx - 修正完了（直接fetchからfetchDataに変更）
+- [x] src/app/settings/page.tsx - 対応済み（既にfetchData関数を使用）
+- [x] src/app/stores/authStore.ts - 対応済み（既にfetchData関数を使用）
+- [x] src/app/stores/notificationStore.ts - 対応済み（既にfetchData関数を使用）
+- [x] src/app/stores/projectStore.ts - 対応済み（既にfetchData関数を使用）
+- [x] src/app/components/notifications/NotificationsPage.tsx - 対応済み（既にfetchData関数を使用）
 
 ### 認証関連コンポーネント
 - [x] src/app/components/auth/LoginForm.tsx: ログインフォーム
 - [x] src/app/components/auth/RegisterForm.tsx: ユーザー登録フォーム
-- [ ] src/app/components/auth/PasswordResetForm.tsx: パスワードリセットフォーム
+- [x] src/app/components/auth/PasswordResetForm.tsx: パスワードリセットフォーム
 
 ### 質問関連コンポーネント
-- [ ] src/app/components/questions/QuestionList.tsx: 質問一覧表示
-- [ ] src/app/components/questions/QuestionForm.tsx: 質問作成・編集フォーム
-- [ ] src/app/components/questions/AnswerForm.tsx: 回答投稿フォーム
-- [ ] src/app/components/questions/QuestionDetail.tsx: 質問詳細表示
+- [x] src/app/components/questions/QuestionList.tsx: 質問一覧表示
+- [x] src/app/components/questions/QuestionForm.tsx: 質問作成・編集フォーム
+- [x] src/app/components/questions/AnswerForm.tsx: 回答投稿フォーム
+- [x] src/app/components/questions/QuestionDetail.tsx: 質問詳細表示
 
 ### プロジェクト関連コンポーネント
-- [ ] src/app/components/projects/ProjectList.tsx: プロジェクト一覧表示
-- [ ] src/app/components/projects/ProjectForm.tsx: プロジェクト作成・編集フォーム
-- [ ] src/app/components/projects/ProjectMembersList.tsx: プロジェクトメンバー管理
-- [ ] src/app/components/projects/ProjectTagsManager.tsx: プロジェクトタグ管理
+- [x] src/app/components/projects/ProjectList.tsx: プロジェクト一覧表示
+- [x] src/app/components/projects/ProjectForm.tsx: プロジェクト作成・編集フォーム
+- [x] src/app/components/projects/ProjectMembersList.tsx: プロジェクトメンバー管理
+- [x] src/app/components/projects/ProjectTagsManager.tsx: プロジェクトタグ管理
 
 ### ユーザー関連コンポーネント
-- [ ] src/app/components/users/UserList.tsx: ユーザー一覧表示
-- [ ] src/app/components/users/ProfileSettings.tsx: プロフィール設定
+- [x] src/app/components/users/UserList.tsx: ユーザー一覧表示
+- [x] src/app/components/users/ProfileSettings.tsx: プロフィール設定
 
 ### 検索関連コンポーネント
-- [ ] src/app/components/search/SearchForm.tsx: 検索フォーム
-- [ ] src/app/components/search/SearchResults.tsx: 検索結果表示
+- [x] src/app/components/search/SearchForm.tsx: 検索フォーム
+- [x] src/app/components/search/SearchResults.tsx: 検索結果表示

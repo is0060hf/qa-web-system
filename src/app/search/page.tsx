@@ -6,6 +6,7 @@ import SearchForm, { SearchParams } from '../components/search/SearchForm';
 import SearchResults, { Question } from '../components/search/SearchResults';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SelectOption } from '../components/common/FormSelectField';
+import { fetchData } from '@/lib/utils/fetchData';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -40,41 +41,34 @@ export default function SearchPage() {
     const fetchFilterOptions = async () => {
       try {
         // プロジェクトリストを取得
-        const projectsResponse = await fetch('/api/projects');
-        if (projectsResponse.ok) {
-          const projectsData = await projectsResponse.json();
-          setProjects(
-            projectsData.projects.map((project: any) => ({
-              value: project.id,
-              label: project.name
-            }))
-          );
-        }
+        const projectsData = await fetchData<any>('projects');
+        setProjects(
+          projectsData.projects.map((project: any) => ({
+            value: project.id,
+            label: project.name
+          }))
+        );
 
         // ユーザーリストを取得
-        const usersResponse = await fetch('/api/users?limit=100');
-        if (usersResponse.ok) {
-          const usersData = await usersResponse.json();
-          setAssignees(
-            usersData.users.map((user: any) => ({
-              value: user.id,
-              label: user.name || user.email
-            }))
-          );
-        }
+        const usersData = await fetchData<any>('users', {
+          params: { limit: '100' }
+        });
+        setAssignees(
+          usersData.users.map((user: any) => ({
+            value: user.id,
+            label: user.name || user.email
+          }))
+        );
 
         // タグリストを取得（プロジェクトに依存するため、プロジェクトが選択されている場合のみ）
         if (initialParams.projectId) {
-          const tagsResponse = await fetch(`/api/projects/${initialParams.projectId}/tags`);
-          if (tagsResponse.ok) {
-            const tagsData = await tagsResponse.json();
-            setTags(
-              tagsData.map((tag: any) => ({
-                value: tag.id,
-                label: tag.name
-              }))
-            );
-          }
+          const tagsData = await fetchData<any>(`projects/${initialParams.projectId}/tags`);
+          setTags(
+            tagsData.map((tag: any) => ({
+              value: tag.id,
+              label: tag.name
+            }))
+          );
         }
       } catch (err) {
         console.error('Failed to fetch filter options:', err);
@@ -120,26 +114,22 @@ export default function SearchPage() {
     setError(null);
     
     try {
-      // APIクエリパラメータを構築
-      const queryParams = new URLSearchParams();
-      if (params.keyword) queryParams.set('search', params.keyword);
-      if (params.projectId) queryParams.set('projectId', params.projectId);
-      if (params.assigneeId) queryParams.set('assigneeId', params.assigneeId);
-      if (params.status) queryParams.set('status', params.status);
-      if (params.priority) queryParams.set('priority', params.priority);
-      if (params.tagId) queryParams.set('tagId', params.tagId);
-      if (params.isDeadlineExpired) queryParams.set('isDeadlineExpired', 'true');
+      // API用のパラメータを準備
+      const queryParams: Record<string, string> = {};
+      if (params.keyword) queryParams.search = params.keyword;
+      if (params.projectId) queryParams.projectId = params.projectId;
+      if (params.assigneeId) queryParams.assigneeId = params.assigneeId;
+      if (params.status) queryParams.status = params.status;
+      if (params.priority) queryParams.priority = params.priority;
+      if (params.tagId) queryParams.tagId = params.tagId;
+      if (params.isDeadlineExpired) queryParams.isDeadlineExpired = 'true';
       
-      queryParams.set('page', page.toString());
-      queryParams.set('limit', pageSize.toString());
+      queryParams.page = page.toString();
+      queryParams.limit = pageSize.toString();
       
-      const response = await fetch(`/api/questions?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('検索に失敗しました');
-      }
-      
-      const data = await response.json();
+      const data = await fetchData<any>('questions', {
+        params: queryParams
+      });
       
       setQuestions(data.questions);
       setTotal(data.total);
