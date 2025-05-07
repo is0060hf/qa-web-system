@@ -28,9 +28,11 @@ import {
   FactCheck as FactCheckIcon,
   AddCircleOutline as AddCircleOutlineIcon,
   Notifications as NotificationsIcon,
+  PeopleAlt as PeopleAltIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const drawerWidth = 240;
 
@@ -91,6 +93,8 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
 
   const handleQuestionsClick = () => {
     setQuestionsOpen(!questionsOpen);
@@ -317,6 +321,33 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
             </ListItemButton>
           </Link>
         </ListItem>
+
+        {/* 管理者向けユーザー管理メニュー */}
+        {isAdmin && (
+          <ListItem disablePadding sx={{ display: 'block' }}>
+            <Link href="/admin/users" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                  px: 2.5,
+                  bgcolor: pathname === '/admin/users' ? 'action.selected' : 'transparent',
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <PeopleAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="ユーザー管理" sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+        )}
       </List>
     </Drawer>
   );

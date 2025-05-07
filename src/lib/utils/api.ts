@@ -21,6 +21,21 @@ export function getUserFromRequest(req: NextRequest) {
 }
 
 /**
+ * ユーザーが管理者かどうかを確認
+ */
+export function isAdmin(user: { role: string } | null) {
+  return user?.role === 'ADMIN';
+}
+
+/**
+ * リクエストから管理者権限を確認
+ */
+export function isAdminRequest(req: NextRequest) {
+  const user = getUserFromRequest(req);
+  return isAdmin(user);
+}
+
+/**
  * リクエストボディをZodスキーマでバリデーション
  */
 export async function validateRequest<T>(
