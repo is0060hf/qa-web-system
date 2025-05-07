@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled, Theme, CSSObject } from '@mui/material/styles';
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   ListItemIcon,
   ListItemText,
   Collapse,
+  Badge,
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -26,8 +27,10 @@ import {
   ExpandMore,
   FactCheck as FactCheckIcon,
   AddCircleOutline as AddCircleOutlineIcon,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -86,6 +89,8 @@ interface SidebarProps {
 export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
   const [questionsOpen, setQuestionsOpen] = useState(false);
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const pathname = usePathname();
 
   const handleQuestionsClick = () => {
     setQuestionsOpen(!questionsOpen);
@@ -94,6 +99,28 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
   const handleProjectsClick = () => {
     setProjectsOpen(!projectsOpen);
   };
+
+  // 未読通知数を取得
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch('/api/notifications?limit=0');
+        if (response.ok) {
+          const data = await response.json();
+          setUnreadCount(data.unreadCount);
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread notifications count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // 60秒ごとに未読通知をポーリング
+    const intervalId = setInterval(fetchUnreadCount, 60000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <Drawer variant="permanent" open={open}>
@@ -111,6 +138,7 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                bgcolor: pathname === '/dashboard' ? 'action.selected' : 'transparent',
               }}
             >
               <ListItemIcon
@@ -134,6 +162,7 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
               minHeight: 48,
               justifyContent: open ? 'initial' : 'center',
               px: 2.5,
+              bgcolor: pathname.startsWith('/projects') ? 'action.selected' : 'transparent',
             }}
           >
             <ListItemIcon
@@ -177,6 +206,7 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
               minHeight: 48,
               justifyContent: open ? 'initial' : 'center',
               px: 2.5,
+              bgcolor: pathname.startsWith('/questions') ? 'action.selected' : 'transparent',
             }}
           >
             <ListItemIcon
@@ -213,6 +243,33 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
           </List>
         </Collapse>
 
+        {/* 通知一覧へのリンク */}
+        <ListItem disablePadding sx={{ display: 'block' }}>
+          <Link href="/notifications" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <ListItemButton
+              sx={{
+                minHeight: 48,
+                justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
+                bgcolor: pathname === '/notifications' ? 'action.selected' : 'transparent',
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: open ? 3 : 'auto',
+                  justifyContent: 'center',
+                }}
+              >
+                <Badge badgeContent={unreadCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </ListItemIcon>
+              <ListItemText primary="通知" sx={{ opacity: open ? 1 : 0 }} />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+
         <ListItem disablePadding sx={{ display: 'block' }}>
           <Link href="/settings" style={{ textDecoration: 'none', color: 'inherit' }}>
             <ListItemButton
@@ -220,6 +277,7 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                bgcolor: pathname === '/settings' ? 'action.selected' : 'transparent',
               }}
             >
               <ListItemIcon
@@ -243,6 +301,7 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                bgcolor: pathname === '/search' ? 'action.selected' : 'transparent',
               }}
             >
               <ListItemIcon
