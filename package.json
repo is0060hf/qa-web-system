@@ -11,7 +11,10 @@
     "test": "jest",
     "test:react": "jest --testMatch='**/__tests__/components/**/*.test.tsx' --testEnvironment=jsdom",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "migrate": "dotenv -e .env -- prisma migrate dev",
+    "db:push": "dotenv -e .env -- prisma db push",
+    "generate": "dotenv -e .env -- prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -56,6 +59,7 @@
     "autoprefixer": "^10.4.21",
     "babel-jest": "^29.7.0",
     "cross-env": "^7.0.3",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.26.0",
     "eslint-config-next": "^15.3.1",
     "identity-obj-proxy": "^3.0.0",
