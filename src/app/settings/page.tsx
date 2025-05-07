@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, CircularProgress } from '@mui/material';
+import { Container, Box, Typography, CircularProgress, Divider } from '@mui/material';
 import UserSettingsForm, { UserSettingsData, PasswordChangeData } from '../components/users/UserSettingsForm';
+import AccessibilitySettingsForm from '../components/users/AccessibilitySettingsForm';
 
 export default function SettingsPage() {
   // ユーザーデータの状態
@@ -133,14 +134,23 @@ export default function SettingsPage() {
           <CircularProgress />
         </Box>
       ) : userData ? (
-        <UserSettingsForm
-          initialData={userData}
-          onSubmit={handleProfileUpdate}
-          onPasswordChange={handlePasswordChange}
-          isLoading={isSubmitting}
-          error={error || undefined}
-          successMessage={successMessage || undefined}
-        />
+        <Box>
+          <UserSettingsForm
+            initialData={userData}
+            onSubmit={handleProfileUpdate}
+            onPasswordChange={handlePasswordChange}
+            isLoading={isSubmitting}
+            error={error || undefined}
+            successMessage={successMessage || undefined}
+          />
+          
+          <Box sx={{ my: 4 }}>
+            <Divider />
+          </Box>
+          
+          {/* アクセシビリティ設定フォーム */}
+          <AccessibilitySettingsForm />
+        </Box>
       ) : (
         <Typography color="error">
           ユーザー情報の読み込みに失敗しました。再読み込みしてください。

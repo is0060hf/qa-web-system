@@ -5,9 +5,67 @@
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
+  --focus-ring-color: #4f46e5;
+  --focus-ring-offset: 2px;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+}
+
+/* アクセシビリティのためのフォーカスインジケーター */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* キーボードユーザー向けスタイル（マウスで操作しているときは不要） */
+.keyboard-user [role="button"]:focus-visible,
+.keyboard-user button:focus-visible,
+.keyboard-user a:focus-visible,
+.keyboard-user input:focus-visible,
+.keyboard-user select:focus-visible,
+.keyboard-user textarea:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+/* スキップリンク */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  z-index: 1500;
+  background: white;
+  color: black;
+  padding: 8px 16px;
+  transition: top 0.3s ease;
+  border: 2px solid var(--focus-ring-color);
+  text-decoration: none;
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* ダークモード対応 */
+[data-theme="dark"] {
+  --focus-ring-color: #7d74ff;
+  color-scheme: dark;
+}
+
+/* 高コントラストモード */
+.high-contrast-mode {
+  --focus-ring-color: #ffff00;
+}
+
+/* フォントサイズ調整 */
+body.font-size-large {
+  font-size: 1.1rem;
+}
+
+body.font-size-larger {
+  font-size: 1.2rem;
 } 

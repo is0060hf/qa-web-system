@@ -30,6 +30,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { ja } from 'date-fns/locale';
+// ダークモード切替ボタンをインポート
+import ThemeToggleButton from '../../../components/theme/ThemeToggleButton';
 
 // 通知の種類
 enum NotificationType {
@@ -228,6 +230,9 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         <Box sx={{ flexGrow: 1 }} />
         
         <Box sx={{ display: 'flex' }}>
+          {/* ダークモード切替ボタン */}
+          <ThemeToggleButton />
+          
           <IconButton
             size="large"
             aria-label="show new notifications"
