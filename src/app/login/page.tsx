@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Box, 
@@ -21,12 +21,43 @@ import { useAuthStore } from '../stores/authStore';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuthStore();
+  const searchParams = useSearchParams();
+  const { login, isLoading, error: storeError } = useAuthStore();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  
+  // ログイン画面表示時に認証ストアをリセット
+  useEffect(() => {
+    // 認証ストアのエラー状態を画面のエラー状態に反映
+    if (storeError) {
+      setError(storeError);
+    }
+    
+    // ローカルストレージをクリア
+    if (typeof window !== 'undefined') {
+      // ログイン画面では認証状態をクリアしておく
+      useAuthStore.setState({ 
+        isLoading: false,
+        error: null
+      });
+    }
+  }, [storeError]);
+  
+  // URLクエリパラメータからリダイレクト理由を取得
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'session_expired') {
+      setError('セッションの有効期限が切れました。再度ログインしてください。');
+    } else if (reason === 'auth_required') {
+      setError('この操作を行うにはログインが必要です。');
+    } else if (reason === 'unauthorized') {
+      setError('認証に失敗しました。再度ログインしてください。');
+    }
+  }, [searchParams]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +67,21 @@ export default function LoginPage() {
       return;
     }
     
+    // 重複送信防止
+    if (isLoading || hasSubmitted) return;
+    
+    setHasSubmitted(true);
+    
     try {
       setError(null);
       await login(email, password);
-      router.push('/'); // ログイン成功後、トップページ（ダッシュボード）へ遷移
+      
+      // リダイレクト先が指定されている場合はそこに戻る
+      const redirectTo = searchParams.get('redirect') || '/';
+      router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ログインに失敗しました。もう一度お試しください。');
+      setHasSubmitted(false);
     }
   };
   

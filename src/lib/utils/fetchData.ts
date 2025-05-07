@@ -215,6 +215,15 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    
+    // 認証エラー（401）の場合、ログインページにリダイレクト
+    if (response.status === 401 && typeof window !== 'undefined') {
+      // 現在のURLをリダイレクト先として保存（戻れるようにするため）
+      const currentPath = window.location.pathname;
+      const redirectUrl = `/login?reason=unauthorized&redirect=${encodeURIComponent(currentPath)}`;
+      window.location.href = redirectUrl;
+    }
+    
     throw new Error(
       errorData.error || `API リクエスト失敗: ${response.status} ${response.statusText}`
     );

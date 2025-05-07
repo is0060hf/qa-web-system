@@ -11,7 +11,7 @@ const protectedPaths = [
   '/notifications',
 ];
 
-// 認証不要のパス
+// 認証不要のパス（完全一致と前方一致のパスを含む）
 const publicPaths = [
   '/login',
   '/register',
@@ -30,29 +30,29 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
+  // 認証不要パスへのアクセスは常に許可
+  if (publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    // 既にログイン済みの場合はダッシュボードへリダイレクト（ただしAPI呼び出しは除く）
+    const authToken = request.cookies.get('authToken')?.value;
+    if (authToken && !pathname.startsWith('/api/')) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+    return NextResponse.next();
+  }
+  
   // 認証トークンが存在するか確認
   const authToken = request.cookies.get('authToken')?.value;
   
-  // パブリックパスへのアクセスでトークンが存在する場合はダッシュボードへリダイレクト
-  // （ログイン済みユーザーがログインページにアクセスした場合など）
-  if (
-    publicPaths.some(path => pathname.startsWith(path)) && 
-    authToken
-  ) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-  
   // 保護されたパスへのアクセスでトークンが存在しない場合はログインページへリダイレクト
   if (
-    protectedPaths.some(path => pathname.startsWith(path)) && 
+    (protectedPaths.some(path => pathname.startsWith(path)) || pathname === '/') && 
     !authToken
   ) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-  
-  // トップページへのアクセスでトークンが存在しない場合はログインページへリダイレクト
-  if (pathname === '/' && !authToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    // リダイレクト元のパスを保存してログイン後に戻れるようにする
+    const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('reason', 'auth_required');
+    redirectUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(redirectUrl);
   }
   
   return NextResponse.next();
