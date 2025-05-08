@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = params.projectId;
+    const projectId = (await params).projectId;
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -57,7 +57,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = params.projectId;
+    const projectId = (await params).projectId;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
@@ -113,7 +113,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = params.projectId;
+    const projectId = (await params).projectId;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);

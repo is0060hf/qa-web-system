@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     // 次のカーソル
     const nextCursor =
-      notifications.length === limit ? notifications[notifications.length - 1].id : null;
+      notifications.length > 0 && notifications.length === limit ? notifications[notifications.length - 1].id : null;
 
     // 未読通知の総数取得
     const totalUnread = await prisma.notification.count({

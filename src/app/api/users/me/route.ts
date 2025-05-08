@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
+import prisma from '@/lib/db';
 import { hashPassword, verifyPassword } from '@/lib/auth';
 import { z } from 'zod';
 
-// ログインユーザー情報取得
+// ユーザー自身の情報を取得
 export async function GET(req: NextRequest) {
   try {
     const user = getUserFromRequest(req);
-
+    
     if (!user) {
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }

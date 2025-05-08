@@ -190,6 +190,9 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     return getMockData(endpoint, options) as T;
   }
   
+  console.log(`[fetchData] Making request to: /api/${endpoint}`);
+  console.log(`[fetchData] Method: ${options.method || 'GET'}`);
+
   // 実際のAPIを呼び出す
   const { method = 'GET', body, headers = {}, params = {} } = options;
   
@@ -202,25 +205,56 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
   const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
   const url = `/api/${endpoint}${queryString}`;
   
+  // 認証トークンをヘッダーに追加
+  const authHeaders: Record<string, string> = {};
+  
+  // authStoreからトークンを取得
+  if (typeof window !== 'undefined') {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const { state } = JSON.parse(authStorage);
+        console.log(`[fetchData] Token in storage: ${state?.token ? 'Present' : 'Missing'}`);
+        if (state?.token) {
+          authHeaders['Authorization'] = `Bearer ${state.token}`;
+          console.log(`[fetchData] Added token to request headers`);
+        } else {
+          console.log(`[fetchData] No token found in storage`);
+        }
+      } catch (e) {
+        console.error('[fetchData] Failed to parse auth storage:', e);
+      }
+    } else {
+      console.log(`[fetchData] No auth-storage found in localStorage`);
+    }
+  }
+  
   const requestOptions: RequestInit = {
     method,
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
       ...headers,
     },
     ...(body && { body: JSON.stringify(body) }),
   };
   
+  console.log(`[fetchData] Request URL: ${url}`);
+  console.log(`[fetchData] Headers:`, JSON.stringify(requestOptions.headers));
+  
   const response = await fetch(url, requestOptions);
+  console.log(`[fetchData] Response status: ${response.status}`);
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error(`[fetchData] Error response:`, errorData);
     
     // 認証エラー（401）の場合、ログインページにリダイレクト
     if (response.status === 401 && typeof window !== 'undefined') {
       // 現在のURLをリダイレクト先として保存（戻れるようにするため）
       const currentPath = window.location.pathname;
       const redirectUrl = `/login?reason=unauthorized&redirect=${encodeURIComponent(currentPath)}`;
+      console.log(`[fetchData] Redirecting to: ${redirectUrl} due to 401 error`);
       window.location.href = redirectUrl;
     }
     
@@ -229,7 +263,9 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     );
   }
   
-  return response.json();
+  const data = await response.json();
+  console.log(`[fetchData] Successful response for: ${endpoint}`);
+  return data;
 };
 
 /**

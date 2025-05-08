@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -109,11 +110,14 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const [error, setError] = useState<string | null>(null);
 
   // プロジェクト詳細データを取得
+  // Note: 将来のNext.jsバージョンではparamsの処理方法が変わる可能性があります
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
         setIsLoading(true);
-        const data = await fetchData<ProjectDetails>(`projects/${params.id}`, {});
+        // パラメータから直接IDを使用
+        const projectId = params.id;
+        const data = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
         setProject(data);
       } catch (err) {
         console.error('Failed to fetch project data:', err);
@@ -377,10 +381,13 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                     }
                   >
                     <ListItemAvatar>
-                      <Avatar>{member.userName.charAt(0)}</Avatar>
+                      <Avatar>
+                        {/* ユーザー名が存在する場合のみ最初の文字を表示、そうでなければ代替テキスト */}
+                        {member.userName ? member.userName.charAt(0) : (member.userEmail ? member.userEmail.charAt(0) : 'U')}
+                      </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={member.userName}
+                      primary={member.userName || member.userEmail || `メンバーID: ${member.userId}`}
                       secondary={member.role}
                     />
                   </ListItem>

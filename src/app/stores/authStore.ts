@@ -50,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
       // ログイン処理
       login: async (email, password) => {
         try {
+          console.log('[AuthStore] login: ログイン処理を開始');
           set({ isLoading: true, error: null });
           
           const data = await fetchData<{ user: User; token: string }>('auth/login', {
@@ -57,6 +58,32 @@ export const useAuthStore = create<AuthState>()(
             body: { email, password }
           });
           
+          console.log('[AuthStore] login: ログイン成功、トークン取得');
+          console.log('[AuthStore] login: トークンの長さ:', data.token.length);
+          
+          // トークンのデコード（デバッグ用）
+          try {
+            const parts = data.token.split('.');
+            if (parts.length === 3) {
+              const payload = JSON.parse(atob(parts[1]));
+              console.log('[AuthStore] login: トークンペイロード:', payload);
+              
+              if (payload.exp) {
+                const now = Math.floor(Date.now() / 1000);
+                console.log('[AuthStore] login: 現在時刻 (unix):', now);
+                console.log('[AuthStore] login: トークン有効期限 (unix):', payload.exp);
+                console.log('[AuthStore] login: 有効期間:', payload.exp - now, '秒');
+                
+                // 有効期限の日時を表示
+                const expiryDate = new Date(payload.exp * 1000);
+                console.log('[AuthStore] login: 有効期限日時:', expiryDate.toISOString());
+              }
+            }
+          } catch (e) {
+            console.error('[AuthStore] login: トークンのデコードに失敗:', e);
+          }
+          
+          console.log('[AuthStore] login: storeの状態を更新');
           set({ 
             user: data.user,
             token: data.token,
@@ -64,8 +91,11 @@ export const useAuthStore = create<AuthState>()(
           });
           
           // プロジェクトメンバーシップを取得
-          get().fetchProjectMemberships();
+          console.log('[AuthStore] login: プロジェクトメンバーシップの取得を開始');
+          await get().fetchProjectMemberships();
+          console.log('[AuthStore] login: ログイン処理完了');
         } catch (error) {
+          console.error('[AuthStore] login: ログイン失敗:', error);
           set({ 
             error: error instanceof Error ? error.message : '認証に失敗しました',
             isLoading: false
@@ -174,27 +204,64 @@ export const useAuthStore = create<AuthState>()(
       // 現在のユーザー情報を取得
       fetchCurrentUser: async () => {
         try {
+          console.log('[AuthStore] fetchCurrentUser: ユーザー情報取得開始');
           set({ isLoading: true });
+          console.log('[AuthStore] fetchCurrentUser: localStorage確認');
+          
+          // ローカルストレージの状態確認
+          if (typeof window !== 'undefined') {
+            const authStorage = localStorage.getItem('auth-storage');
+            console.log('[AuthStore] fetchCurrentUser: localStorage内容:', 
+                       authStorage ? 'データあり' : 'データなし');
+            
+            if (authStorage) {
+              try {
+                const { state } = JSON.parse(authStorage);
+                console.log('[AuthStore] fetchCurrentUser: 保存されたトークン:', 
+                           state?.token ? '存在します' : '存在しません');
+              } catch (e) {
+                console.error('[AuthStore] fetchCurrentUser: ストレージの解析エラー:', e);
+              }
+            }
+          }
           
           try {
-            const userData = await fetchData<User>('auth/me', {});
+            console.log('[AuthStore] fetchCurrentUser: /api/auth/me エンドポイントを呼び出し');
+            const userData = await fetchData<User | null>('auth/me', {});
+            console.log('[AuthStore] fetchCurrentUser: レスポンス:', userData);
             
+            // ユーザーデータがnullの場合は未ログイン状態
+            if (userData === null) {
+              console.log('[AuthStore] fetchCurrentUser: ユーザーデータがnull、認証状態をクリア');
+              set({ 
+                user: null,
+                token: null,
+                isLoading: false 
+              });
+              return;
+            }
+            
+            console.log('[AuthStore] fetchCurrentUser: ユーザーデータあり、storeに設定:', userData.id);
             set({ 
               user: userData,
               isLoading: false
             });
             
             // プロジェクトメンバーシップを取得
+            console.log('[AuthStore] fetchCurrentUser: プロジェクトメンバーシップの取得を開始');
             get().fetchProjectMemberships();
           } catch (error) {
             // 認証エラーの場合はユーザー情報をクリア
+            console.error('[AuthStore] fetchCurrentUser: 取得エラー:', error);
             if (error instanceof Error && error.message.includes('401')) {
+              console.log('[AuthStore] fetchCurrentUser: 401エラー検出、認証状態をクリア');
               set({ user: null, token: null, isLoading: false });
               return;
             }
             throw error;
           }
         } catch (error) {
+          console.error('[AuthStore] fetchCurrentUser: 未処理のエラー:', error);
           set({ 
             error: error instanceof Error ? error.message : 'ユーザー情報の取得に失敗しました',
             isLoading: false
