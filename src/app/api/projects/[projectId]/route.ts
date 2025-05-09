@@ -32,8 +32,33 @@ export async function GET(
       where: { projectId },
     });
 
+    // プロジェクトメンバー情報を加工
+    const formattedMembers = project.members.map((member: any) => ({
+      id: member.id,
+      userId: member.userId,
+      userName: member.user.name || null,
+      userEmail: member.user.email,
+      role: member.role,
+      joinedAt: member.createdAt
+    }));
+
+    // プロジェクトの質問情報も取得
+    const questions = await prisma.question.findMany({
+      where: { projectId },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        creatorId: true,
+        createdAt: true
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
     return NextResponse.json({
       ...project,
+      members: formattedMembers,
+      questions,
       tags,
     });
   } catch (error) {

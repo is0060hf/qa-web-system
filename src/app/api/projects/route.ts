@@ -114,22 +114,50 @@ export async function POST(req: NextRequest) {
 
     const { name, description } = validation.data;
 
-    // プロジェクト作成
-    const project = await prisma.project.create({
-      data: {
-        name,
-        description,
-        creatorId: user.id,
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    // トランザクションを使用してプロジェクト作成とメンバー追加を一緒に行う
+    const project = await prisma.$transaction(async (tx) => {
+      // プロジェクト作成
+      const newProject = await tx.project.create({
+        data: {
+          name,
+          description,
+          creatorId: user.id,
+        },
+      });
+
+      // 作成者をプロジェクト管理者として追加
+      await tx.projectMember.create({
+        data: {
+          projectId: newProject.id,
+          userId: user.id,
+          role: 'MANAGER', // ProjectRole.MANAGER
+        },
+      });
+
+      // プロジェクト情報を関連データと一緒に取得して返す
+      return await tx.project.findUnique({
+        where: { id: newProject.id },
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                },
+              },
+            },
           },
         },
-      },
+      });
     });
 
     return NextResponse.json(project, { status: 201 });

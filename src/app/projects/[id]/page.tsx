@@ -142,6 +142,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     try {
       setIsLoading(true);
       const data = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
+      console.log('プロジェクト詳細データ:', data);
+      console.log('メンバー情報:', data.members);
       setProject(data);
     } catch (err) {
       console.error('Failed to fetch project data:', err);
@@ -471,8 +473,14 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={member.userName || member.userEmail || `メンバーID: ${member.userId}`}
-                      secondary={member.role}
+                      primary={member.userName || member.userEmail || "名前未設定"}
+                      secondary={
+                        <>
+                          <Typography component="span" variant="body2" color="text.secondary">
+                            {member.role} {member.userId && ` • ID: ${member.userId.substring(0, 8)}...`}
+                          </Typography>
+                        </>
+                      }
                     />
                   </ListItem>
                   {index < project.members.length - 1 && <Divider variant="inset" component="li" />}

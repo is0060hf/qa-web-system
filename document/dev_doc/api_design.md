@@ -202,11 +202,46 @@
 
 *   **Method:** `GET`
 *   **Path:** `/api/projects/{projectId}`
-*   **Description:** 特定のプロジェクトの詳細情報を取得します。
+*   **Description:** 特定のプロジェクトの詳細情報を取得します。メンバー情報には各ユーザーのID、名前、メールアドレス、役割などが含まれます。
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Project Member, Project Manager, ADMIN
 *   **URL Parameters:** `projectId`
 *   **Success Response:** `200 OK` (プロジェクト詳細情報、メンバー、タグなどを含む)
+    ```json
+    {
+      "id": "project_id",
+      "name": "プロジェクト名",
+      "description": "プロジェクト説明",
+      "createdAt": "creation_timestamp",
+      "updatedAt": "update_timestamp",
+      "status": "アクティブ",
+      "members": [
+        {
+          "id": "member_id",
+          "userId": "user_id",
+          "userName": "ユーザー名",
+          "userEmail": "user@example.com",
+          "role": "MANAGER",
+          "joinedAt": "join_timestamp"
+        }
+      ],
+      "questions": [
+        {
+          "id": "question_id",
+          "title": "質問タイトル",
+          "status": "NEW",
+          "creatorId": "creator_id",
+          "createdAt": "creation_timestamp"
+        }
+      ],
+      "tags": [
+        {
+          "id": "tag_id",
+          "name": "タグ名"
+        }
+      ]
+    }
+    ```
 *   **Error Response:** `401 Unauthorized`, `403 Forbidden`, `404 Not Found`
 
 ### 3.3.1. プロジェクト招待可能ユーザー一覧取得
@@ -679,8 +714,7 @@
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Answer Creator (if question is not closed)
 *   **URL Parameters:** `answerId`
-*   **Success Response:** `204 No Content`
-*   **Error Response:** `401 Unauthorized`, `403 Forbidden` (Not creator or question closed), `404 Not Found`
+*   **Success Response:** `204 No Content`*   **Error Response:** `401 Unauthorized`, `403 Forbidden` (Not creator or question closed), `404 Not Found`
 
 ## 9. 添付ファイル (Attachments)
 
@@ -814,4 +848,6 @@
 *   **Authorization:** Authenticated User
 *   **Success Response:** `200 OK` `{ "updatedCount": 10 }`
 *   **Error Response:** `401 Unauthorized`
+
+
 
