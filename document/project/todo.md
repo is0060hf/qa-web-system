@@ -147,6 +147,11 @@
   - [x] プロジェクト一覧/詳細/作成/更新: 複数の関数 → すべての関数でfetchDataを使用済み
   - [x] タグ管理: 複数の関数 → すべての関数でfetchDataを使用済み
   - [x] メンバー招待/管理: 複数の関数 → すべての関数でfetchDataを使用済み
+- [x] src/app/projects/[id]/page.tsx
+  - [x] プロジェクト更新: `await fetch('/api/projects/${params.id}', {...})` → `fetchData<ProjectDetails>('projects/${params.id}', { method: 'PATCH', ... })`に修正済み
+- [x] src/app/projects/[id]/edit/page.tsx
+  - [x] プロジェクト取得: `await fetch('/api/projects/${params.id}')` → `fetchData<Project>('projects/${params.id}', {})`に修正済み
+  - [x] プロジェクト更新: `await fetch('/api/projects/${params.id}', {...})` → `fetchData<any>('projects/${params.id}', { method: 'PATCH', ... })`に修正済み
 
 ### 対応状況まとめ
 - [x] src/app/search/page.tsx - 修正完了（直接fetchからfetchDataに変更）
@@ -155,6 +160,8 @@
 - [x] src/app/stores/notificationStore.ts - 対応済み（既にfetchData関数を使用）
 - [x] src/app/stores/projectStore.ts - 対応済み（既にfetchData関数を使用）
 - [x] src/app/components/notifications/NotificationsPage.tsx - 対応済み（既にfetchData関数を使用）
+- [x] src/app/projects/[id]/page.tsx - 修正完了（直接fetchからfetchDataに変更）
+- [x] src/app/projects/[id]/edit/page.tsx - 修正完了（直接fetchからfetchDataに変更）
 
 ### 認証関連コンポーネント
 - [x] src/app/components/auth/LoginForm.tsx: ログインフォーム

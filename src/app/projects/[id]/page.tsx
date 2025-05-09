@@ -41,6 +41,7 @@ import {
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData } from '@/lib/utils/fetchData';
+import ProjectForm from '../../components/projects/ProjectForm';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -108,6 +109,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const [project, setProject] = useState<ProjectDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [projectFormError, setProjectFormError] = useState<string | undefined>(undefined);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // プロジェクト詳細データを取得
   // Note: 将来のNext.jsバージョンではparamsの処理方法が変わる可能性があります
@@ -179,6 +182,29 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     }
   };
 
+  const handleUpdateProject = async (name: string, description: string) => {
+    setIsSubmitting(true);
+    setProjectFormError(undefined);
+
+    try {
+      // 直接fetchを使う代わりにfetchDataユーティリティを使用
+      await fetchData<ProjectDetails>(`projects/${params.id}`, {
+        method: 'PATCH',
+        body: { name, description },
+      });
+
+      // 成功したら最新のプロジェクト情報を再取得
+      const updatedProject = await fetchData<ProjectDetails>(`projects/${params.id}`, {});
+      setProject(updatedProject);
+      
+      // 成功メッセージをトーストで表示するなどの処理も可能
+    } catch (error) {
+      setProjectFormError(error instanceof Error ? error.message : '予期せぬエラーが発生しました');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -222,7 +248,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <Button
             variant="outlined"
             startIcon={<PersonAddIcon />}
-            onClick={() => {/* メンバー追加処理 */}}
+            onClick={() => setTabValue(1)}
           >
             メンバー追加
           </Button>
@@ -232,21 +258,6 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             onClick={() => {/* 共有処理 */}}
           >
             共有
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<EditIcon />}
-            onClick={() => router.push(`/projects/${params.id}/edit`)}
-          >
-            編集
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={() => setOpenDeleteDialog(true)}
-          >
-            削除
           </Button>
         </Box>
       </Box>
@@ -259,102 +270,61 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="project tabs">
-          <Tab label="概要" {...a11yProps(0)} />
+          <Tab label="質問一覧" {...a11yProps(0)} />
           <Tab label="メンバー" {...a11yProps(1)} />
-          <Tab label="質問" {...a11yProps(2)} />
+          <Tab label="設定" {...a11yProps(2)} />
         </Tabs>
       </Box>
 
       <TabPanel value={tabValue} index={0}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Card elevation={0} sx={{ borderRadius: 2 }}>
-              <CardHeader title="プロジェクト情報" />
-              <Divider />
-              <CardContent>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ width: 150 }}>プロジェクトID:</Typography>
-                  <Typography variant="body2">{project.id}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ width: 150 }}>作成日:</Typography>
-                  <Typography variant="body2">{new Date(project.createdAt).toLocaleDateString('ja-JP')}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ width: 150 }}>メンバー数:</Typography>
-                  <Typography variant="body2">{project.memberCount || project.members.length}人</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ width: 150 }}>質問数:</Typography>
-                  <Typography variant="body2">{project.questions?.length || 0}件</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ width: 150 }}>ステータス:</Typography>
-                  <Chip 
-                    label={project.status} 
-                    color={getStatusColor(project.status) as any}
-                    size="small"
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card elevation={0} sx={{ borderRadius: 2 }}>
-              <CardHeader 
-                title="最近の質問" 
-                action={
-                  <Button 
-                    variant="text" 
-                    color="primary"
-                    onClick={() => router.push(`/questions/create?projectId=${params.id}`)}
-                    startIcon={<HelpOutlineIcon />}
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            startIcon={<HelpOutlineIcon />}
+            onClick={() => router.push(`/questions/create?projectId=${params.id}`)}
+          >
+            質問を作成
+          </Button>
+        </Box>
+        <Paper elevation={0} sx={{ borderRadius: 2 }}>
+          <List>
+            {project.questions && project.questions.length > 0 ? (
+              project.questions.map((question, index) => (
+                <Box key={question.id}>
+                  <ListItem
+                    component="div"
+                    sx={{ px: 3, py: 2 }}
+                    secondaryAction={
+                      <Chip 
+                        label={question.status} 
+                        color={getQuestionStatusColor(question.status) as any}
+                        size="small"
+                      />
+                    }
                   >
-                    質問を作成
-                  </Button>
-                }
-              />
-              <Divider />
-              <CardContent sx={{ p: 0 }}>
-                <List>
-                  {project.questions && project.questions.length > 0 ? (
-                    project.questions.slice(0, 3).map((question, index) => (
-                      <Box key={question.id}>
-                        <ListItem
-                          button
-                          onClick={() => router.push(`/questions/${question.id}`)}
-                          sx={{ px: 3, py: 2 }}
-                          secondaryAction={
-                            <Chip 
-                              label={question.status} 
-                              color={getQuestionStatusColor(question.status) as any}
-                              size="small"
-                            />
-                          }
-                        >
-                          <ListItemAvatar>
-                            <Avatar sx={{ bgcolor: 'primary.main' }}>
-                              <AssignmentIcon />
-                            </Avatar>
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={question.title}
-                            secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
-                          />
-                        </ListItem>
-                        {index < Math.min(project.questions.length - 1, 2) && <Divider variant="inset" component="li" />}
-                      </Box>
-                    ))
-                  ) : (
-                    <ListItem sx={{ px: 3, py: 2 }}>
-                      <ListItemText primary="質問がありません" />
-                    </ListItem>
-                  )}
-                </List>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+                    <Box onClick={() => router.push(`/questions/${question.id}`)} 
+                         sx={{ display: 'flex', alignItems: 'center', width: '100%', cursor: 'pointer' }}>
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: 'primary.main' }}>
+                          <AssignmentIcon />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={question.title}
+                        secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
+                      />
+                    </Box>
+                  </ListItem>
+                  {index < (project.questions?.length ?? 0) - 1 && <Divider variant="inset" component="li" />}
+                </Box>
+              ))
+            ) : (
+              <ListItem sx={{ px: 3, py: 2 }}>
+                <ListItemText primary="質問がありません" />
+              </ListItem>
+            )}
+          </List>
+        </Paper>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
@@ -404,52 +374,63 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
-        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            startIcon={<HelpOutlineIcon />}
-            onClick={() => router.push(`/questions/create?projectId=${params.id}`)}
-          >
-            質問を作成
-          </Button>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" gutterBottom>
+              プロジェクト編集
+            </Typography>
+            <Paper sx={{ p: 3, borderRadius: 2 }}>
+              {project && (
+                <ProjectForm
+                  onSubmit={handleUpdateProject}
+                  initialData={project}
+                  isLoading={isSubmitting}
+                  error={projectFormError}
+                  isEditMode={true}
+                />
+              )}
+            </Paper>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" gutterBottom>
+              タグ管理
+            </Typography>
+            <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                現在のタグを管理したり、新しいタグを追加したりできます。
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                まだ実装されていません。今後実装予定です。
+              </Typography>
+            </Paper>
+
+            <Typography variant="h6" gutterBottom>
+              保留中の招待
+            </Typography>
+            <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
+              <Typography variant="body2" color="text.secondary">
+                まだ応答していない招待リストを表示します。今後実装予定です。
+              </Typography>
+            </Paper>
+
+            <Typography variant="h6" gutterBottom>
+              危険な操作
+            </Typography>
+            <Paper sx={{ p: 3, borderRadius: 2 }}>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                プロジェクトを削除すると、すべての質問や関連データも削除されます。この操作は元に戻せません。
+              </Typography>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                プロジェクトを削除
+              </Button>
+            </Paper>
+          </Box>
         </Box>
-        <Paper elevation={0} sx={{ borderRadius: 2 }}>
-          <List>
-            {project.questions && project.questions.length > 0 ? (
-              project.questions.map((question, index) => (
-                <Box key={question.id}>
-                  <ListItem
-                    button
-                    onClick={() => router.push(`/questions/${question.id}`)}
-                    sx={{ px: 3, py: 2 }}
-                    secondaryAction={
-                      <Chip 
-                        label={question.status} 
-                        color={getQuestionStatusColor(question.status) as any}
-                        size="small"
-                      />
-                    }
-                  >
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: 'primary.main' }}>
-                        <AssignmentIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={question.title}
-                      secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
-                    />
-                  </ListItem>
-                  {index < project.questions.length - 1 && <Divider variant="inset" component="li" />}
-                </Box>
-              ))
-            ) : (
-              <ListItem sx={{ px: 3, py: 2 }}>
-                <ListItemText primary="質問がありません" />
-              </ListItem>
-            )}
-          </List>
-        </Paper>
       </TabPanel>
 
       {/* 削除確認ダイアログ */}
