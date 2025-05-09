@@ -29,6 +29,12 @@ import {
   DialogActions,
   CircularProgress,
   Alert,
+  TextField,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Autocomplete,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -42,6 +48,7 @@ import {
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData } from '@/lib/utils/fetchData';
 import ProjectForm from '../../components/projects/ProjectForm';
+import { useProjectStore } from '../../stores/projectStore';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -102,36 +109,52 @@ interface ProjectDetails {
   memberCount: number;
 }
 
+// 新しいインターフェース追加
+interface User {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  // プロジェクトIDを安全に抽出
+  const projectId = React.useMemo(() => params.id, [params.id]);
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openInviteDialog, setOpenInviteDialog] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
   const [project, setProject] = useState<ProjectDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectFormError, setProjectFormError] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inviteTabValue, setInviteTabValue] = useState(0);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const projectStore = useProjectStore();
 
-  // プロジェクト詳細データを取得
+  // プロジェクト詳細データを取得する関数
+  const fetchProjectData = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
+      setProject(data);
+    } catch (err) {
+      console.error('Failed to fetch project data:', err);
+      setError(err instanceof Error ? err.message : 'プロジェクト情報の取得に失敗しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Note: 将来のNext.jsバージョンではparamsの処理方法が変わる可能性があります
   useEffect(() => {
-    const fetchProjectData = async () => {
-      try {
-        setIsLoading(true);
-        // パラメータから直接IDを使用
-        const projectId = params.id;
-        const data = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
-        setProject(data);
-      } catch (err) {
-        console.error('Failed to fetch project data:', err);
-        setError(err instanceof Error ? err.message : 'プロジェクト情報の取得に失敗しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchProjectData();
-  }, [params.id]);
+  }, [projectId]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -139,7 +162,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
 
   const handleDelete = async () => {
     try {
-      await fetchData<{ success: boolean }>(`projects/${params.id}`, {
+      await fetchData<{ success: boolean }>(`projects/${projectId}`, {
         method: 'DELETE'
       });
       setOpenDeleteDialog(false);
@@ -187,21 +210,112 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     setProjectFormError(undefined);
 
     try {
-      // 直接fetchを使う代わりにfetchDataユーティリティを使用
-      await fetchData<ProjectDetails>(`projects/${params.id}`, {
+      await fetchData<ProjectDetails>(`projects/${projectId}`, {
         method: 'PATCH',
         body: { name, description },
       });
 
       // 成功したら最新のプロジェクト情報を再取得
-      const updatedProject = await fetchData<ProjectDetails>(`projects/${params.id}`, {});
+      const updatedProject = await fetchData<ProjectDetails>(`projects/${projectId}`, {});
       setProject(updatedProject);
       
-      // 成功メッセージをトーストで表示するなどの処理も可能
     } catch (error) {
       setProjectFormError(error instanceof Error ? error.message : '予期せぬエラーが発生しました');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // 既存ユーザー取得
+  const fetchUsers = async () => {
+    try {
+      setIsLoadingUsers(true);
+      
+      console.log('招待可能ユーザー取得開始 - プロジェクトID:', params.id);
+      // 新しいAPIエンドポイントを使用 - プロジェクトに参加していないユーザーを取得
+      const data = await fetchData<User[]>(`projects/${params.id}/available-users`, {});
+      
+      // レスポンスが配列かどうかを確認
+      if (Array.isArray(data)) {
+        console.log('有効なユーザー配列を受信:', data.length, '件');
+        if (data.length > 0) {
+          console.log('受信したユーザー例:', data.slice(0, 3).map(u => ({ id: u.id, name: u.name, email: u.email })));
+        }
+        setUsers(data);
+      } else {
+        console.error('APIレスポンスが配列ではありません:', typeof data, data);
+        setUsers([]);
+      }
+    } catch (err) {
+      console.error('ユーザー取得エラー:', err);
+      setUsers([]);
+      setInviteError('ユーザー情報の取得に失敗しました');
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  const handleOpenInviteDialog = () => {
+    setInviteEmail('');
+    setInviteError(null);
+    setSelectedUser(null);
+    setInviteTabValue(0);
+    setOpenInviteDialog(true);
+    // ダイアログを開いたらユーザー一覧を取得
+    fetchUsers();
+  };
+
+  const handleCloseInviteDialog = () => {
+    setOpenInviteDialog(false);
+  };
+
+  const handleInviteTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setInviteTabValue(newValue);
+    // タブが変わったらエラーをリセット
+    setInviteError(null);
+  };
+
+  const handleInviteMember = async () => {
+    try {
+      setIsInviting(true);
+      setInviteError(null);
+
+      if (inviteTabValue === 0) {
+        // メールアドレスによる招待
+        if (!inviteEmail.trim()) {
+          setInviteError('メールアドレスを入力してください');
+          return;
+        }
+
+        await projectStore.inviteUserByEmail(projectId, inviteEmail.trim());
+        
+        // 成功したら招待ダイアログを閉じる
+        setOpenInviteDialog(false);
+        
+        // サクセスメッセージ
+        alert('招待メールを送信しました');
+      } else {
+        // 既存ユーザー選択による招待
+        if (!selectedUser) {
+          setInviteError('ユーザーを選択してください');
+          return;
+        }
+
+        await projectStore.inviteUserToProject(projectId, selectedUser.id);
+        
+        // 成功したら招待ダイアログを閉じる
+        setOpenInviteDialog(false);
+        
+        // サクセスメッセージ
+        alert(`${selectedUser.name || selectedUser.email}をプロジェクトメンバーとして追加しました`);
+        
+        // プロジェクト情報（メンバーリスト）を再取得して更新
+        fetchProjectData();
+      }
+    } catch (error) {
+      setInviteError(error instanceof Error ? error.message : '招待処理中にエラーが発生しました');
+    } finally {
+      setIsInviting(false);
     }
   };
 
@@ -332,7 +446,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <Button
             variant="contained"
             startIcon={<PersonAddIcon />}
-            onClick={() => {/* メンバー追加処理 */}}
+            onClick={handleOpenInviteDialog}
           >
             メンバー追加
           </Button>
@@ -432,6 +546,93 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           </Box>
         </Box>
       </TabPanel>
+
+      {/* メンバー招待ダイアログ */}
+      <Dialog
+        open={openInviteDialog}
+        onClose={handleCloseInviteDialog}
+        aria-labelledby="invite-dialog-title"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="invite-dialog-title">
+          メンバーを招待
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+            <Tabs value={inviteTabValue} onChange={handleInviteTabChange} aria-label="invite tabs">
+              <Tab label="メールアドレスで招待" />
+              <Tab label="既存ユーザーから選択" />
+            </Tabs>
+          </Box>
+
+          {inviteError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {inviteError}
+            </Alert>
+          )}
+
+          {inviteTabValue === 0 ? (
+            // メールアドレスによる招待
+            <TextField
+              autoFocus
+              margin="dense"
+              id="email"
+              label="メールアドレス"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+            />
+          ) : (
+            // 既存ユーザー選択による招待
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                プロジェクトに招待する既存ユーザーを選択してください。
+              </Typography>
+              {isLoadingUsers ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                  <CircularProgress size={24} />
+                </Box>
+              ) : users.length === 0 ? (
+                <Typography color="text.secondary" sx={{ textAlign: 'center', my: 2 }}>
+                  招待可能なユーザーが見つかりませんでした
+                </Typography>
+              ) : (
+                <Autocomplete
+                  id="user-select"
+                  options={users || []}
+                  getOptionLabel={(option) => {
+                    // optionがnullやundefinedでないことを確認
+                    if (!option) return '';
+                    return option.name ? `${option.name} (${option.email})` : option.email;
+                  }}
+                  value={selectedUser}
+                  onChange={(event, newValue) => {
+                    setSelectedUser(newValue);
+                  }}
+                  renderInput={(params) => <TextField {...params} label="ユーザーを選択" />}
+                  noOptionsText="ユーザーが見つかりません"
+                  fullWidth
+                  isOptionEqualToValue={(option, value) => option.id === value?.id}
+                />
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseInviteDialog}>キャンセル</Button>
+          <Button 
+            onClick={handleInviteMember} 
+            color="primary" 
+            disabled={isInviting}
+            startIcon={isInviting ? <CircularProgress size={20} /> : null}
+          >
+            {isInviting ? '招待中...' : '招待する'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* 削除確認ダイアログ */}
       <Dialog

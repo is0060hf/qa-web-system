@@ -209,6 +209,23 @@
 *   **Success Response:** `200 OK` (プロジェクト詳細情報、メンバー、タグなどを含む)
 *   **Error Response:** `401 Unauthorized`, `403 Forbidden`, `404 Not Found`
 
+### 3.3.1. プロジェクト招待可能ユーザー一覧取得
+
+*   **Method:** `GET`
+*   **Path:** `/api/projects/{projectId}/available-users`
+*   **Description:** 特定のプロジェクトに招待可能なユーザー（まだメンバーでないユーザー）の一覧を取得します。
+*   **Authentication:** Required (JWT)
+*   **Authorization:** Project Member, Project Manager, ADMIN
+*   **URL Parameters:** `projectId`
+*   **Success Response:** `200 OK` (ユーザー一覧)
+    ```json
+    [
+      { "id": "user_cuid", "name": "User Name", "email": "user@example.com" },
+      ...
+    ]
+    ```
+*   **Error Response:** `401 Unauthorized`, `403 Forbidden`, `404 Not Found`
+
 ### 3.4. プロジェクト情報更新
 
 *   **Method:** `PATCH`
@@ -343,37 +360,101 @@
 
 *   **Method:** `POST`
 *   **Path:** `/api/projects/{projectId}/invitations`
-*   **Description:** ユーザーをプロジェクトに招待します（既存ユーザー選択またはメールアドレス指定）。
+*   **Description:** ユーザーをプロジェクトに招待します（既存ユーザー選択またはメールアドレス指定）。既存ユーザーを招待した場合は自動的にプロジェクトメンバーとして追加され、招待ステータスは「ACCEPTED」に設定されます。メールアドレスのみの招待の場合は、招待レコードを作成し、ステータスは「PENDING」となります。
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Project Manager, ADMIN
 *   **URL Parameters:** `projectId`
 *   **Request Body:**
     ```json
-    // Existing user
-    { "userId": "existing_user_cuid" }
-    // New user by email
-    { "email": "newuser@example.com" }
+    // 既存ユーザーを招待（即時メンバー追加）
+    { 
+      "type": "userId",
+      "userId": "existing_user_cuid" 
+    }
+    // メールアドレスで招待
+    { 
+      "type": "email",
+      "email": "newuser@example.com" 
+    }
     ```
-*   **Success Response:** `201 Created` (招待情報、メール送信の場合はその旨)
+*   **Success Response:** `201 Created` 
+    ```json
+    // 既存ユーザー招待時
+    {
+      "message": "ユーザーをプロジェクトに追加しました",
+      "invitation": { ... },
+      "memberRecord": { ... }
+    }
+    
+    // メールアドレス招待時
+    {
+      "message": "プロジェクト招待を送信しました",
+      "invitation": { ... }
+    }
+    ```
 *   **Error Response:** `400 Bad Request` (ユーザー既に参加済み、招待済み、メール形式不正), `401 Unauthorized`, `403 Forbidden`, `404 Not Found` (Project or User not found)
 
 ### 6.2. 招待承認/拒否
 
 *   **Method:** `POST`
 *   **Path:** `/api/invitations/respond`
-*   **Description:** 招待されたユーザーが招待を承認または拒否します。
-*   **Authentication:** Required (JWT) - 招待されたユーザーとしてログインしている想定、またはトークンベース
+*   **Description:** 招待されたユーザーが招待を承認または拒否します。承認した場合はプロジェクトメンバーとして追加されます。
+*   **Authentication:** Required (JWT) - 招待されたユーザーとしてログインしている必要があります
 *   **Request Body:**
     ```json
     {
-      "token": "invitation_token", // or invitationId if logged in
-      "accept": true // or false to reject
+      "token": "invitation_token",
+      "accept": true // true: 承認、false: 拒否
     }
     ```
-*   **Success Response:** `200 OK` (承認された場合はプロジェクトメンバー情報)
-*   **Error Response:** `400 Bad Request` (トークン無効/期限切れ), `401 Unauthorized`, `404 Not Found` (Invitation not found)
+*   **Success Response:** 
+    ```json
+    // 承認時
+    {
+      "message": "プロジェクト招待を承認しました",
+      "project": { ... },
+      "membership": { ... }
+    }
+    
+    // 拒否時
+    {
+      "message": "プロジェクト招待を拒否しました"
+    }
+    ```
+*   **Error Response:** `400 Bad Request` (トークン無効/期限切れ), `401 Unauthorized`, `403 Forbidden` (招待メールアドレスとユーザーのメールアドレス不一致), `404 Not Found` (Invitation not found), `410 Gone` (既に応答済みの招待/期限切れ)
 
-### 6.3. 保留中の招待一覧 (プロジェクト別)
+### 6.3. トークンによる招待詳細取得
+
+*   **Method:** `GET`
+*   **Path:** `/api/invitations/{token}`
+*   **Description:** 招待トークンに基づいて招待の詳細情報を取得します。
+*   **Authentication:** Optional - 未認証でもアクセス可能ですが、認証済みの場合はユーザーと招待の関連チェックを行います
+*   **URL Parameters:** `token` (招待トークン)
+*   **Success Response:** `200 OK` (招待詳細情報)
+    ```json
+    {
+      "invitation": {
+        "id": "invitation_id",
+        "email": "invited@example.com",
+        "status": "PENDING",
+        "expiresAt": "expiry_timestamp",
+        "createdAt": "creation_timestamp",
+        "project": {
+          "id": "project_id",
+          "name": "Project Name",
+          "description": "Project Description"
+        },
+        "inviter": {
+          "id": "inviter_id",
+          "name": "Inviter Name",
+          "email": "inviter@example.com"
+        }
+      }
+    }
+    ```
+*   **Error Response:** `404 Not Found` (招待が見つからない), `410 Gone` (招待が期限切れまたは既に応答済み)
+
+### 6.4. 保留中の招待一覧 (プロジェクト別)
 
 *   **Method:** `GET`
 *   **Path:** `/api/projects/{projectId}/invitations`
@@ -385,7 +466,7 @@
 *   **Success Response:** `200 OK` (招待リスト)
 *   **Error Response:** `401 Unauthorized`, `403 Forbidden`, `404 Not Found`
 
-### 6.4. 招待取り消し
+### 6.5. 招待取り消し
 
 *   **Method:** `DELETE`
 *   **Path:** `/api/invitations/{invitationId}`

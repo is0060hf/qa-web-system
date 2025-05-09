@@ -34,9 +34,16 @@ export const createProjectTagSchema = z.object({
 });
 
 // プロジェクト招待スキーマ
-export const inviteToProjectSchema = z.object({
-  email: z.string().email('有効なメールアドレスを入力してください'),
-});
+export const inviteToProjectSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('email'),
+    email: z.string().email('有効なメールアドレスを入力してください'),
+  }),
+  z.object({
+    type: z.literal('userId'),
+    userId: z.string().min(1, 'ユーザーIDは必須です'),
+  }),
+]);
 
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;

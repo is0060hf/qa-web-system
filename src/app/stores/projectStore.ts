@@ -311,7 +311,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       await fetchData<{ success: boolean }>(`projects/${projectId}/invitations`, {
         method: 'POST',
-        body: { userId }
+        body: { 
+          type: 'userId',
+          userId 
+        }
       });
     } catch (error) {
       throw error;
@@ -323,7 +326,10 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
     try {
       await fetchData<{ success: boolean }>(`projects/${projectId}/invitations`, {
         method: 'POST',
-        body: { email }
+        body: { 
+          type: 'email',
+          email 
+        }
       });
     } catch (error) {
       throw error;

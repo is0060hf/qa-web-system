@@ -87,20 +87,122 @@ export async function POST(
       return validation.error;
     }
 
-    const { email } = validation.data;
+    const { type } = validation.data;
+    
+    // 招待タイプに応じた処理
+    if (type === 'email') {
+      // メールアドレスによる招待
+      const { email } = validation.data;
 
-    // 既存ユーザーのチェック
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+      // 既存ユーザーのチェック
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
 
-    // 既にプロジェクトメンバーか確認
-    if (existingUser) {
+      // 既にプロジェクトメンバーか確認
+      if (existingUser) {
+        const isAlreadyMember = await prisma.projectMember.findUnique({
+          where: {
+            projectId_userId: {
+              projectId,
+              userId: existingUser.id,
+            }
+          }
+        });
+
+        if (isAlreadyMember) {
+          return NextResponse.json(
+            { error: 'このユーザーは既にプロジェクトメンバーです' },
+            { status: 409 }
+          );
+        }
+      }
+
+      // 既に招待しているか確認
+      const existingInvitation = await prisma.invitation.findFirst({
+        where: {
+          email,
+          projectId,
+          status: 'PENDING',
+        },
+      });
+
+      if (existingInvitation) {
+        return NextResponse.json(
+          { error: 'このメールアドレスは既に招待されています' },
+          { status: 409 }
+        );
+      }
+
+      // トークン生成と有効期限設定
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 招待有効期限7日間
+
+      // 招待作成
+      const invitation = await prisma.invitation.create({
+        data: {
+          email,
+          projectId,
+          inviterId: user.id,
+          token,
+          expiresAt,
+          status: 'PENDING',
+        },
+        include: {
+          inviter: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          project: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      // 実際のアプリケーションでは、ここでメール送信サービスを使用して招待メールを送信
+
+      return NextResponse.json({
+        message: 'プロジェクト招待を送信しました',
+        invitation: {
+          id: invitation.id,
+          email: invitation.email,
+          status: invitation.status,
+          expiresAt: invitation.expiresAt,
+          createdAt: invitation.createdAt,
+          inviter: invitation.inviter,
+          project: invitation.project,
+        }
+      }, { status: 201 });
+    } else {
+      // 既存ユーザーIDによる招待
+      const { userId } = validation.data;
+      
+      // ユーザーの存在チェック
+      const targetUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, name: true }
+      });
+      
+      if (!targetUser) {
+        return NextResponse.json(
+          { error: '指定されたユーザーが見つかりません' },
+          { status: 404 }
+        );
+      }
+      
+      // 既にプロジェクトメンバーか確認
       const isAlreadyMember = await prisma.projectMember.findUnique({
         where: {
           projectId_userId: {
             projectId,
-            userId: existingUser.id,
+            userId: targetUser.id,
           }
         }
       });
@@ -111,70 +213,88 @@ export async function POST(
           { status: 409 }
         );
       }
-    }
-
-    // 既に招待しているか確認
-    const existingInvitation = await prisma.invitation.findFirst({
-      where: {
-        email,
-        projectId,
-        status: 'PENDING',
-      },
-    });
-
-    if (existingInvitation) {
-      return NextResponse.json(
-        { error: 'このメールアドレスは既に招待されています' },
-        { status: 409 }
-      );
-    }
-
-    // トークン生成と有効期限設定
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 招待有効期限7日間
-
-    // 招待作成
-    const invitation = await prisma.invitation.create({
-      data: {
-        email,
-        projectId,
-        inviterId: user.id,
-        token,
-        expiresAt,
-        status: 'PENDING',
-      },
-      include: {
-        inviter: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+      
+      // 既に招待しているか確認
+      const existingInvitation = await prisma.invitation.findFirst({
+        where: {
+          email: targetUser.email,
+          projectId,
+          status: 'PENDING',
         },
-        project: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+      });
 
-    // 実際のアプリケーションでは、ここでメール送信サービスを使用して招待メールを送信
-
-    return NextResponse.json({
-      message: 'プロジェクト招待を送信しました',
-      invitation: {
-        id: invitation.id,
-        email: invitation.email,
-        status: invitation.status,
-        expiresAt: invitation.expiresAt,
-        createdAt: invitation.createdAt,
-        inviter: invitation.inviter,
-        project: invitation.project,
+      if (existingInvitation) {
+        return NextResponse.json(
+          { error: 'このユーザーは既に招待されています' },
+          { status: 409 }
+        );
       }
-    }, { status: 201 });
+      
+      // 既存ユーザーの場合は、招待レコードを作成して自動的に承認し、プロジェクトメンバーに追加する
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 招待有効期限7日間
+
+      // トランザクションを使用して、招待作成とメンバー追加を一括処理
+      const [invitation, memberRecord] = await prisma.$transaction([
+        // 招待レコード作成（自動承認状態）
+        prisma.invitation.create({
+          data: {
+            email: targetUser.email,
+            projectId,
+            inviterId: user.id,
+            token,
+            expiresAt,
+            status: 'ACCEPTED', // 自動承認済み
+          },
+          include: {
+            inviter: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            project: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        }),
+        
+        // プロジェクトメンバーとして追加
+        prisma.projectMember.create({
+          data: {
+            projectId,
+            userId: targetUser.id,
+            role: 'MEMBER', // デフォルトはメンバー権限
+          },
+        }),
+      ]);
+
+      // 追加処理成功を知らせる通知などの実装をここに追加することも可能
+      
+      return NextResponse.json({
+        message: 'ユーザーをプロジェクトに追加しました',
+        invitation: {
+          id: invitation.id,
+          email: invitation.email,
+          status: invitation.status,
+          expiresAt: invitation.expiresAt,
+          createdAt: invitation.createdAt,
+          inviter: invitation.inviter,
+          project: invitation.project,
+        },
+        memberRecord: {
+          id: memberRecord.id,
+          userId: memberRecord.userId,
+          projectId: memberRecord.projectId,
+          role: memberRecord.role,
+        }
+      }, { status: 201 });
+    }
   } catch (error) {
     console.error('プロジェクト招待作成エラー:', error);
     return NextResponse.json(
