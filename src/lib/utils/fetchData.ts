@@ -246,8 +246,15 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
   console.log(`[fetchData] Response status: ${response.status}`);
   
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch (e) {
+      console.error(`[fetchData] Failed to parse error response as JSON`, e);
+      errorData = {};
+    }
     console.error(`[fetchData] Error response:`, errorData);
+    console.error(`[fetchData] Response headers:`, response.headers);
     
     // 認証エラー（401）の場合、ログインページにリダイレクト
     if (response.status === 401 && typeof window !== 'undefined') {
@@ -263,8 +270,17 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     );
   }
   
-  const data = await response.json();
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    console.error(`[fetchData] Failed to parse successful response as JSON`, e);
+    console.error(`[fetchData] Response text:`, await response.text());
+    throw new Error('レスポンスの解析に失敗しました');
+  }
+  
   console.log(`[fetchData] Successful response for: ${endpoint}`);
+  console.log(`[fetchData] Response data:`, data);
   return data;
 };
 

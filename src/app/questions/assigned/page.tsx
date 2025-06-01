@@ -227,9 +227,21 @@ export default function AssignedQuestionsPage() {
         }>('questions/assigned-to-me', { params });
         
         console.log('[AssignedQuestionsPage] API Response:', questionsResponse);
+        console.log('[AssignedQuestionsPage] Response type:', typeof questionsResponse);
+        console.log('[AssignedQuestionsPage] Response keys:', Object.keys(questionsResponse || {}));
+        console.log('[AssignedQuestionsPage] Questions array:', questionsResponse?.questions);
         
         // questionsプロパティから質問配列を取得
-        setQuestions(questionsResponse.questions || []);
+        if (!questionsResponse || typeof questionsResponse !== 'object') {
+          throw new Error('Invalid API response format');
+        }
+        
+        if (!Array.isArray(questionsResponse.questions)) {
+          console.error('[AssignedQuestionsPage] Invalid questions format:', questionsResponse);
+          throw new Error('Questions is not an array');
+        }
+        
+        setQuestions(questionsResponse.questions);
         
         // プロジェクト一覧を取得（フィルター用）
         const projectsResponse = await fetchData<{

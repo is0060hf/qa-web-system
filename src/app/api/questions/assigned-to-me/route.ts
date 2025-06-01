@@ -87,6 +87,13 @@ export async function GET(req: NextRequest) {
             email: true,
           },
         },
+        assignee: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         tags: {
           include: {
             tag: true,
@@ -104,31 +111,33 @@ export async function GET(req: NextRequest) {
     const formattedQuestions = questions.map(q => ({
       id: q.id,
       title: q.title,
-      content: q.content,
+      projectName: q.project.name,
       status: q.status,
       priority: q.priority,
       deadline: q.deadline,
-      isDeadlineExpired: q.deadline ? new Date(q.deadline) < new Date() : false,
-      projectId: q.projectId,
-      projectName: q.project.name,
-      creatorId: q.creatorId,
-      creatorName: q.creator.name || q.creator.email,
       createdAt: q.createdAt,
       updatedAt: q.updatedAt,
-      tags: q.tags.map(t => ({
-        id: t.tag.id,
-        name: t.tag.name,
-      })),
-      answerCount: q._count.answers,
+      creator: {
+        id: q.creator.id,
+        name: q.creator.name || q.creator.email,
+      },
+      answersCount: q._count.answers,
     }));
 
-    return NextResponse.json({
+    console.log('[API] Formatted questions count:', formattedQuestions.length);
+    console.log('[API] First formatted question:', formattedQuestions[0]);
+
+    const responseData = {
       questions: formattedQuestions,
       total,
       page,
       limit,
       totalPages: Math.ceil(total / limit),
-    });
+    };
+
+    console.log('[API] Response data keys:', Object.keys(responseData));
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('担当質問一覧取得エラー:', error);
     return NextResponse.json(
