@@ -6,7 +6,6 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
   FormControl,
   InputLabel,
   Select,
@@ -28,8 +27,8 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import ja from 'date-fns/locale/ja';
-import { format, isPast, isWithinDays } from 'date-fns';
+import { ja } from 'date-fns/locale';
+import { format, isPast, differenceInDays } from 'date-fns';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import DataTable from '../../components/common/DataTable';
 import { fetchData } from '@/lib/utils/fetchData';
@@ -166,7 +165,8 @@ const columns = [
       const deadline = new Date(value);
       const now = new Date();
       const isExpired = isPast(deadline);
-      const isNearDeadline = !isExpired && isWithinDays(deadline, now, 3); // 3日以内
+      const daysUntilDeadline = differenceInDays(deadline, now);
+      const isNearDeadline = !isExpired && daysUntilDeadline <= 3; // 3日以内
       
       return (
         <Typography
@@ -209,24 +209,43 @@ export default function AssignedQuestionsPage() {
       
       try {
         // クエリパラメータの作成
-        const params = new URLSearchParams();
+        const params: Record<string, string> = {};
         
-        if (searchTerm) params.append('search', searchTerm);
-        if (statusFilter !== 'all') params.append('status', statusFilter);
-        if (priorityFilter !== 'all') params.append('priority', priorityFilter);
-        if (projectFilter !== 'all') params.append('projectId', projectFilter);
-        if (deadlineFilter === 'expired') params.append('isDeadlineExpired', 'true');
+        if (searchTerm) params.search = searchTerm;
+        if (statusFilter !== 'all') params.status = statusFilter;
+        if (priorityFilter !== 'all') params.priority = priorityFilter;
+        if (projectFilter !== 'all') params.projectId = projectFilter;
+        if (deadlineFilter === 'expired') params.isDeadlineExpired = 'true';
         
         // 担当中の質問を取得
-        const questionsData = await fetchData<Question[]>('questions/assigned-to-me', { params });
-        setQuestions(questionsData);
+        const questionsResponse = await fetchData<{
+          questions: Question[];
+          total: number;
+          page: number;
+          limit: number;
+          totalPages: number;
+        }>('questions/assigned-to-me', { params });
+        
+        console.log('[AssignedQuestionsPage] API Response:', questionsResponse);
+        
+        // questionsプロパティから質問配列を取得
+        setQuestions(questionsResponse.questions || []);
         
         // プロジェクト一覧を取得（フィルター用）
-        const projectsData = await fetchData<Project[]>('projects');
-        setProjects(projectsData);
+        const projectsResponse = await fetchData<{
+          projects?: Project[];
+        } | Project[]>('projects');
+        
+        // レスポンスが配列かオブジェクトかを判定して処理
+        if (Array.isArray(projectsResponse)) {
+          setProjects(projectsResponse);
+        } else {
+          setProjects(projectsResponse.projects || []);
+        }
         
         setLoading(false);
       } catch (err: any) {
+        console.error('[AssignedQuestionsPage] Error:', err);
         setError('質問データの取得に失敗しました: ' + err.message);
         setLoading(false);
       }
@@ -280,8 +299,8 @@ export default function AssignedQuestionsPage() {
           </Typography>
         </Box>
         
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(33.333% - 16px)' } }}>
             <TextField
               fullWidth
               label="キーワード検索"
@@ -292,9 +311,9 @@ export default function AssignedQuestionsPage() {
                 startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />,
               }}
             />
-          </Grid>
+          </Box>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } }}>
             <FormControl fullWidth>
               <InputLabel>プロジェクト</InputLabel>
               <Select
@@ -310,9 +329,9 @@ export default function AssignedQuestionsPage() {
                 ))}
               </Select>
             </FormControl>
-          </Grid>
+          </Box>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } }}>
             <FormControl fullWidth>
               <InputLabel>ステータス</InputLabel>
               <Select
@@ -327,9 +346,9 @@ export default function AssignedQuestionsPage() {
                 <MenuItem value="CLOSED">クローズ</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
+          </Box>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } }}>
             <FormControl fullWidth>
               <InputLabel>優先度</InputLabel>
               <Select
@@ -344,9 +363,9 @@ export default function AssignedQuestionsPage() {
                 <MenuItem value="LOW">低</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
+          </Box>
           
-          <Grid item xs={12} sm={6} md={4}>
+          <Box sx={{ flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } }}>
             <FormControl fullWidth>
               <InputLabel>期限</InputLabel>
               <Select
@@ -359,8 +378,8 @@ export default function AssignedQuestionsPage() {
                 <MenuItem value="this-week">今週中</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Paper>
       
       {loading ? (
@@ -372,15 +391,12 @@ export default function AssignedQuestionsPage() {
           {error}
         </Alert>
       ) : (
-        <DataTable
+        <DataTable<Question>
           columns={columns}
           data={questions}
           title="担当中の質問"
           searchPlaceholder="質問を検索..."
           onRowClick={handleRowClick}
-          initialSortBy="deadline"
-          initialSortDirection="asc"
-          emptyMessage="担当中の質問はありません"
         />
       )}
     </DashboardLayout>

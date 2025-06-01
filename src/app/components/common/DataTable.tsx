@@ -22,29 +22,29 @@ import {
   Clear as ClearIcon,
 } from '@mui/icons-material';
 
-interface Column {
+interface Column<T = any> {
   id: string;
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
-  format?: (value: any) => string | React.ReactNode;
+  format?: (value: any, row: T) => string | React.ReactNode;
 }
 
-interface DataTableProps {
-  columns: Column[];
-  data: Record<string, any>[];
+interface DataTableProps<T = Record<string, any>> {
+  columns: Column<T>[];
+  data: T[];
   title?: string;
   searchPlaceholder?: string;
-  onRowClick?: (row: Record<string, any>) => void;
+  onRowClick?: (row: T) => void;
 }
 
-export default function DataTable({
+export default function DataTable<T extends Record<string, any>>({
   columns,
   data,
   title = '',
   searchPlaceholder = '検索...',
   onRowClick,
-}: DataTableProps) {
+}: DataTableProps<T>) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
@@ -149,7 +149,7 @@ export default function DataTable({
                       const value = row[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>
-                          {column.format ? column.format(value) : value}
+                          {column.format ? column.format(value, row) : value}
                         </TableCell>
                       );
                     })}
