@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Container,
   Box,
   CircularProgress,
   Alert,
@@ -145,7 +144,7 @@ export default function NotificationsPage() {
   }, [currentPage, unreadOnly]);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Box>
       <NotificationList
         notifications={notifications}
         total={total}
@@ -160,6 +159,6 @@ export default function NotificationsPage() {
         onToggleUnreadOnly={handleToggleUnreadOnly}
         unreadOnly={unreadOnly}
       />
-    </Container>
+    </Box>
   );
 } 

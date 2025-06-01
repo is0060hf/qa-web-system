@@ -20,6 +20,7 @@ interface FormTextareaProps extends Omit<TextFieldProps, 'error'> {
   required?: boolean;
   showOptionalLabel?: boolean;
   rows?: number;
+  minRows?: number;
   maxRows?: number;
 }
 
@@ -33,10 +34,16 @@ export default function FormTextarea({
   helperText,
   required = false,
   showOptionalLabel = true,
-  rows = 4,
+  rows,
+  minRows = 4,
   maxRows = 8,
   ...rest
 }: FormTextareaProps) {
+  // rowsが指定されている場合は固定行数、そうでない場合は動的行数を使用
+  const textFieldProps = rows 
+    ? { rows }  // rowsが指定されている場合はrowsのみ使用
+    : { minRows, maxRows };  // rowsが指定されていない場合はminRows/maxRowsを使用
+
   return (
     <Box sx={{ mb: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'baseline', mb: 0.5 }}>
@@ -67,8 +74,7 @@ export default function FormTextarea({
         variant="outlined"
         size="medium"
         multiline
-        rows={rows}
-        maxRows={maxRows}
+        {...textFieldProps}
         {...rest}
       />
       {(error || helperText) && (

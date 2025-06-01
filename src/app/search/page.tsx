@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import SearchForm, { SearchParams } from '../components/search/SearchForm';
 import SearchResults, { Question } from '../components/search/SearchResults';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SelectOption } from '../components/common/FormSelectField';
 import { fetchData } from '@/lib/utils/fetchData';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -150,34 +151,36 @@ export default function SearchPage() {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-        質問検索
-      </Typography>
-      
-      <SearchForm
-        onSearch={handleSearch}
-        projects={projects}
-        assignees={assignees}
-        tags={tags}
-        initialParams={initialParams}
-        isLoading={isLoading}
-      />
-      
-      {(questions.length > 0 || isLoading || error) && (
-        <Box sx={{ mt: 4 }}>
-          <SearchResults
-            questions={questions}
-            total={total}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            isLoading={isLoading}
-            error={error || undefined}
-            onPageChange={handlePageChange}
-            onQuestionClick={handleQuestionClick}
-          />
-        </Box>
-      )}
-    </Container>
+    <DashboardLayout>
+      <Box>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
+          質問検索
+        </Typography>
+        
+        <SearchForm
+          onSearch={handleSearch}
+          projects={projects}
+          assignees={assignees}
+          tags={tags}
+          initialParams={initialParams}
+          isLoading={isLoading}
+        />
+        
+        {(questions.length > 0 || isLoading || error) && (
+          <Box sx={{ mt: 4 }}>
+            <SearchResults
+              questions={questions}
+              total={total}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              isLoading={isLoading}
+              error={error || undefined}
+              onPageChange={handlePageChange}
+              onQuestionClick={handleQuestionClick}
+            />
+          </Box>
+        )}
+      </Box>
+    </DashboardLayout>
   );
 } 

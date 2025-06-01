@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, CircularProgress, Divider } from '@mui/material';
+import { Box, Typography, CircularProgress, Divider } from '@mui/material';
 import UserSettingsForm, { UserSettingsData, PasswordChangeData } from '../components/users/UserSettingsForm';
 import AccessibilitySettingsForm from '../components/users/AccessibilitySettingsForm';
 import { fetchData } from '@/lib/utils/fetchData';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 export default function SettingsPage() {
   // ユーザーデータの状態
@@ -103,38 +104,40 @@ export default function SettingsPage() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
-        アカウント設定
-      </Typography>
-      
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
-          <CircularProgress />
-        </Box>
-      ) : userData ? (
-        <Box>
-          <UserSettingsForm
-            initialData={userData}
-            onSubmit={handleProfileUpdate}
-            onPasswordChange={handlePasswordChange}
-            isLoading={isSubmitting}
-            error={error || undefined}
-            successMessage={successMessage || undefined}
-          />
-          
-          <Box sx={{ my: 4 }}>
-            <Divider />
-          </Box>
-          
-          {/* アクセシビリティ設定フォーム */}
-          <AccessibilitySettingsForm />
-        </Box>
-      ) : (
-        <Typography color="error">
-          ユーザー情報の読み込みに失敗しました。再読み込みしてください。
+    <DashboardLayout>
+      <Box sx={{ maxWidth: 'md', mx: 'auto' }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 4 }}>
+          アカウント設定
         </Typography>
-      )}
-    </Container>
+        
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : userData ? (
+          <Box>
+            <UserSettingsForm
+              initialData={userData}
+              onSubmit={handleProfileUpdate}
+              onPasswordChange={handlePasswordChange}
+              isLoading={isSubmitting}
+              error={error || undefined}
+              successMessage={successMessage || undefined}
+            />
+            
+            <Box sx={{ my: 4 }}>
+              <Divider />
+            </Box>
+            
+            {/* アクセシビリティ設定フォーム */}
+            <AccessibilitySettingsForm />
+          </Box>
+        ) : (
+          <Typography color="error">
+            ユーザー情報の読み込みに失敗しました。再読み込みしてください。
+          </Typography>
+        )}
+      </Box>
+    </DashboardLayout>
   );
 } 

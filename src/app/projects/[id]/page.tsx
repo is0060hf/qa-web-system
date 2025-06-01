@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import {
@@ -116,10 +116,14 @@ interface User {
   email: string;
 }
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+// params の型を Promise として定義
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  // プロジェクトIDを安全に抽出
-  const projectId = React.useMemo(() => params.id, [params.id]);
+  
+  // React.use() を使用して params をアンラップ
+  const resolvedParams = use(params);
+  const projectId = resolvedParams.id;
+  
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openInviteDialog, setOpenInviteDialog] = useState(false);
@@ -233,9 +237,9 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     try {
       setIsLoadingUsers(true);
       
-      console.log('招待可能ユーザー取得開始 - プロジェクトID:', params.id);
+      console.log('招待可能ユーザー取得開始 - プロジェクトID:', projectId);
       // 新しいAPIエンドポイントを使用 - プロジェクトに参加していないユーザーを取得
-      const data = await fetchData<User[]>(`projects/${params.id}/available-users`, {});
+      const data = await fetchData<User[]>(`projects/${projectId}/available-users`, {});
       
       // レスポンスが配列かどうかを確認
       if (Array.isArray(data)) {
@@ -397,7 +401,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <Button
             variant="contained"
             startIcon={<HelpOutlineIcon />}
-            onClick={() => router.push(`/questions/create?projectId=${params.id}`)}
+            onClick={() => router.push(`/questions/create?projectId=${projectId}`)}
           >
             質問を作成
           </Button>

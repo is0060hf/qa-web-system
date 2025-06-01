@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Alert, Box, Typography, Container, CircularProgress } from '@mui/material';
 import DashboardLayout from '@/app/components/layout/DashboardLayout';
@@ -16,40 +16,46 @@ interface Project {
   updatedAt: string;
 }
 
-export default function EditProjectPage({ params }: { params: { id: string } }) {
+export default function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  
+  // React.use() を使用して params をアンラップ
+  const resolvedParams = use(params);
+  const projectId = resolvedParams.id;
+  
   const [project, setProject] = useState<Project | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
   const [updateError, setUpdateError] = useState<string | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchProject = async () => {
+    async function fetchProject() {
       try {
-        const data = await fetchData<Project>(`projects/${params.id}`, {});
+        setIsLoading(true);
+        const data = await fetchData<Project>(`projects/${projectId}`, {});
         setProject(data);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : '予期せぬエラーが発生しました');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '予期せぬエラーが発生しました');
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     fetchProject();
-  }, [params.id]);
+  }, [projectId]);
 
   const handleUpdateProject = async (name: string, description: string) => {
     setIsSubmitting(true);
     setUpdateError(undefined);
 
     try {
-      await fetchData<Project>(`projects/${params.id}`, {
+      await fetchData<Project>(`projects/${projectId}`, {
         method: 'PATCH',
         body: { name, description },
       });
 
-      router.push(`/projects/${params.id}`);
+      router.push(`/projects/${projectId}`);
       router.refresh();
     } catch (error) {
       setUpdateError(error instanceof Error ? error.message : '予期せぬエラーが発生しました');

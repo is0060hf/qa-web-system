@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -78,8 +78,13 @@ function a11yProps(index: number) {
   };
 }
 
-export default function QuestionDetailPage({ params }: { params: { id: string } }) {
+export default function QuestionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  
+  // React.use() を使用して params をアンラップ
+  const resolvedParams = use(params);
+  const questionId = resolvedParams.id;
+  
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [comment, setComment] = useState('');
@@ -91,7 +96,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
     error, 
     refetch 
   } = useDataFetching<MockQuestion | null>(
-    () => fetchData<MockQuestion>(`questions/${params.id}`),
+    () => fetchData<MockQuestion>(`questions/${questionId}`),
     null
   );
 
@@ -102,7 +107,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
   const handleDelete = async () => {
     try {
       // 実際には削除のAPIコールが必要
-      await fetchData(`questions/${params.id}`, { method: 'DELETE' });
+      await fetchData(`questions/${questionId}`, { method: 'DELETE' });
       setOpenDeleteDialog(false);
       router.push('/questions');
     } catch (err) {
@@ -119,7 +124,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
     if (comment.trim()) {
       try {
         // 実際にはコメント送信のAPIコールが必要
-        await fetchData(`questions/${params.id}/comments`, {
+        await fetchData(`questions/${questionId}/comments`, {
           method: 'POST',
           body: { content: comment },
         });
@@ -135,7 +140,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
   const handleAcceptAnswer = async (answerId: string) => {
     try {
       // 実際には回答承認のAPIコールが必要
-      await fetchData(`questions/${params.id}/answers/${answerId}/accept`, {
+      await fetchData(`questions/${questionId}/answers/${answerId}/accept`, {
         method: 'PATCH',
       });
       refetch(); // データを再取得
@@ -248,14 +253,14 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
           <Button
             variant="outlined"
             startIcon={<ReplyIcon />}
-            onClick={() => router.push(`/questions/${params.id}/answer`)}
+            onClick={() => router.push(`/questions/${questionId}/answer`)}
           >
             回答する
           </Button>
           <Button
             variant="outlined"
             startIcon={<EditIcon />}
-            onClick={() => router.push(`/questions/${params.id}/edit`)}
+            onClick={() => router.push(`/questions/${questionId}/edit`)}
           >
             編集
           </Button>
@@ -291,7 +296,7 @@ export default function QuestionDetailPage({ params }: { params: { id: string } 
             variant="contained"
             color="primary"
             startIcon={<ReplyIcon />}
-            onClick={() => router.push(`/questions/${params.id}/answer`)}
+            onClick={() => router.push(`/questions/${questionId}/answer`)}
           >
             回答する
           </Button>
