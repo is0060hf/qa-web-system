@@ -47,8 +47,75 @@ import {
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
-import { MockQuestion } from '@/mocks/questions';
 import MarkdownViewer from '@/components/common/MarkdownViewer';
+
+// 実際のAPIレスポンスに合わせた型定義
+interface QuestionDetail {
+  id: string;
+  title: string;
+  content: string;
+  status: string;
+  priority: string;
+  deadline: string | null;
+  createdAt: string;
+  updatedAt: string;
+  project: {
+    id: string;
+    name: string;
+    description: string | null;
+  };
+  creator: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  assignee: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  tags: Array<{
+    id: string;
+    name: string;
+  }>;
+  answerForm: {
+    id: string;
+    fields: Array<{
+      id: string;
+      label: string;
+      fieldType: string;
+      options: string[];
+      isRequired: boolean;
+      order: number;
+    }>;
+  } | null;
+  answers: Array<{
+    id: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    formResponses: Array<{
+      id: string;
+      formFieldId: string;
+      formFieldLabel: string;
+      value: string | null;
+      mediaFileId: string | null;
+    }>;
+    attachments: Array<{
+      id: string;
+      fileName: string;
+      fileSize: number;
+      fileType: string;
+      storageUrl: string;
+      createdAt: string;
+    }>;
+  }>;
+}
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -96,8 +163,8 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     isLoading, 
     error, 
     refetch 
-  } = useDataFetching<MockQuestion | null>(
-    () => fetchData<MockQuestion>(`questions/${questionId}`),
+  } = useDataFetching<QuestionDetail | null>(
+    () => fetchData<QuestionDetail>(`questions/${questionId}`),
     null
   );
 
@@ -107,7 +174,6 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
 
   const handleDelete = async () => {
     try {
-      // 実際には削除のAPIコールが必要
       await fetchData(`questions/${questionId}`, { method: 'DELETE' });
       setOpenDeleteDialog(false);
       router.push('/questions');
@@ -122,45 +188,57 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
   };
 
   const handleSubmitComment = async () => {
-    if (comment.trim()) {
-      try {
-        // 実際にはコメント送信のAPIコールが必要
-        await fetchData(`questions/${questionId}/comments`, {
-          method: 'POST',
-          body: { content: comment },
-        });
-        setComment('');
-        refetch(); // データを再取得
-      } catch (err) {
-        console.error('コメント送信エラー:', err);
-        // エラー処理
-      }
-    }
+    // 現在のスキーマではコメント機能は実装されていません
+    console.log('コメント機能は後で実装します');
   };
 
   const handleAcceptAnswer = async (answerId: string) => {
-    try {
-      // 実際には回答承認のAPIコールが必要
-      await fetchData(`questions/${questionId}/answers/${answerId}/accept`, {
-        method: 'PATCH',
-      });
-      refetch(); // データを再取得
-    } catch (err) {
-      console.error('回答承認エラー:', err);
-      // エラー処理
-    }
+    // 承認機能は後で実装します
+    console.log('承認機能は後で実装します');
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case '回答中':
+      case 'IN_PROGRESS':
         return 'primary';
-      case '承認待ち':
+      case 'PENDING_APPROVAL':
         return 'warning';
-      case 'クローズ':
+      case 'CLOSED':
         return 'success';
+      case 'NEW':
+        return 'info';
       default:
         return 'default';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'IN_PROGRESS':
+        return '回答中';
+      case 'PENDING_APPROVAL':
+        return '承認待ち';
+      case 'CLOSED':
+        return 'クローズ';
+      case 'NEW':
+        return '新規';
+      default:
+        return status;
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case 'HIGHEST':
+        return '最高';
+      case 'HIGH':
+        return '高';
+      case 'MEDIUM':
+        return '中';
+      case 'LOW':
+        return '低';
+      default:
+        return priority;
     }
   };
 
@@ -208,19 +286,25 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             {question.title}
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
+            {question.deadline && (
+              <Chip 
+                icon={<AccessTimeIcon />}
+                label={`期限: ${new Date(question.deadline).toLocaleDateString('ja-JP')}`}
+                variant="outlined"
+                color={new Date(question.deadline) < new Date() ? 'error' : 'default'}
+              />
+            )}
             <Chip 
-              icon={<AccessTimeIcon />}
-              label={`期限: ${new Date(question.deadline).toLocaleDateString('ja-JP')}`}
-              variant="outlined"
-              color={new Date(question.deadline) < new Date() ? 'error' : 'default'}
-            />
-            <Chip 
-              label={question.status} 
+              label={getStatusLabel(question.status)} 
               color={getStatusColor(question.status) as any}
             />
             <Chip 
+              label={`優先度: ${getPriorityLabel(question.priority)}`}
+              variant="outlined"
+            />
+            <Chip 
               icon={<PersonIcon />}
-              label={`作成者: ${question.createdByName}`}
+              label={`作成者: ${question.creator.name}`}
               variant="outlined"
             />
           </Box>
@@ -228,22 +312,29 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
               担当者:
             </Typography>
-            <AvatarGroup max={3}>
-              {question.assignees.map((user) => (
-                <Tooltip key={user.id} title={user.name}>
-                  <Avatar sx={{ width: 28, height: 28, fontSize: '0.875rem' }}>
-                    {user.name.charAt(0)}
-                  </Avatar>
-                </Tooltip>
-              ))}
-            </AvatarGroup>
+            <Tooltip title={question.assignee.name}>
+              <Avatar sx={{ width: 28, height: 28, fontSize: '0.875rem' }}>
+                {question.assignee.name.charAt(0)}
+              </Avatar>
+            </Tooltip>
+            <Typography variant="body2" sx={{ ml: 1 }}>
+              {question.assignee.name}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+              プロジェクト:
+            </Typography>
+            <Typography variant="body2">
+              {question.project.name}
+            </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {question.tags?.map(tag => (
+            {question.tags.map(tag => (
               <Chip 
-                key={tag}
+                key={tag.id}
                 icon={<TagIcon />}
-                label={tag}
+                label={tag.name}
                 size="small"
                 variant="outlined"
               />
@@ -279,15 +370,14 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="question tabs">
           <Tab label="質問内容" {...a11yProps(0)} />
-          <Tab label={`回答 (${question.answers?.length || 0})`} {...a11yProps(1)} />
-          <Tab label={`コメント (${question.comments?.length || 0})`} {...a11yProps(2)} />
-          <Tab label={`添付ファイル (${question.attachments?.length || 0})`} {...a11yProps(3)} />
+          <Tab label={`回答 (${question.answers.length})`} {...a11yProps(1)} />
+          {question.answerForm && <Tab label="回答フォーム" {...a11yProps(2)} />}
         </Tabs>
       </Box>
 
       <TabPanel value={tabValue} index={0}>
         <Paper sx={{ p: 3, borderRadius: 2 }}>
-          <MarkdownViewer content={question.description || ''} />
+          <MarkdownViewer content={question.content} />
         </Paper>
       </TabPanel>
 
@@ -303,45 +393,58 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
           </Button>
         </Box>
         
-        {question.answers && question.answers.length > 0 ? (
+        {question.answers.length > 0 ? (
           <Stack spacing={3}>
             {question.answers.map((answer) => (
               <Card key={answer.id} elevation={0} sx={{ borderRadius: 2 }}>
                 <CardHeader
                   avatar={
                     <Avatar sx={{ bgcolor: 'primary.main' }}>
-                      {answer.createdByName.charAt(0)}
+                      {answer.user.name.charAt(0)}
                     </Avatar>
                   }
-                  title={answer.createdByName}
+                  title={answer.user.name}
                   subheader={`回答日: ${new Date(answer.createdAt).toLocaleDateString('ja-JP')}`}
-                  action={
-                    <Box>
-                      {answer.isAccepted ? (
-                        <Chip 
-                          icon={<CheckIcon />}
-                          label="承認済み" 
-                          color="success"
-                          size="small"
-                        />
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="success"
-                          startIcon={<CheckIcon />}
-                          onClick={() => handleAcceptAnswer(answer.id)}
-                          sx={{ mr: 1 }}
-                        >
-                          承認
-                        </Button>
-                      )}
-                    </Box>
-                  }
                 />
                 <Divider />
                 <CardContent>
                   <MarkdownViewer content={answer.content} />
+                  
+                  {answer.formResponses.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        フォーム回答:
+                      </Typography>
+                      {answer.formResponses.map((response) => (
+                        <Box key={response.id} sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {response.formFieldLabel}:
+                          </Typography>
+                          <Typography variant="body2">
+                            {response.value || 'なし'}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                  
+                  {answer.attachments.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        添付ファイル:
+                      </Typography>
+                      {answer.attachments.map((file) => (
+                        <Chip
+                          key={file.id}
+                          icon={<AttachFileIcon />}
+                          label={file.fileName}
+                          size="small"
+                          sx={{ mr: 1, mb: 1 }}
+                          onClick={() => window.open(file.storageUrl, '_blank')}
+                        />
+                      ))}
+                    </Box>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -355,151 +458,25 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
         )}
       </TabPanel>
 
-      <TabPanel value={tabValue} index={2}>
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            label="コメントを追加"
-            multiline
-            rows={3}
-            value={comment}
-            onChange={handleCommentChange}
-            fullWidth
-            variant="outlined"
-            placeholder="質問や補足を入力してください..."
-            InputProps={{
-              endAdornment: (
-                <IconButton 
-                  color="primary" 
-                  onClick={handleSubmitComment} 
-                  disabled={!comment.trim()}
-                  sx={{ alignSelf: 'flex-end' }}
-                >
-                  <SendIcon />
-                </IconButton>
-              ),
-            }}
-          />
-        </Box>
-        
-        {question.comments && question.comments.length > 0 ? (
-          <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-            {question.comments.map((commentItem, index) => (
-              <Box key={commentItem.id}>
-                <ListItem alignItems="flex-start" sx={{ py: 2 }}>
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                      {commentItem.createdByName.charAt(0)}
-                    </Avatar>
-                  </ListItemAvatar>
+      {question.answerForm && (
+        <TabPanel value={tabValue} index={2}>
+          <Paper sx={{ p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              回答フォーム項目
+            </Typography>
+            <List>
+              {question.answerForm.fields.map((field) => (
+                <ListItem key={field.id}>
                   <ListItemText
-                    primary={
-                      <Typography
-                        sx={{ display: 'inline' }}
-                        component="span"
-                        variant="subtitle2"
-                      >
-                        {commentItem.createdByName}
-                      </Typography>
-                    }
-                    secondary={
-                      <>
-                        <Typography
-                          sx={{ display: 'inline', mb: 1 }}
-                          component="span"
-                          variant="body2"
-                          color="text.secondary"
-                        >
-                          {new Date(commentItem.createdAt).toLocaleDateString('ja-JP')}
-                        </Typography>
-                        <Typography
-                          component="span"
-                          variant="body1"
-                          color="text.primary"
-                          sx={{ display: 'block', mt: 1 }}
-                        >
-                          {commentItem.content}
-                        </Typography>
-                      </>
-                    }
+                    primary={field.label}
+                    secondary={`タイプ: ${field.fieldType}${field.isRequired ? ' (必須)' : ''}`}
                   />
                 </ListItem>
-                {index < question.comments!.length - 1 && <Divider variant="inset" component="li" />}
-              </Box>
-            ))}
-          </List>
-        ) : (
-          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 2 }}>
-            <Typography variant="body1" color="text.secondary">
-              まだコメントがありません。
-            </Typography>
+              ))}
+            </List>
           </Paper>
-        )}
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={3}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="outlined"
-            startIcon={<AttachFileIcon />}
-            onClick={() => {/* ファイル添付処理 */}}
-          >
-            ファイルを添付
-          </Button>
-        </Box>
-        
-        {question.attachments && question.attachments.length > 0 ? (
-          <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-            {question.attachments.map((file, index) => (
-              <Box key={file.id}>
-                <ListItem
-                  alignItems="flex-start"
-                  sx={{ py: 2 }}
-                  secondaryAction={
-                    <IconButton edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'info.main' }}>
-                      <AttachFileIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={file.name}
-                    secondary={
-                      <>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color="text.secondary"
-                        >
-                          サイズ: {file.size} • 形式: {file.type}
-                        </Typography>
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ display: 'block' }}
-                        >
-                          アップロード日: {new Date(file.uploadedAt).toLocaleDateString('ja-JP')}
-                        </Typography>
-                      </>
-                    }
-                  />
-                </ListItem>
-                {index < question.attachments!.length - 1 && <Divider variant="inset" component="li" />}
-              </Box>
-            ))}
-          </List>
-        ) : (
-          <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 2 }}>
-            <Typography variant="body1" color="text.secondary">
-              添付ファイルはありません。
-            </Typography>
-          </Paper>
-        )}
-      </TabPanel>
+        </TabPanel>
+      )}
 
       {/* 削除確認ダイアログ */}
       <Dialog
@@ -513,7 +490,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            「{question.title}」を削除すると、すべての回答やコメントも削除されます。この操作は元に戻せません。
+            「{question.title}」を削除すると、すべての回答も削除されます。この操作は元に戻せません。
           </DialogContentText>
         </DialogContent>
         <DialogActions>
