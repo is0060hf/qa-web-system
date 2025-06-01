@@ -48,6 +48,7 @@ import {
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import { MockQuestion } from '@/mocks/questions';
+import MarkdownViewer from '@/components/common/MarkdownViewer';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -286,7 +287,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
 
       <TabPanel value={tabValue} index={0}>
         <Paper sx={{ p: 3, borderRadius: 2 }}>
-          <div dangerouslySetInnerHTML={{ __html: question.description?.replace(/\n/g, '<br />') || '' }} />
+          <MarkdownViewer content={question.description || ''} />
         </Paper>
       </TabPanel>
 
@@ -340,7 +341,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
                 />
                 <Divider />
                 <CardContent>
-                  <div dangerouslySetInnerHTML={{ __html: answer.content.replace(/\n/g, '<br />') }} />
+                  <MarkdownViewer content={answer.content} />
                 </CardContent>
               </Card>
             ))}
@@ -422,7 +423,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
                     }
                   />
                 </ListItem>
-                {index < question.comments.length - 1 && <Divider variant="inset" component="li" />}
+                {index < question.comments!.length - 1 && <Divider variant="inset" component="li" />}
               </Box>
             ))}
           </List>
@@ -487,7 +488,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
                     }
                   />
                 </ListItem>
-                {index < question.attachments.length - 1 && <Divider variant="inset" component="li" />}
+                {index < question.attachments!.length - 1 && <Divider variant="inset" component="li" />}
               </Box>
             ))}
           </List>

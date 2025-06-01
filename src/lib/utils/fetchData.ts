@@ -481,4 +481,33 @@ export const useDataFetching = <T>(
   }, []);
   
   return { data, isLoading, error, refetch: fetchData };
+};
+
+/**
+ * POST リクエスト用のユーティリティ関数
+ */
+export const postData = async <T>(endpoint: string, body: any): Promise<T> => {
+  return fetchData<T>(endpoint, {
+    method: 'POST',
+    body,
+  });
+};
+
+/**
+ * PATCH リクエスト用のユーティリティ関数
+ */
+export const patchData = async <T>(endpoint: string, body: any): Promise<T> => {
+  return fetchData<T>(endpoint, {
+    method: 'PATCH',
+    body,
+  });
+};
+
+/**
+ * DELETE リクエスト用のユーティリティ関数
+ */
+export const deleteData = async <T>(endpoint: string): Promise<T> => {
+  return fetchData<T>(endpoint, {
+    method: 'DELETE',
+  });
 }; 

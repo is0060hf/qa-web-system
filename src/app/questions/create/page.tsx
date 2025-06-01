@@ -20,15 +20,15 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Checkbox,
   CircularProgress,
   Alert,
-  IconButton,
-  Grid
+  IconButton
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import ja from 'date-fns/locale/ja';
+import { ja } from 'date-fns/locale/ja';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -36,7 +36,6 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import RichTextEditor from '@/components/common/RichTextEditor';
 import { fetchData, postData } from '@/lib/utils/fetchData';
 
 // フォームフィールド型の定義
@@ -63,6 +62,15 @@ interface User {
   id: string;
   name: string;
   email: string;
+}
+
+// プロジェクトメンバーの型定義
+interface ProjectMember {
+  id: string;
+  projectId: string;
+  userId: string;
+  role: 'MANAGER' | 'MEMBER';
+  user: User;
 }
 
 // タグの型定義
@@ -97,7 +105,7 @@ interface FormInput {
 export default function CreateQuestionPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [templates, setTemplates] = useState<FormTemplate[]>([]);
   const [loading, setLoading] = useState(false);
@@ -136,9 +144,15 @@ export default function CreateQuestionPage() {
         .catch(err => setError('タグの取得に失敗しました: ' + err.message));
       
       // プロジェクトのメンバーを取得
-      fetchData<User[]>(`projects/${selectedProjectId}/members`)
-        .then(data => setUsers(data))
-        .catch(err => setError('メンバーの取得に失敗しました: ' + err.message));
+      fetchData<ProjectMember[]>(`projects/${selectedProjectId}/members`)
+        .then(data => {
+          console.log('取得したメンバー:', data);
+          setProjectMembers(data);
+        })
+        .catch(err => {
+          console.error('メンバー取得エラー:', err);
+          setError('メンバーの取得に失敗しました: ' + err.message);
+        });
       
       // タグとメンバーが変わったのでリセット
       setValue('tagIds', []);
@@ -157,13 +171,20 @@ export default function CreateQuestionPage() {
         // フォームテンプレート一覧を取得
         const templatesData = await fetchData<FormTemplate[]>('answer-form-templates');
         setTemplates(templatesData);
+        
+        // URLのクエリパラメータからプロジェクトIDを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectIdFromUrl = urlParams.get('projectId');
+        if (projectIdFromUrl && projectsData.some(p => p.id === projectIdFromUrl)) {
+          setValue('projectId', projectIdFromUrl);
+        }
       } catch (err: any) {
         setError('データの取得に失敗しました: ' + err.message);
       }
     };
     
     fetchInitialData();
-  }, []);
+  }, [setValue]);
 
   // テンプレート選択時の処理
   const handleTemplateChange = async (templateId: string) => {
@@ -318,20 +339,15 @@ export default function CreateQuestionPage() {
               control={control}
               rules={{ required: '質問内容を入力してください' }}
               render={({ field }) => (
-                <Box>
-                  <Typography variant="subtitle1" gutterBottom>
-                    質問内容 *
-                  </Typography>
-                  <RichTextEditor
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                  {errors.content && (
-                    <FormHelperText error>
-                      {errors.content.message}
-                    </FormHelperText>
-                  )}
-                </Box>
+                <TextField
+                  {...field}
+                  label="質問内容 *"
+                  fullWidth
+                  multiline
+                  rows={6}
+                  error={!!errors.content}
+                  helperText={errors.content?.message}
+                />
               )}
             />
 
@@ -347,9 +363,9 @@ export default function CreateQuestionPage() {
                     label="担当者 *"
                     disabled={!selectedProjectId}
                   >
-                    {users.map(user => (
-                      <MenuItem key={user.id} value={user.id}>
-                        {user.name}
+                    {projectMembers.map(member => (
+                      <MenuItem key={member.userId} value={member.user.id}>
+                        {member.user.name || member.user.email}
                       </MenuItem>
                     ))}
                   </Select>
@@ -519,70 +535,72 @@ export default function CreateQuestionPage() {
                     variant="outlined"
                     sx={{ p: 2 }}
                   >
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs={12} sm={5}>
-                        <Controller
-                          name={`formFields.${index}.label`}
-                          control={control}
-                          rules={{ required: 'ラベルを入力してください' }}
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              label="フィールドラベル"
-                              fullWidth
-                              size="small"
-                              error={!!errors.formFields?.[index]?.label}
-                              helperText={errors.formFields?.[index]?.label?.message}
-                            />
-                          )}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <Controller
-                          name={`formFields.${index}.fieldType`}
-                          control={control}
-                          render={({ field }) => (
-                            <FormControl fullWidth size="small">
-                              <InputLabel>タイプ</InputLabel>
-                              <Select {...field} label="タイプ">
-                                <MenuItem value="TEXT">テキスト</MenuItem>
-                                <MenuItem value="NUMBER">数値</MenuItem>
-                                <MenuItem value="RADIO">ラジオボタン</MenuItem>
-                                <MenuItem value="FILE">ファイル</MenuItem>
-                                <MenuItem value="TEXTAREA">複数行テキスト</MenuItem>
-                              </Select>
-                            </FormControl>
-                          )}
-                        />
-                      </Grid>
-                      <Grid item xs={8} sm={2}>
-                        <Controller
-                          name={`formFields.${index}.isRequired`}
-                          control={control}
-                          render={({ field }) => (
-                            <FormControlLabel
-                              control={
-                                <Radio
-                                  checked={field.value}
-                                  onChange={(e) => field.onChange(e.target.checked)}
-                                />
-                              }
-                              label="必須"
-                            />
-                          )}
-                        />
-                      </Grid>
-                      <Grid item xs={4} sm={1}>
-                        <IconButton
-                          color="error"
-                          onClick={() => handleRemoveField(index)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Grid>
+                    <Stack spacing={2}>
+                      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                        <Box sx={{ flex: { xs: '1', sm: '5' } }}>
+                          <Controller
+                            name={`formFields.${index}.label`}
+                            control={control}
+                            rules={{ required: 'ラベルを入力してください' }}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                label="フィールドラベル"
+                                fullWidth
+                                size="small"
+                                error={!!errors.formFields?.[index]?.label}
+                                helperText={errors.formFields?.[index]?.label?.message}
+                              />
+                            )}
+                          />
+                        </Box>
+                        <Box sx={{ flex: { xs: '1', sm: '4' } }}>
+                          <Controller
+                            name={`formFields.${index}.fieldType`}
+                            control={control}
+                            render={({ field }) => (
+                              <FormControl fullWidth size="small">
+                                <InputLabel>タイプ</InputLabel>
+                                <Select {...field} label="タイプ">
+                                  <MenuItem value="TEXT">テキスト</MenuItem>
+                                  <MenuItem value="NUMBER">数値</MenuItem>
+                                  <MenuItem value="RADIO">ラジオボタン</MenuItem>
+                                  <MenuItem value="FILE">ファイル</MenuItem>
+                                  <MenuItem value="TEXTAREA">複数行テキスト</MenuItem>
+                                </Select>
+                              </FormControl>
+                            )}
+                          />
+                        </Box>
+                        <Box sx={{ flex: { xs: '1', sm: '2' }, display: 'flex', alignItems: 'center' }}>
+                          <Controller
+                            name={`formFields.${index}.isRequired`}
+                            control={control}
+                            render={({ field }) => (
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={field.value}
+                                    onChange={(e) => field.onChange(e.target.checked)}
+                                  />
+                                }
+                                label="必須"
+                              />
+                            )}
+                          />
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleRemoveField(index)}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
 
                       {watch(`formFields.${index}.fieldType`) === 'RADIO' && (
-                        <Grid item xs={12}>
+                        <Box>
                           <Controller
                             name={`formFields.${index}.options`}
                             control={control}
@@ -624,9 +642,9 @@ export default function CreateQuestionPage() {
                               />
                             )}
                           />
-                        </Grid>
+                        </Box>
                       )}
-                    </Grid>
+                    </Stack>
                   </Paper>
                 ))}
               </Stack>
@@ -637,7 +655,7 @@ export default function CreateQuestionPage() {
                     name="saveAsTemplate"
                     control={control}
                     render={({ field }) => (
-                      <Radio
+                      <Checkbox
                         checked={field.value}
                         onChange={(e) => field.onChange(e.target.checked)}
                       />

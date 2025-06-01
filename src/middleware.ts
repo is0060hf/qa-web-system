@@ -11,6 +11,7 @@ const AUTH_REQUIRED_PATHS = [
   '/api/invitations',
   '/api/notifications',
   '/api/dashboard',
+  '/api/answer-form-templates',
 ];
 
 // 認証不要なAPIパス
