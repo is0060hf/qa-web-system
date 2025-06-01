@@ -1,40 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
-import { InvitationStatus, ProjectRole } from '@prisma/client';
-import { z } from 'zod';
 import { validateRequest } from '@/lib/utils/api';
+import { z } from 'zod';
+import { InvitationStatus, ProjectRole } from '@prisma/client';
 
-// 招待応答スキーマ
-const invitationResponseSchema = z.object({
+// リクエストスキーマ
+const respondInvitationSchema = z.object({
   token: z.string().min(1, 'トークンは必須です'),
-  accept: z.boolean()
+  accept: z.boolean(),
 });
 
-// 招待承認/拒否
-export async function POST(
-  req: NextRequest
-) {
+export async function POST(req: NextRequest) {
   try {
     const user = getUserFromRequest(req);
-    
     if (!user) {
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    // リクエストデータのバリデーション
-    const validation = await validateRequest(req, invitationResponseSchema);
+    // リクエストのバリデーション
+    const validation = await validateRequest(req, respondInvitationSchema);
     if (!validation.success) {
       return validation.error;
     }
 
     const { token, accept } = validation.data;
 
-    // トークンの存在確認
+    // 招待を取得
     const invitation = await prisma.invitation.findUnique({
       where: { token },
       include: {
         project: true,
+        inviter: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -45,15 +48,7 @@ export async function POST(
       );
     }
 
-    // 招待の有効期限切れチェック
-    if (invitation.expiresAt < new Date()) {
-      return NextResponse.json(
-        { error: '招待の有効期限が切れています' },
-        { status: 410 }
-      );
-    }
-
-    // 既に応答済みの招待かチェック
+    // 招待のステータスチェック
     if (invitation.status !== InvitationStatus.PENDING) {
       return NextResponse.json(
         { error: 'この招待は既に応答済みです' },
@@ -61,66 +56,68 @@ export async function POST(
       );
     }
 
-    // 招待のメールアドレスと現在のユーザーのメールアドレスが一致するか確認
-    if (user.email !== invitation.email) {
+    // 有効期限チェック
+    if (new Date(invitation.expiresAt) < new Date()) {
       return NextResponse.json(
-        { error: 'この招待は別のメールアドレス宛てに送信されています' },
+        { error: 'この招待は期限切れです' },
+        { status: 410 }
+      );
+    }
+
+    // 招待メールアドレスとユーザーのメールアドレスが一致するかチェック
+    if (invitation.email !== user.email) {
+      return NextResponse.json(
+        { error: 'この招待はあなた宛てではありません' },
         { status: 403 }
       );
     }
 
-    // 招待を承認
     if (accept) {
-      // すでにプロジェクトメンバーか確認
-      const existingMember = await prisma.projectMember.findUnique({
-        where: {
-          projectId_userId: {
-            projectId: invitation.projectId,
-            userId: user.id,
+      // 承認の場合、トランザクションで招待ステータス更新とプロジェクトメンバー追加を行う
+      const result = await prisma.$transaction(async (tx) => {
+        // 既にプロジェクトメンバーでないかチェック
+        const existingMember = await tx.projectMember.findUnique({
+          where: {
+            projectId_userId: {
+              projectId: invitation.projectId,
+              userId: user.id,
+            },
           },
-        },
-      });
+        });
 
-      if (existingMember) {
-        // 招待を承認済みにする
-        await prisma.invitation.update({
+        if (existingMember) {
+          throw new Error('既にプロジェクトのメンバーです');
+        }
+
+        // 招待ステータスを更新
+        await tx.invitation.update({
           where: { id: invitation.id },
           data: { status: InvitationStatus.ACCEPTED },
         });
 
-        return NextResponse.json(
-          { message: 'あなたは既にこのプロジェクトのメンバーです' },
-          { status: 200 }
-        );
-      }
-
-      // トランザクションでメンバー追加と招待ステータス更新を実行
-      const result = await prisma.$transaction([
         // プロジェクトメンバーとして追加
-        prisma.projectMember.create({
+        const membership = await tx.projectMember.create({
           data: {
             projectId: invitation.projectId,
             userId: user.id,
-            role: ProjectRole.MEMBER, // デフォルトはメンバー
+            role: ProjectRole.MEMBER,
           },
-        }),
-        // 招待ステータスを承認済みに更新
-        prisma.invitation.update({
-          where: { id: invitation.id },
-          data: { status: InvitationStatus.ACCEPTED },
-        }),
-      ]);
+        });
+
+        return { invitation, membership };
+      });
 
       return NextResponse.json({
         message: 'プロジェクト招待を承認しました',
-        project: invitation.project,
-        membership: result[0],
+        project: {
+          id: invitation.project.id,
+          name: invitation.project.name,
+          description: invitation.project.description,
+        },
+        membership: result.membership,
       });
-    }
-
-    // 招待を拒否
-    if (!accept) {
-      // 招待ステータスを拒否に更新
+    } else {
+      // 拒否の場合
       await prisma.invitation.update({
         where: { id: invitation.id },
         data: { status: InvitationStatus.REJECTED },
@@ -130,10 +127,18 @@ export async function POST(
         message: 'プロジェクト招待を拒否しました',
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('招待応答エラー:', error);
+    
+    if (error.message === '既にプロジェクトのメンバーです') {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { error: '招待への応答に失敗しました' },
+      { error: '招待への応答処理に失敗しました' },
       { status: 500 }
     );
   }

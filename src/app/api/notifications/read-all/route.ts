@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    // 全ての未読通知を既読に更新
+    // ユーザーの未読通知を全て既読に更新
     const result = await prisma.notification.updateMany({
       where: {
         userId: user.id,
@@ -23,13 +23,13 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      message: `${result.count}件の未読通知を既読にしました`,
-      count: result.count,
+      message: '全ての通知を既読にしました',
+      updatedCount: result.count,
     });
   } catch (error) {
-    console.error('一括既読エラー:', error);
+    console.error('全通知既読化エラー:', error);
     return NextResponse.json(
-      { error: '通知の一括既読に失敗しました' },
+      { error: '通知の既読化に失敗しました' },
       { status: 500 }
     );
   }

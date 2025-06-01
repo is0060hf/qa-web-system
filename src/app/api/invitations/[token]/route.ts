@@ -9,9 +9,9 @@ export async function GET(
   { params }: { params: { token: string } }
 ) {
   try {
-    const token = params.token;
+    const { token } = params;
 
-    // トークンの存在確認
+    // 招待を取得
     const invitation = await prisma.invitation.findUnique({
       where: { token },
       include: {
@@ -39,15 +39,15 @@ export async function GET(
       );
     }
 
-    // 招待の有効期限切れチェック
-    if (invitation.expiresAt < new Date()) {
+    // 有効期限チェック
+    if (new Date(invitation.expiresAt) < new Date()) {
       return NextResponse.json(
-        { error: '招待の有効期限が切れています' },
+        { error: 'この招待は期限切れです' },
         { status: 410 }
       );
     }
 
-    // 既に応答済みの招待かチェック
+    // 既に応答済みかチェック
     if (invitation.status !== InvitationStatus.PENDING) {
       return NextResponse.json(
         { error: 'この招待は既に応答済みです' },
@@ -55,6 +55,16 @@ export async function GET(
       );
     }
 
+    // 認証済みの場合、招待メールアドレスとの一致をチェック
+    const user = getUserFromRequest(req);
+    if (user && user.email !== invitation.email) {
+      return NextResponse.json(
+        { error: 'この招待はあなた宛てではありません' },
+        { status: 403 }
+      );
+    }
+
+    // レスポンスの形式を整形
     return NextResponse.json({
       invitation: {
         id: invitation.id,
@@ -62,14 +72,22 @@ export async function GET(
         status: invitation.status,
         expiresAt: invitation.expiresAt,
         createdAt: invitation.createdAt,
-        project: invitation.project,
-        inviter: invitation.inviter,
+        project: {
+          id: invitation.project.id,
+          name: invitation.project.name,
+          description: invitation.project.description,
+        },
+        inviter: {
+          id: invitation.inviter.id,
+          name: invitation.inviter.name,
+          email: invitation.inviter.email,
+        },
       },
     });
   } catch (error) {
     console.error('招待詳細取得エラー:', error);
     return NextResponse.json(
-      { error: '招待詳細の取得に失敗しました' },
+      { error: '招待情報の取得に失敗しました' },
       { status: 500 }
     );
   }
