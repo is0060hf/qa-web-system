@@ -132,7 +132,7 @@ export default function Dashboard() {
 
       <Grid container spacing={3}>
         {/* 統計カード */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard 
             title="割り当て質問"
             value={stats.assignedQuestions}
@@ -141,7 +141,7 @@ export default function Dashboard() {
           />
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard 
             title="完了質問"
             value={stats.completedQuestions}
@@ -150,7 +150,7 @@ export default function Dashboard() {
           />
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard 
             title="期限間近"
             value={stats.nearDeadlineQuestions}
@@ -159,7 +159,7 @@ export default function Dashboard() {
           />
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard 
             title="期限超過"
             value={stats.overdueQuestions}
@@ -169,7 +169,7 @@ export default function Dashboard() {
         </Grid>
 
         {/* 担当質問 */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardHeader 
               title="担当質問" 
@@ -215,7 +215,7 @@ export default function Dashboard() {
                           }
                           secondary={
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Typography variant="body2" component="span">
                                   {question.project}
                                 </Typography>
@@ -226,11 +226,12 @@ export default function Dashboard() {
                                   sx={{ ml: 1 }}
                                 />
                               </Box>
-                              <Typography variant="body2">
+                              <Typography variant="body2" component="span">
                                 期限: {new Date(question.deadline).toLocaleDateString('ja-JP')}
                               </Typography>
                             </Box>
                           }
+                          secondaryTypographyProps={{ component: 'div' }}
                         />
                       </ListItemButton>
                       {index < assignedQuestions.length - 1 && <Divider />}
@@ -249,7 +250,7 @@ export default function Dashboard() {
         </Grid>
 
         {/* 作成質問 */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardHeader 
               title="作成質問" 
@@ -295,7 +296,7 @@ export default function Dashboard() {
                           }
                           secondary={
                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Typography variant="body2" component="span">
                                   {question.project}
                                 </Typography>
@@ -312,11 +313,12 @@ export default function Dashboard() {
                                   sx={{ ml: 1 }}
                                 />
                               </Box>
-                              <Typography variant="body2">
+                              <Typography variant="body2" component="span">
                                 作成日: {new Date(question.createdAt).toLocaleDateString('ja-JP')}
                               </Typography>
                             </Box>
                           }
+                          secondaryTypographyProps={{ component: 'div' }}
                         />
                       </ListItemButton>
                       {index < createdQuestions.length - 1 && <Divider />}
@@ -335,7 +337,7 @@ export default function Dashboard() {
         </Grid>
 
         {/* 最近のプロジェクト */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardHeader 
               title="最近のプロジェクト" 
@@ -349,7 +351,7 @@ export default function Dashboard() {
             {recentProjects.length > 0 ? (
               <Grid container sx={{ p: 2 }}>
                 {recentProjects.map((project) => (
-                  <Grid key={project.id} item xs={12} sm={6} md={4}>
+                  <Grid key={project.id} size={{ xs: 12, sm: 6, md: 4 }}>
                     <Paper 
                       elevation={0} 
                       sx={{ 
