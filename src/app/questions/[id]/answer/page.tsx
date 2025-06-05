@@ -84,6 +84,22 @@ interface AttachedFile {
   file: File;
   name: string;
   size: number;
+  uploadedMediaId?: string;
+}
+
+interface UploadUrlResponse {
+  uploadUrl: string;
+  url: string;
+  fileName: string;
+  fileType: string;
+}
+
+interface MediaFileResponse {
+  id: string;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  url: string;
 }
 
 export default function AnswerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -96,6 +112,7 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
 
   // 質問データの取得
   const { 
@@ -154,6 +171,68 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
     return true;
   };
 
+  // ファイルアップロード処理
+  const uploadFiles = async () => {
+    const uploadedMediaIds: string[] = [];
+    
+    for (const attachedFile of attachedFiles) {
+      if (attachedFile.uploadedMediaId) {
+        uploadedMediaIds.push(attachedFile.uploadedMediaId);
+        continue;
+      }
+
+      try {
+        // アップロードURLを取得
+        const urlResponse = await fetchData<UploadUrlResponse>('media/upload-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileName: attachedFile.file.name,
+            contentType: attachedFile.file.type || 'application/octet-stream',
+            directory: 'answers'
+          })
+        });
+
+        // ファイルをアップロード
+        const uploadResponse = await fetch(urlResponse.uploadUrl, {
+          method: 'PUT',
+          body: attachedFile.file,
+          headers: {
+            'Content-Type': attachedFile.file.type || 'application/octet-stream',
+          }
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('ファイルのアップロードに失敗しました');
+        }
+
+        // メディアファイルをシステムに登録
+        const mediaFile = await fetchData<MediaFileResponse>('media', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileName: attachedFile.file.name,
+            fileType: attachedFile.file.type || 'application/octet-stream',
+            fileSize: attachedFile.file.size,
+            storageUrl: urlResponse.url,
+          })
+        });
+
+        uploadedMediaIds.push(mediaFile.id);
+        attachedFile.uploadedMediaId = mediaFile.id;
+      } catch (error) {
+        console.error('ファイルアップロードエラー:', error);
+        throw new Error(`ファイル「${attachedFile.name}」のアップロードに失敗しました`);
+      }
+    }
+
+    return uploadedMediaIds;
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) {
       setSubmitError('必須項目を入力してください');
@@ -169,37 +248,50 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
     setSubmitError(null);
 
     try {
-      const formData = new FormData();
+      // ファイルをアップロード
+      let mediaFileIds: string[] = [];
+      if (attachedFiles.length > 0) {
+        setIsUploadingFiles(true);
+        try {
+          mediaFileIds = await uploadFiles();
+        } catch (error: any) {
+          setSubmitError(error.message);
+          return;
+        } finally {
+          setIsUploadingFiles(false);
+        }
+      }
+
+      // リクエストボディを構築
+      const requestBody: any = {};
 
       // 自由記述形式の場合
       if (!question.answerForm) {
-        formData.append('content', content);
+        requestBody.content = content;
       } else {
         // フォーム形式の場合
         const formDataArray = question.answerForm.fields.map(field => ({
           formFieldId: field.id,
           value: formResponses[field.id] || ''
         }));
-        formData.append('formData', JSON.stringify(formDataArray));
+        requestBody.formData = formDataArray;
         
         // 追加コメントがある場合
-        if (content.trim()) {
-          formData.append('content', content);
-        }
+        requestBody.content = content.trim() || '回答フォームの内容を参照してください';
       }
 
-      // ファイルを追加
-      attachedFiles.forEach((attachedFile, index) => {
-        formData.append(`files`, attachedFile.file);
-      });
+      // メディアファイルIDを追加
+      if (mediaFileIds.length > 0) {
+        requestBody.mediaFileIds = mediaFileIds;
+      }
 
       // プロジェクトIDを含む正しいAPIパスを使用
       await fetchData(`projects/${question.project.id}/questions/${questionId}/answers`, {
         method: 'POST',
-        body: formData,
         headers: {
-          // multipart/form-dataの場合、Content-Typeヘッダーは自動設定されるため指定しない
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       });
 
       // 成功したら質問詳細ページに戻る
@@ -209,6 +301,7 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
       setSubmitError(err.message || '回答の投稿に失敗しました');
     } finally {
       setIsSubmitting(false);
+      setIsUploadingFiles(false);
     }
   };
 
@@ -447,11 +540,11 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
           <Button
             variant="contained"
             color="primary"
-            startIcon={<SendIcon />}
+            startIcon={isUploadingFiles ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
             onClick={handleSubmit}
             disabled={isSubmitting || !validateForm()}
           >
-            {isSubmitting ? '送信中...' : '回答を送信'}
+            {isUploadingFiles ? 'ファイルアップロード中...' : isSubmitting ? '送信中...' : '回答を送信'}
           </Button>
         </Box>
       </Paper>
