@@ -10,16 +10,21 @@
 ```
 
 ### 1.2 使用技術
-- **フロントエンド**: Next.js (v14以上)
+- **フロントエンド**: Next.js (v15.3.1)
+- **UIライブラリ**: React (v19.1.0)
 - **バックエンド**: Next.js API Routes
 - **データベース**: Neon PostgreSQL (サーバーレスPostgreSQL)
-- **ORM**: Prisma (最新安定版)
-- **認証**: JWT (JSON Web Token)
-- **UI**: Material UI v5 (DataGrid, Chart含む)
-- **状態管理**: Zustand
-- **APIキャッシュ**: React Query（TanStack Query）
+- **ORM**: Prisma (v6.7.0)
+- **認証**: JWT (jsonwebtoken / jose)
+- **UI**: Material UI v7.1.0 (DataGrid, Chart含む)
+- **状態管理**: Zustand (v5.0.4)
+- **APIキャッシュ**: React Query（TanStack Query v5.75.2）
+- **フォーム管理**: React Hook Form (v7.56.3)
+- **バリデーション**: Zod (v3.24.4)
 - **ストレージ**: Vercel Blob (添付ファイル用)
 - **デプロイメント**: Vercel
+- **言語**: TypeScript (v5.8.3)
+- **スタイリング**: Tailwind CSS (v4.1.5)
 
 ### 1.3 システム要件
 - **想定同時接続ユーザー数**: 最大100名
@@ -73,7 +78,7 @@
 - **CI/CD**: GitHub Actions + Vercel自動デプロイ
 - **フロー**:
   1. プルリクエスト作成時にVercel Previewデプロイ
-  2. テスト自動実行（Jest/Vitest + React Testing Library）
+  2. テスト自動実行（Jest + React Testing Library）
   3. コードレビュー
   4. mainブランチへのマージで本番環境に自動デプロイ
 
@@ -91,9 +96,12 @@
 
 ### 5.1 認証・認可
 - **認証方式**: JWT
-- **トークン管理**: HttpOnly Cookie
-- **トークン有効期限**: アクセストークン 2時間、リフレッシュトークン 30日
-- **パスワード管理**: bcryptによるハッシュ化（コスト係数12）
+- **トークン管理**: Zustand store
+- **トークン有効期限**: アクセストークン 15分（900秒）
+- **パスワード管理**: bcryptjsによるハッシュ化
+- **JWT処理**: 
+  - 通常のAPI Routes: jsonwebtoken
+  - Edge Runtime: jose
 
 ### 5.2 通信セキュリティ
 - **HTTPSの強制**: 全通信をHTTPS化
@@ -214,7 +222,7 @@
   - Neon PostgreSQLデータベース作成
   - リポジトリ設定とCI/CD基盤構築
 - **週2**: API基盤とセキュリティ設定
-  - JWT認証システム実装
+  - JWT認証システム実装（jsonwebtoken/jose）
   - 環境変数設定
   - HTTPS・CORS設定
 - **週3**: ストレージ・監視設定
@@ -236,7 +244,7 @@
   - 回答システム
   - 通知システム
 - **週5-6**: テストと監視
-  - 単体テスト・統合テスト（Jest/Vitest + React Testing Library）
+  - 単体テスト・統合テスト（Jest + React Testing Library）
   - E2Eテスト（Playwright/Cypress）
   - アラート設定
 
