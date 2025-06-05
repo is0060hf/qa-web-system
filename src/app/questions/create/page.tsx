@@ -238,17 +238,41 @@ export default function CreateQuestionPage() {
     
     try {
       // APIリクエスト用のデータを整形
-      const requestData = {
-        ...data,
-        deadline: data.deadline ? data.deadline.toISOString() : null,
-        // テンプレート関連の情報を整形
-        answerForm: data.answerFormType === 'form' ? {
-          fields: data.formFields,
-        } : null,
-        answerFormTemplateId: data.answerFormType === 'form' && data.templateId ? data.templateId : null,
+      const requestData: any = {
+        title: data.title,
+        content: data.content,
+        assigneeId: data.assigneeId,
+        priority: data.priority,
+        tagIds: data.tagIds,
         saveAsTemplate: data.saveAsTemplate,
-        templateName: data.saveAsTemplate ? data.templateName : null,
       };
+
+      // deadlineが設定されている場合のみ追加
+      if (data.deadline) {
+        requestData.deadline = data.deadline.toISOString();
+      }
+
+      // 回答フォームが選択されている場合のみ関連フィールドを追加
+      if (data.answerFormType === 'form') {
+        // カスタムフォームフィールドがある場合
+        if (data.formFields && data.formFields.length > 0) {
+          requestData.answerForm = {
+            fields: data.formFields,
+          };
+        }
+        
+        // テンプレートが選択されている場合
+        if (data.templateId) {
+          requestData.answerFormTemplateId = data.templateId;
+        }
+      }
+
+      // テンプレート保存が選択されている場合のみ追加
+      if (data.saveAsTemplate && data.templateName) {
+        requestData.templateName = data.templateName;
+      }
+      
+      console.log('送信データ:', JSON.stringify(requestData, null, 2));
       
       // 質問を作成
       await postData(`projects/${data.projectId}/questions`, requestData);

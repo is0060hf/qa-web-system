@@ -7,7 +7,7 @@ import { Role } from '@prisma/client';
 // メディアファイル取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -16,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const fileId = params.fileId;
+    const { fileId } = await params;
 
     // メディアファイルの存在確認
     const mediaFile = await prisma.mediaFile.findUnique({
@@ -51,7 +51,7 @@ export async function GET(
 // メディアファイル削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -60,7 +60,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const fileId = params.fileId;
+    const { fileId } = await params;
 
     // メディアファイルの存在確認
     const mediaFile = await prisma.mediaFile.findUnique({

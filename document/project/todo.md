@@ -1,189 +1,181 @@
 # 実装すべき画面のTODOリスト
 
-## 認証関連画面
-- [x] ログイン画面
-  - [x] メールアドレス入力フィールド
-  - [x] パスワード入力フィールド（パスワード表示切替機能付き）
-  - [x] 「ログイン」ボタン
-  - [x] 「パスワードをお忘れですか？」リンク
-  - [x] 「アカウントをお持ちでない場合: 新規登録」リンク
-  - [x] ログイン状態の保持
-  - [x] エラーメッセージ表示
+## 🚨 重要度：高 - 機能が動作しない/セキュリティリスクがある
 
-- [x] 新規登録画面
-  - [x] 氏名入力フィールド
-  - [x] メールアドレス入力フィールド
-  - [x] パスワード入力フィールド
-  - [x] パスワード確認入力フィールド
-  - [x] 「登録」ボタン
-  - [x] 「アカウントをお持ちの場合: ログイン」リンク
-  - [x] 入力バリデーション
-  - [x] エラーメッセージ表示
+### API/バックエンド
+- [ ] `/api/questions` エンドポイントの実装
+  - [ ] 質問一覧の取得（検索、フィルタリング、ページネーション対応）
+  - [ ] 検索ページ（`/search/page.tsx`）で使用されているが未実装
+  
+- [ ] メール送信機能の実装
+  - [ ] `src/app/api/auth/request-password-reset/route.ts` - パスワードリセットメール
+  - [ ] `src/app/api/projects/[projectId]/invitations/route.ts` - 招待メール
+  - [ ] SendGridやAWS SESなどのメールサービスの統合
+  
+- [ ] PasswordResetTokenモデルの追加
+  - [ ] Prismaスキーマにモデル定義を追加
+  - [ ] マイグレーションの実行
+  - [ ] パスワードリセットトークンの有効期限管理
+  
+### セキュリティ
+- [ ] CORS設定の実装
+  - [ ] Next.jsのミドルウェアでCORSヘッダーを設定
+  - [ ] 許可するオリジンの設定
+  
+- [ ] XSS対策の強化
+  - [ ] ユーザー入力のサニタイズ処理
+  - [ ] Content Security Policy (CSP) ヘッダーの設定
+  
+- [ ] CSRF対策の実装
+  - [ ] CSRFトークンの生成と検証
+  
+- [ ] レート制限の実装
+  - [ ] APIエンドポイントへのリクエスト制限
+  - [ ] ブルートフォース攻撃対策
 
-- [x] パスワードリセット要求画面
-  - [x] メールアドレス入力フィールド
-  - [x] 「リセットリンクを送信」ボタン
-  - [x] 「ログイン画面に戻る」リンク
-  - [x] 送信完了メッセージ
+## 🔧 重要度：中 - 機能は動作するが改善が必要
 
-- [x] パスワードリセット実行画面
-  - [x] 新しいパスワード入力フィールド
-  - [x] 新しいパスワード確認入力フィールド
-  - [x] 「パスワードを更新」ボタン
-  - [x] トークン検証機能
-  - [x] 更新完了メッセージ
+### UI/UX
+- [ ] フォームビルダーUIの実装
+  - [ ] `src/app/components/questions/QuestionForm.tsx` - 370行目のTODOコメント
+  - [ ] ドラッグ&ドロップでフィールドを追加/並び替え
+  - [ ] フィールドタイプの選択UI
+  - [ ] プレビュー機能
+  
+- [ ] ファイルアップロード機能の改善
+  - [ ] プログレスバーの実装
+  - [ ] ファイルサイズ制限の明確な表示
+  - [ ] 複数ファイルの一括アップロード
+  - [ ] アップロード済みファイルのプレビュー機能
+  
+- [ ] エラーハンドリングの統一
+  - [ ] グローバルエラーハンドラーの実装
+  - [ ] エラーメッセージの国際化対応
+  - [ ] ユーザーフレンドリーなエラー表示
 
-## 質問関連画面
-- [x] 質問作成画面
-  - [x] プロジェクト選択ドロップダウン
-  - [x] 質問タイトル入力フィールド
-  - [x] 質問内容入力（リッチテキストエディタ）
-  - [x] 担当者選択
-  - [x] 回答期限設定（DatePicker）
-  - [x] 優先度選択
-  - [x] タグ選択
-  - [x] 回答形式選択（自由記述/フォーム）
-  - [x] 回答フォームビルダー
-  - [x] 「作成」ボタン
-  - [x] 「キャンセル」ボタン
+### API/バックエンド
+- [ ] 添付ファイル関連APIの完全実装
+  - [ ] `/api/attachments/[fileId]` - ファイルダウンロード
+  - [ ] `/api/attachments/[fileId]/metadata` - ファイルメタデータ取得
+  - [ ] ファイル削除エンドポイント
+  
+- [ ] ログ機能の実装
+  - [ ] 構造化ログライブラリ（Winston、Pino等）の導入
+  - [ ] アクセスログ
+  - [ ] エラーログ
+  - [ ] 監査ログ（重要な操作の記録）
+  
+- [ ] バックアップ機能
+  - [ ] データベースの定期バックアップ
+  - [ ] アップロードファイルのバックアップ
 
-- [x] 質問編集画面
-  - [x] 既存質問情報の読み込み表示
-  - [x] 質問タイトル編集
-  - [x] 質問内容編集
-  - [x] 担当者変更
-  - [x] 回答期限変更
-  - [x] 優先度変更
-  - [x] タグ変更
-  - [x] 回答形式変更
-  - [x] 「更新」ボタン
-  - [x] 「キャンセル」ボタン
+### パフォーマンス
+- [ ] キャッシュ戦略の実装
+  - [ ] Redisの導入検討
+  - [ ] APIレスポンスのキャッシュ
+  - [ ] 静的アセットのキャッシュ設定
+  
+- [ ] データベースクエリの最適化
+  - [ ] N+1問題の解決
+  - [ ] インデックスの最適化
+  - [ ] 大量データ処理の改善
 
-- [x] 担当中の質問一覧画面
-  - [x] 検索フィルター（キーワード、プロジェクト、ステータス、優先度、期限）
-  - [x] 質問テーブル表示
-  - [x] ソート機能
-  - [x] ページネーション
-  - [x] 期限切れ/近い質問の強調表示
+## 📝 重要度：低 - 改善により開発効率/保守性が向上
 
-## 通知関連画面
-- [x] 通知ドロップダウン
-  - [x] 最新5件の未読通知表示
-  - [x] 「すべて既読にする」ボタン
-  - [x] 「通知一覧へ」リンク
-  - [x] 通知クリックで関連ページへの遷移
+### ドキュメント
+- [ ] 環境変数の設定ドキュメント
+  - [ ] 必要な環境変数の一覧と説明
+  - [ ] `.env.example` ファイルの作成
+  - [ ] 各環境（開発/ステージング/本番）での設定方法
+  
+- [ ] APIドキュメントの自動生成
+  - [ ] OpenAPI/Swagger仕様書の作成
+  - [ ] APIエンドポイントの一覧と使用方法
+  
+- [ ] デプロイメントガイド
+  - [ ] Vercelへのデプロイ手順
+  - [ ] データベースのセットアップ
+  - [ ] 環境変数の設定
 
-- [x] 通知一覧画面
-  - [x] 「未読のみ表示」フィルター
-  - [x] 「すべて既読にする」ボタン
-  - [x] 通知リスト表示
-  - [x] 無限スクロールまたはページネーション
-  - [x] 通知クリックで関連ページへの遷移
+### テスト
+- [ ] E2Eテストの追加
+  - [ ] Cypress/Playwrightの導入
+  - [ ] 主要なユーザーフローのテスト
+  
+- [ ] 統合テストの拡充
+  - [ ] APIエンドポイントの統合テスト
+  - [ ] データベーストランザクションのテスト
+  
+- [ ] パフォーマンステスト
+  - [ ] 負荷テストツールの導入
+  - [ ] APIレスポンスタイムの測定
 
-## 管理者機能画面
-- [x] ユーザー管理画面
-  - [x] ユーザー検索機能
-  - [x] ユーザーテーブル表示
-  - [x] 役割（ADMIN/USER）変更機能
-  - [x] ユーザー削除機能
-  - [x] ページネーション
+### 開発環境
+- [ ] Docker環境の整備
+  - [ ] `docker-compose.yml` の作成
+  - [ ] 開発環境の統一化
+  
+- [ ] CI/CDパイプラインの改善
+  - [ ] 自動テストの実行
+  - [ ] コードカバレッジのレポート
+  - [ ] 自動デプロイの設定
 
-## その他機能拡張
-- [x] レスポンシブデザイン対応
-  - [x] モバイル対応（xs / sm）
-  - [x] タブレット対応（md）
-  - [x] デスクトップ対応（lg / xl）
+### コード品質
+- [ ] TypeScriptの型定義の改善
+  - [ ] `any` 型の削減
+  - [ ] 共通の型定義ファイルの整理
+  
+- [ ] コンポーネントの再利用性向上
+  - [ ] 共通コンポーネントの抽出
+  - [ ] Storybookの導入検討
+  
+- [ ] コードの重複削減
+  - [ ] 共通処理のユーティリティ化
+  - [ ] カスタムフックの作成
 
-- [x] アクセシビリティ対応
-  - [x] キーボードアクセシビリティ
-  - [x] スクリーンリーダー対応
-  - [x] 適切なコントラスト比
-  - [x] 拡大表示対応
+## 🐛 既知のバグ
 
-- [x] ダークモード対応
-  - [x] ダークモードテーマ作成
-  - [x] テーマ切替機能
-  - [x] ユーザー設定の保存
+### 機能的なバグ
+- [ ] 検索ページでの質問検索が動作しない（APIエンドポイント未実装）
+- [ ] パスワードリセット機能が完全に動作しない（トークン管理未実装）
+- [ ] ファイルアップロード後の表示/ダウンロードが不完全
 
-## モックデータ対応箇所（API呼び出し）
+### UI/UXのバグ
+- [ ] モバイル表示での一部レイアウト崩れ
+- [ ] ダークモード時の一部コンポーネントの視認性問題
+- [ ] 長いテキストでのオーバーフロー処理不足
 
-- [x] src/hooks/useAuth.ts: 認証フックでのAPI呼び出し
-- [x] src/app/components/notifications/NotificationsPage.tsx: 通知一覧画面
-- [x] src/app/components/layout/Header.tsx: ヘッダーの通知関連
-- [x] src/app/components/layout/Sidebar.tsx: サイドバーの通知カウント
-- [x] src/app/stores/authStore.ts: 認証ストア
-- [x] src/app/stores/projectStore.ts: プロジェクトストア
-- [x] src/app/stores/notificationStore.ts: 通知ストア
-- [x] src/app/stores/questionStore.ts: 質問ストア（存在しない）
-- [x] src/app/admin/users/page.tsx: ユーザー管理画面
-- [x] src/app/settings/page.tsx: ユーザー設定画面
-- [x] src/app/search/page.tsx: 検索画面（実装なし）
-- [x] src/app/projects/page.tsx: プロジェクト一覧画面
-- [x] src/app/projects/[id]/page.tsx: プロジェクト詳細画面
-- [x] src/app/projects/create/page.tsx: プロジェクト作成画面（存在しない）
-- [x] src/app/questions/page.tsx: 質問一覧画面
-- [x] src/app/questions/[id]/page.tsx: 質問詳細画面
-- [x] src/app/questions/create/page.tsx: 質問作成画面
+### セキュリティのバグ
+- [ ] セッション管理の脆弱性（JWT有効期限の適切な設定）
+- [ ] ファイルアップロードのバリデーション不足
+- [ ] SQLインジェクション対策の不足（Prismaを使用しているため低リスクだが確認必要）
 
-### 直接fetchを使用している要対応箇所
-- [x] src/app/search/page.tsx
-  - [x] プロジェクト一覧取得: `await fetch('/api/projects')` → `fetchData<any>('projects')`に修正済み
-  - [x] ユーザー一覧取得: `await fetch('/api/users?limit=100')` → `fetchData<any>('users', { params })`に修正済み
-  - [x] タグ一覧取得: `await fetch(/api/projects/${projectId}/tags)` → `fetchData<any>('projects/${projectId}/tags')`に修正済み
-  - [x] 質問一覧検索: `await fetch(/api/questions?${queryParams})` → `fetchData<any>('questions', { params })`に修正済み
-- [x] src/app/settings/page.tsx
-  - [x] ユーザー情報取得: `await fetch('/api/auth/me')` → すでに`fetchData<{name: string; email: string}>('auth/me')`を使用
-  - [x] ユーザー情報更新: `await fetch('/api/users/me')` → すでに`fetchData<{name: string; email: string}>('users/me', {...})`を使用
-  - [x] パスワード変更: `await fetch('/api/users/change-password')` → すでに`fetchData<{success: boolean}>('users/change-password', {...})`を使用
-- [x] src/app/stores/authStore.ts
-  - [x] ログイン: `await fetch('/api/auth/login')` → すでに`fetchData<{ user: User; token: string }>('auth/login', {...})`を使用
-  - [x] 登録: `await fetch('/api/auth/register')` → すでに`fetchData<{ id: string; email: string }>('auth/register', {...})`を使用
-  - [x] パスワードリセット関連: 複数の関数 → すべての関数でfetchDataを使用済み
-  - [x] ユーザー情報取得: `await fetch('/api/auth/me')` → すでに`fetchData<User>('auth/me', {})`を使用
-  - [x] ユーザープロジェクト取得: `await fetch('/api/users/me/projects')` → すでに`fetchData<ProjectMember[]>('users/me/projects', {})`を使用
-- [x] src/app/stores/notificationStore.ts
-  - [x] 通知一覧取得・既読設定: 複数の関数 → すべての関数でfetchDataを使用済み
-- [x] src/app/stores/projectStore.ts
-  - [x] プロジェクト一覧/詳細/作成/更新: 複数の関数 → すべての関数でfetchDataを使用済み
-  - [x] タグ管理: 複数の関数 → すべての関数でfetchDataを使用済み
-  - [x] メンバー招待/管理: 複数の関数 → すべての関数でfetchDataを使用済み
-- [x] src/app/projects/[id]/page.tsx
-  - [x] プロジェクト更新: `await fetch('/api/projects/${params.id}', {...})` → `fetchData<ProjectDetails>('projects/${params.id}', { method: 'PATCH', ... })`に修正済み
-- [x] src/app/projects/[id]/edit/page.tsx
-  - [x] プロジェクト取得: `await fetch('/api/projects/${params.id}')` → `fetchData<Project>('projects/${params.id}', {})`に修正済み
-  - [x] プロジェクト更新: `await fetch('/api/projects/${params.id}', {...})` → `fetchData<any>('projects/${params.id}', { method: 'PATCH', ... })`に修正済み
+## 🔍 調査が必要な項目
 
-### 対応状況まとめ
-- [x] src/app/search/page.tsx - 修正完了（直接fetchからfetchDataに変更）
-- [x] src/app/settings/page.tsx - 対応済み（既にfetchData関数を使用）
-- [x] src/app/stores/authStore.ts - 対応済み（既にfetchData関数を使用）
-- [x] src/app/stores/notificationStore.ts - 対応済み（既にfetchData関数を使用）
-- [x] src/app/stores/projectStore.ts - 対応済み（既にfetchData関数を使用）
-- [x] src/app/components/notifications/NotificationsPage.tsx - 対応済み（既にfetchData関数を使用）
-- [x] src/app/projects/[id]/page.tsx - 修正完了（直接fetchからfetchDataに変更）
-- [x] src/app/projects/[id]/edit/page.tsx - 修正完了（直接fetchからfetchDataに変更）
+- [ ] リアルタイム通知機能の実装方法（WebSocket/Server-Sent Events）
+- [ ] 大規模ファイルアップロードの最適化（チャンクアップロード）
+- [ ] 国際化（i18n）対応の必要性
+- [ ] アクセシビリティ（WCAG 2.2）準拠の詳細確認
+- [ ] パフォーマンス監視ツールの導入（Sentry、DataDog等）
 
-### 認証関連コンポーネント
-- [x] src/app/components/auth/LoginForm.tsx: ログインフォーム
-- [x] src/app/components/auth/RegisterForm.tsx: ユーザー登録フォーム
-- [x] src/app/components/auth/PasswordResetForm.tsx: パスワードリセットフォーム
+## 📅 実装優先順位
 
-### 質問関連コンポーネント
-- [x] src/app/components/questions/QuestionList.tsx: 質問一覧表示
-- [x] src/app/components/questions/QuestionForm.tsx: 質問作成・編集フォーム
-- [x] src/app/components/questions/AnswerForm.tsx: 回答投稿フォーム
-- [x] src/app/components/questions/QuestionDetail.tsx: 質問詳細表示
+1. **緊急対応が必要**
+   - `/api/questions` エンドポイントの実装
+   - PasswordResetTokenモデルの追加
+   - 基本的なセキュリティ対策
 
-### プロジェクト関連コンポーネント
-- [x] src/app/components/projects/ProjectList.tsx: プロジェクト一覧表示
-- [x] src/app/components/projects/ProjectForm.tsx: プロジェクト作成・編集フォーム
-- [x] src/app/components/projects/ProjectMembersList.tsx: プロジェクトメンバー管理
-- [x] src/app/components/projects/ProjectTagsManager.tsx: プロジェクトタグ管理
+2. **早期に対応すべき**
+   - メール送信機能の実装
+   - ログ機能の実装
+   - エラーハンドリングの改善
 
-### ユーザー関連コンポーネント
-- [x] src/app/components/users/UserList.tsx: ユーザー一覧表示
-- [x] src/app/components/users/ProfileSettings.tsx: プロフィール設定
+3. **計画的に対応**
+   - フォームビルダーUIの実装
+   - ドキュメントの整備
+   - テストの拡充
 
-### 検索関連コンポーネント
-- [x] src/app/components/search/SearchForm.tsx: 検索フォーム
-- [x] src/app/components/search/SearchResults.tsx: 検索結果表示
+4. **長期的な改善**
+   - パフォーマンス最適化
+   - コード品質の向上
+   - 開発環境の改善

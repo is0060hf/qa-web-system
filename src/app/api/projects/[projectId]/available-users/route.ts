@@ -8,7 +8,7 @@ import { canAccessProject, canManageProject } from '@/lib/utils/auth';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     // ログインユーザーの取得
@@ -20,7 +20,7 @@ export async function GET(
 
     console.log('ログインユーザー:', user.id, user.email);
     
-    const projectId = params.projectId;
+    const { projectId } = await params;
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);

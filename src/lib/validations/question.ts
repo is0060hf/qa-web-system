@@ -1,17 +1,37 @@
 import { z } from 'zod';
 import { QuestionPriority, QuestionStatus } from '@prisma/client';
 
+// フォームフィールドのスキーマ
+const formFieldSchema = z.object({
+  id: z.string().optional(), // フロントエンドで生成されるIDは無視
+  label: z.string().min(1, 'ラベルは必須です').max(100, 'ラベルは100文字以内で入力してください'),
+  fieldType: z.enum(['TEXT', 'NUMBER', 'RADIO', 'FILE', 'TEXTAREA']),
+  options: z.array(z.string()).optional(), // RADIOタイプの場合の選択肢
+  isRequired: z.boolean().optional().default(false),
+  order: z.number().int().optional(),
+});
+
+// 回答フォームのスキーマ
+const answerFormSchema = z.object({
+  fields: z.array(formFieldSchema).min(1, '少なくとも1つのフィールドが必要です'),
+});
+
 // 質問作成スキーマ
 export const createQuestionSchema = z.object({
   title: z.string().min(1, 'タイトルは必須です').max(200, 'タイトルは200文字以内で入力してください'),
   content: z.string().min(1, '内容は必須です').max(10000, '内容は10000文字以内で入力してください'),
   assigneeId: z.string().min(1, '回答者は必須です'),
-  deadline: z.string().optional(), // ISO 8601 形式の日付文字列
+  deadline: z.string().optional().nullable(), // ISO 8601 形式の日付文字列
   priority: z.nativeEnum(QuestionPriority, {
     errorMap: () => ({ message: '優先度は HIGHEST, HIGH, MEDIUM, LOW のいずれかを指定してください' }),
   }).optional().default(QuestionPriority.MEDIUM),
   tagIds: z.array(z.string()).optional(),
-});
+  // 回答フォーム関連フィールドを追加（null値を許可）
+  answerForm: answerFormSchema.optional().nullable(),
+  answerFormTemplateId: z.string().optional().nullable(),
+  saveAsTemplate: z.boolean().optional().default(false),
+  templateName: z.string().optional().nullable(),
+}).passthrough(); // 未定義のフィールドを許可（フロントエンドの余分なフィールドを無視）
 
 // 質問更新スキーマ
 export const updateQuestionSchema = z.object({

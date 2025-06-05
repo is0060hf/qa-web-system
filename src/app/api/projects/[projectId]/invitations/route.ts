@@ -10,7 +10,7 @@ import { ProjectMember, ProjectRole } from '@prisma/client';
 // プロジェクト招待一覧取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -19,7 +19,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = params.projectId;
+    const { projectId } = await params;
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -64,7 +64,7 @@ export async function GET(
 // プロジェクト招待作成
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -73,7 +73,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = params.projectId;
+    const { projectId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
