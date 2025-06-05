@@ -6,10 +6,10 @@ import { InvitationStatus, ProjectRole } from '@prisma/client';
 // 招待の詳細取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
-    const { token } = params;
+    const { token } = await params;
 
     // 招待を取得
     const invitation = await prisma.invitation.findUnique({

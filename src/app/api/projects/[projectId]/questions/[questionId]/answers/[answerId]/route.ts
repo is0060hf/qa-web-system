@@ -9,7 +9,7 @@ import { QuestionStatus, Role } from '@prisma/client';
 // 回答取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string; answerId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string; answerId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId, answerId } = params;
+    const { projectId, questionId, answerId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -99,7 +99,7 @@ export async function GET(
 // 回答更新
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string; answerId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string; answerId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -108,7 +108,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId, answerId } = params;
+    const { projectId, questionId, answerId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -368,7 +368,7 @@ export async function PATCH(
 // 回答削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string; answerId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string; answerId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -377,7 +377,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId, answerId } = params;
+    const { projectId, questionId, answerId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);

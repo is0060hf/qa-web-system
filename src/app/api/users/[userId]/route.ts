@@ -16,9 +16,17 @@ const updateUserSchema = z.object({
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const user = getUserFromRequest(req);
+
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+    }
+
+    const { userId } = await params;
+
     // 管理者権限チェック
     const isAdmin = isAdminRequest(req);
     if (!isAdmin) {
@@ -27,8 +35,6 @@ export async function PATCH(
         { status: 403 }
       );
     }
-
-    const { userId } = params;
 
     // リクエストデータの解析
     let body;
@@ -182,6 +188,44 @@ export async function DELETE(
     console.error('ユーザー削除エラー:', error);
     return NextResponse.json(
       { error: 'ユーザーの削除に失敗しました' },
+      { status: 500 }
+    );
+  }
+}
+
+// ユーザー詳細取得
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
+  try {
+    const user = getUserFromRequest(req);
+
+    if (!user) {
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+    }
+
+    const { userId } = await params;
+
+    // 更新対象のユーザーが存在するか確認
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: 'ユーザーが見つかりません' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      user: existingUser,
+    });
+  } catch (error) {
+    console.error('ユーザー情報取得エラー:', error);
+    return NextResponse.json(
+      { error: 'ユーザー情報の取得に失敗しました' },
       { status: 500 }
     );
   }

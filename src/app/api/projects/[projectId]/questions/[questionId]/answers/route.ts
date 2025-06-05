@@ -9,7 +9,7 @@ import { QuestionStatus } from '@prisma/client';
 // 質問に対する回答作成
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -18,7 +18,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId } = params;
+    const { projectId, questionId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
