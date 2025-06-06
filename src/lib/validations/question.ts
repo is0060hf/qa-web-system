@@ -54,7 +54,7 @@ export const updateQuestionStatusSchema = z.object({
 
 // 回答作成スキーマ
 export const createAnswerSchema = z.object({
-  content: z.string().min(1, '回答内容は必須です').max(10000, '回答内容は10000文字以内で入力してください'),
+  content: z.string().max(10000, '回答内容は10000文字以内で入力してください').optional(), // フォーム形式の場合は任意
   mediaFileIds: z.array(z.string()).optional(), // 添付ファイルIDs
   formData: z.array(
     z.object({

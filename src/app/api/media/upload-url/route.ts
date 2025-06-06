@@ -2,25 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { getUploadUrlSchema } from '@/lib/validations/media';
-import { put } from '@vercel/blob';
+import { generateClientTokenFromReadWriteToken } from '@vercel/blob/client';
 import { getMimeType } from '@/lib/utils/blob';
 
-// 署名付きURL生成結果の型定義
-interface PresignedUrlResult {
-  url: string;
-  uploadUrl: string;
-}
-
-// 拡張されたPutオプション
-interface ExtendedPutOptions {
-  access: 'public';
-  handleUploadUrl: boolean;
-  contentType: string;
-  multipart: boolean;
-  token?: string;
-}
-
-// アップロード用署名付きURL生成
+// アップロード用クライアントトークン生成
 export async function POST(req: NextRequest) {
   try {
     const user = getUserFromRequest(req);
@@ -56,19 +41,24 @@ export async function POST(req: NextRequest) {
       ? `${directory}/${user.id}/${uniqueFileName}`
       : `uploads/${user.id}/${uniqueFileName}`;
 
-    // Vercel Blobへのアップロード用署名付きURLを生成
-    // @ts-ignore - 型の互換性エラーを無視
-    const result = await put(filePath, '', {
-      access: 'public',
-      handleUploadUrl: true,
-      contentType,
-      multipart: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN
-    } as ExtendedPutOptions) as PresignedUrlResult;
+    // クライアントトークンを生成
+    const clientToken = await generateClientTokenFromReadWriteToken({
+      token: process.env.BLOB_READ_WRITE_TOKEN!,
+      pathname: filePath,
+      addRandomSuffix: false, // すでにランダムサフィックスを追加済み
+      maximumSizeInBytes: 100 * 1024 * 1024, // 100MB
+      allowedContentTypes: [contentType],
+      validUntil: Date.now() + 60 * 60 * 1000, // 1時間有効
+    });
+
+    // Note: clientTokenを使った直接アップロードは、クライアント側で実装します
+    // ここでは簡易的にトークンとURLパターンを返します
+    const baseUrl = process.env.BLOB_PUBLIC_URL || 'https://blob.vercel-storage.com';
 
     return NextResponse.json({
-      uploadUrl: result.uploadUrl,
-      url: result.url,
+      clientToken,
+      uploadUrl: `${baseUrl}/upload`, // これは仮のURL
+      url: `${baseUrl}/${filePath}`, // アップロード完了後のURL（予測）
       fileName,
       fileType: contentType,
     });

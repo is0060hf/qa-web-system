@@ -20,7 +20,7 @@ const createQuestionFromAnswerSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { questionId: string; answerId: string } }
+  { params }: { params: Promise<{ questionId: string; answerId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -28,7 +28,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { questionId, answerId } = params;
+    const { questionId, answerId } = await params;
 
     // 元の質問と回答を取得
     const originalQuestion = await prisma.question.findUnique({

@@ -229,14 +229,24 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     }
   }
   
+  // FormDataの場合はContent-Typeを設定しない
+  const isFormData = body instanceof FormData;
+  const requestHeaders: Record<string, string> = {
+    ...authHeaders,
+    ...headers,
+  };
+  
+  // FormDataでない場合のみContent-Typeを設定
+  if (!isFormData && !headers['Content-Type']) {
+    requestHeaders['Content-Type'] = 'application/json';
+  }
+  
   const requestOptions: RequestInit = {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders,
-      ...headers,
-    },
-    ...(body && { body: JSON.stringify(body) }),
+    headers: requestHeaders,
+    ...(body && { 
+      body: isFormData ? body : JSON.stringify(body) 
+    }),
   };
   
   console.log(`[fetchData] Request URL: ${url}`);

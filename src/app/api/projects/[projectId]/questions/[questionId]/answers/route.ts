@@ -9,7 +9,7 @@ import { QuestionStatus } from '@prisma/client';
 // 質問に対する回答作成
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -18,7 +18,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId } = params;
+    const { projectId, questionId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -76,6 +76,14 @@ export async function POST(
     }
 
     const { content, mediaFileIds, formData } = validation.data;
+
+    // 自由記述形式の場合、contentは必須
+    if (!question.answerForm && (!content || content.trim() === '')) {
+      return NextResponse.json(
+        { error: '回答内容は必須です' },
+        { status: 400 }
+      );
+    }
 
     // 添付ファイルの存在確認
     if (mediaFileIds && mediaFileIds.length > 0) {
@@ -154,7 +162,7 @@ export async function POST(
       // 回答の作成
       const createdAnswer = await tx.answer.create({
         data: {
-          content,
+          content: content || '',
           questionId,
           creatorId: user.id,
         },

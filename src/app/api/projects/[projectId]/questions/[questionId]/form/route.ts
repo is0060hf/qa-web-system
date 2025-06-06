@@ -9,7 +9,7 @@ import { QuestionStatus, Role } from '@prisma/client';
 // 回答フォーム取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId } = params;
+    const { projectId, questionId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -78,7 +78,7 @@ export async function GET(
 // 回答フォーム作成または更新
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -87,7 +87,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId } = params;
+    const { projectId, questionId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -213,7 +213,7 @@ export async function POST(
 // 回答フォーム削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string; questionId: string } }
+  { params }: { params: Promise<{ projectId: string; questionId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -222,7 +222,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, questionId } = params;
+    const { projectId, questionId } = await params;
 
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);

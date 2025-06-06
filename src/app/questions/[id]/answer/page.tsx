@@ -154,6 +154,61 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
     return true;
   };
 
+  const uploadFile = async (file: File): Promise<string | null> => {
+    try {
+      // Vercel Blob Client Upload を使用
+      const { upload } = await import('@vercel/blob/client');
+      
+      // 認証トークンを取得
+      const authStorage = localStorage.getItem('auth-storage');
+      let token = '';
+      if (authStorage) {
+        try {
+          const { state } = JSON.parse(authStorage);
+          token = state?.token || '';
+        } catch (e) {
+          console.error('Failed to parse auth storage:', e);
+        }
+      }
+      
+      console.log('Starting client upload:', file.name);
+      console.log('File size:', file.size);
+      console.log('Has token:', !!token);
+      
+      // クライアントペイロードを準備
+      const clientPayload = JSON.stringify({ 
+        token,
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
+      
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/media/upload',
+        clientPayload,
+      });
+      
+      console.log('Upload successful:', blob);
+
+      // メディアファイル情報を登録
+      const mediaFile = await fetchData<{ id: string }>('media', {
+        method: 'POST',
+        body: {
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type || 'application/octet-stream',
+          storageUrl: blob.url,
+        },
+      });
+
+      return mediaFile.id;
+    } catch (error) {
+      console.error('ファイルアップロードエラー:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) {
       setSubmitError('必須項目を入力してください');
@@ -169,37 +224,42 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
     setSubmitError(null);
 
     try {
-      const formData = new FormData();
-
-      // 自由記述形式の場合
-      if (!question.answerForm) {
-        formData.append('content', content);
-      } else {
-        // フォーム形式の場合
-        const formDataArray = question.answerForm.fields.map(field => ({
-          formFieldId: field.id,
-          value: formResponses[field.id] || ''
-        }));
-        formData.append('formData', JSON.stringify(formDataArray));
+      // ファイルをアップロード
+      const mediaFileIds: string[] = [];
+      if (attachedFiles.length > 0) {
+        setSubmitError('ファイルをアップロード中...');
         
-        // 追加コメントがある場合
-        if (content.trim()) {
-          formData.append('content', content);
+        for (const attachedFile of attachedFiles) {
+          const fileId = await uploadFile(attachedFile.file);
+          if (fileId) {
+            mediaFileIds.push(fileId);
+      } else {
+            throw new Error(`ファイル ${attachedFile.name} のアップロードに失敗しました`);
+          }
         }
+        
+        setSubmitError(null);
       }
 
-      // ファイルを追加
-      attachedFiles.forEach((attachedFile, index) => {
-        formData.append(`files`, attachedFile.file);
-      });
+      // 回答データを作成
+      const answerData: any = {
+        content: content || '',
+        mediaFileIds,
+      };
+
+        // フォーム形式の場合
+      if (question.answerForm) {
+        const formDataArray = question.answerForm.fields.map(field => ({
+          formFieldId: field.id,
+          value: formResponses[field.id] || '',
+        }));
+        answerData.formData = formDataArray;
+        }
 
       // プロジェクトIDを含む正しいAPIパスを使用
       await fetchData(`projects/${question.project.id}/questions/${questionId}/answers`, {
         method: 'POST',
-        body: formData,
-        headers: {
-          // multipart/form-dataの場合、Content-Typeヘッダーは自動設定されるため指定しない
-        }
+        body: answerData,
       });
 
       // 成功したら質問詳細ページに戻る

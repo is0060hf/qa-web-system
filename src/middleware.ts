@@ -12,6 +12,8 @@ const AUTH_REQUIRED_PATHS = [
   '/api/notifications',
   '/api/dashboard',
   '/api/answer-form-templates',
+  '/api/media',
+  '/api/attachments',
 ];
 
 // 認証不要なAPIパス
@@ -19,6 +21,7 @@ const PUBLIC_PATHS = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/reset-password',
+  '/api/media/upload', // Vercel Blob client uploadのため
 ];
 
 export async function middleware(request: NextRequest) {
@@ -32,8 +35,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 認証不要なパスの場合はスキップ
-  if (PUBLIC_PATHS.some(path => pathname.startsWith(path))) {
+  // 認証不要なパスの場合はスキップ（完全一致または末尾がスラッシュの場合のみ）
+  if (PUBLIC_PATHS.some(path => {
+    // 完全一致、またはパスの後にスラッシュが続く場合のみマッチ
+    return pathname === path || pathname.startsWith(path + '/');
+  })) {
     console.log(`[Middleware] Public path: ${pathname}, skipping authentication`);
     return NextResponse.next();
   }
