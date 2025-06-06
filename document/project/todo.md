@@ -3,19 +3,32 @@
 ## 🚨 重要度：高 - 機能が動作しない/セキュリティリスクがある
 
 ### API/バックエンド
-- [ ] `/api/questions` エンドポイントの実装
-  - [ ] 質問一覧の取得（検索、フィルタリング、ページネーション対応）
-  - [ ] 検索ページ（`/search/page.tsx`）で使用されているが未実装
+- [x] `/api/questions` エンドポイントの実装
+  - [x] 質問一覧の取得（検索、フィルタリング、ページネーション対応）
+  - [x] 検索ページ（`/search/page.tsx`）で使用されているが未実装
+  - 実装済み：`src/app/api/questions/route.ts`に実装
+  - 検索、フィルタリング（プロジェクト、担当者、ステータス、優先度、タグ、期限切れ）対応
+  - ページネーション機能実装済み
+  - ユーザー権限に応じた適切なデータフィルタリング実装済み
   
-- [ ] メール送信機能の実装
-  - [ ] `src/app/api/auth/request-password-reset/route.ts` - パスワードリセットメール
-  - [ ] `src/app/api/projects/[projectId]/invitations/route.ts` - 招待メール
-  - [ ] SendGridやAWS SESなどのメールサービスの統合
+- [x] メール送信機能の実装
+  - [x] `src/app/api/auth/request-password-reset/route.ts` - パスワードリセットメール
+  - [x] `src/app/api/projects/[projectId]/invitations/route.ts` - 招待メール
+  - [x] SendGridやAWS SESなどのメールサービスの統合
+  - 実装済み：`src/lib/utils/email.ts`にメール送信ユーティリティを作成
+  - 開発環境用のダミーメール送信サービス実装済み
+  - SendGridとAWS SES用のプレースホルダー実装済み
+  - 各種メールテンプレート（パスワードリセット、プロジェクト招待、質問通知等）作成済み
+  - `.env.example`に必要な環境変数を文書化
   
-- [ ] PasswordResetTokenモデルの追加
-  - [ ] Prismaスキーマにモデル定義を追加
-  - [ ] マイグレーションの実行
-  - [ ] パスワードリセットトークンの有効期限管理
+- [x] PasswordResetTokenモデルの追加
+  - [x] Prismaスキーマにモデル定義を追加
+  - [x] マイグレーションの実行
+  - [x] パスワードリセットトークンの有効期限管理
+  - 実装済み：`prisma/schema.prisma`にPasswordResetTokenモデルを追加
+  - マイグレーション実行済み（20250606040138_add_password_reset_token）
+  - パスワードリセットAPIでトークンの作成、検証、使用済み処理を実装
+  - トークン有効期限は1時間に設定
   
 ### セキュリティ
 - [ ] CORS設定の実装
@@ -136,8 +149,8 @@
 ## 🐛 既知のバグ
 
 ### 機能的なバグ
-- [ ] 検索ページでの質問検索が動作しない（APIエンドポイント未実装）
-- [ ] パスワードリセット機能が完全に動作しない（トークン管理未実装）
+- [x] ~~検索ページでの質問検索が動作しない（APIエンドポイント未実装）~~ → 2025/06/06 解決済み
+- [x] ~~パスワードリセット機能が完全に動作しない（トークン管理未実装）~~ → 2025/06/06 解決済み
 - [ ] ファイルアップロード後の表示/ダウンロードが不完全
 
 ### UI/UXのバグ
@@ -161,12 +174,12 @@
 ## 📅 実装優先順位
 
 1. **緊急対応が必要**
-   - `/api/questions` エンドポイントの実装
-   - PasswordResetTokenモデルの追加
+   - ~~`/api/questions` エンドポイントの実装~~ ✅ 完了
+   - ~~PasswordResetTokenモデルの追加~~ ✅ 完了
    - 基本的なセキュリティ対策
 
 2. **早期に対応すべき**
-   - メール送信機能の実装
+   - ~~メール送信機能の実装~~ ✅ 完了（開発環境用のダミー実装済み、本番環境用の設定は別途必要）
    - ログ機能の実装
    - エラーハンドリングの改善
 
@@ -179,3 +192,45 @@
    - パフォーマンス最適化
    - コード品質の向上
    - 開発環境の改善
+
+## 📌 完了済みタスクの追加設定
+
+### メール送信機能（2025/06/06 実装）
+現在は開発環境用のダミー実装のみ。本番環境での有効化には以下が必要：
+
+**SendGridを使用する場合：**
+- `npm install @sendgrid/mail`
+- SendGrid APIキーを取得
+- 環境変数設定：
+  - `EMAIL_PROVIDER=sendgrid`
+  - `SENDGRID_API_KEY=your-api-key`
+  - `EMAIL_FROM=noreply@yourdomain.com`
+
+**AWS SESを使用する場合：**
+- `npm install @aws-sdk/client-ses`
+- AWS認証情報を設定
+- 環境変数設定：
+  - `EMAIL_PROVIDER=aws-ses`
+  - `AWS_REGION=your-region`
+  - `AWS_ACCESS_KEY_ID=your-key`
+  - `AWS_SECRET_ACCESS_KEY=your-secret`
+  - `EMAIL_FROM=noreply@yourdomain.com`
+
+### パスワードリセット機能（2025/06/06 実装）
+- トークン有効期限：1時間
+- URLパターン：`/reset-password/[token]`
+- 使用済みトークンは自動削除
+- 複数の未使用トークンがある場合、新規作成時に古いトークンを削除
+
+### 質問検索API（2025/06/06 実装）
+- エンドポイント：`/api/questions`
+- 対応フィルター：
+  - キーワード検索（タイトル、内容）
+  - プロジェクトID
+  - 担当者ID
+  - ステータス
+  - 優先度
+  - タグID
+  - 期限切れフラグ
+- ページネーション対応（page, limit パラメータ）
+- ユーザー権限に応じたデータフィルタリング実装済み

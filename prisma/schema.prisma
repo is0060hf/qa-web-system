@@ -81,6 +81,7 @@ model User {
   formTemplates  AnswerFormTemplate[] // Answer form templates created by the user
   uploadedFiles  MediaFile[]    // Files uploaded by the user
   sentInvitations Invitation[]  @relation("SentInvitations") // Invitations sent by the user
+  passwordResetTokens PasswordResetToken[] // Password reset tokens for the user
 }
 
 model Project {
@@ -309,6 +310,21 @@ model Invitation {
   @@index([projectId])
   @@index([token])
   @@index([inviterId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique // ハッシュ化されたトークン
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  usedAt    DateTime? // トークンが使用された日時
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
 }
 
 

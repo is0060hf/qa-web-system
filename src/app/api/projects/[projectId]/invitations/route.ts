@@ -6,6 +6,7 @@ import { inviteToProjectSchema } from '@/lib/validations/project';
 import { canAccessProject, canManageProject } from '@/lib/utils/auth';
 import crypto from 'crypto';
 import { ProjectMember, ProjectRole } from '@prisma/client';
+import { sendProjectInvitationEmail } from '@/lib/utils/email';
 
 // プロジェクト招待一覧取得
 export async function GET(
@@ -166,7 +167,14 @@ export async function POST(
         },
       });
 
-      // 実際のアプリケーションでは、ここでメール送信サービスを使用して招待メールを送信
+      // 招待メールを送信
+      const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invitations/${token}`;
+      await sendProjectInvitationEmail(
+        email,
+        invitation.inviter.name || invitation.inviter.email,
+        invitation.project.name,
+        invitationUrl
+      );
 
       return NextResponse.json({
         message: 'プロジェクト招待を送信しました',

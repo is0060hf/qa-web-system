@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import { validateRequest } from '@/lib/utils/api';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { sendPasswordResetEmail } from '@/lib/utils/email';
 
 // リクエストスキーマ
 const requestPasswordResetSchema = z.object({
@@ -40,20 +41,27 @@ export async function POST(req: NextRequest) {
     expiresAt.setHours(expiresAt.getHours() + 1);
 
     // 既存のリセットトークンがあれば削除
-    // 注: 現在の実装ではPasswordResetTokenモデルが存在しないため、
-    // ユーザーのメタデータとして保存する一時的な実装とします
-    // TODO: PasswordResetTokenモデルを追加して適切に管理する
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+      },
+    });
+
+    // 新しいリセットトークンを作成
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        token: tokenHash,
+        expiresAt,
+      },
+    });
 
     // メール送信処理
-    // TODO: 実際のメール送信サービス（SendGrid、AWS SES等）を使用
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${resetToken}`;
     
-    console.log('パスワードリセットURL:', resetUrl);
-    console.log('対象ユーザー:', email);
-    console.log('トークン有効期限:', expiresAt);
-
-    // 本番環境では実際にメールを送信する処理を実装
-    // await sendPasswordResetEmail(email, resetUrl);
+    // メールを送信
+    await sendPasswordResetEmail(email, resetUrl);
 
     return NextResponse.json({
       message: 'パスワードリセットのメールを送信しました。メールをご確認ください。'
