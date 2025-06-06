@@ -227,6 +227,21 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     } else {
       console.log(`[fetchData] No auth-storage found in localStorage`);
     }
+    
+    // CSRFトークンをCookieから取得（存在する場合）
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf-token='))
+        ?.split('=')[1];
+      
+      if (csrfToken) {
+        authHeaders['X-CSRF-Token'] = csrfToken;
+        console.log(`[fetchData] Added CSRF token to request headers`);
+      } else {
+        console.log(`[fetchData] No CSRF token found in cookies`);
+      }
+    }
   }
   
   // FormDataの場合はContent-Typeを設定しない
@@ -241,6 +256,8 @@ export const fetchData = async <T>(endpoint: EndpointType, options: FetchOptions
     requestHeaders['Content-Type'] = 'application/json';
   }
   
+  // リクエストボディはサニタイズせず、そのまま送信
+  // （サニタイズは表示時に行う）
   const requestOptions: RequestInit = {
     method,
     headers: requestHeaders,

@@ -4,6 +4,7 @@ import { Inter, Noto_Sans_JP } from 'next/font/google';
 import AuthProvider from './auth-provider';
 import { AccessibilityProvider } from '../components/providers/AccessibilityProvider';
 import ThemeRegistry from '../components/providers/ThemeRegistry';
+import { SecurityProvider } from '../components/providers/SecurityProvider';
 
 // フォント設定
 const inter = Inter({
@@ -41,11 +42,13 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <ThemeRegistry>
-            <AccessibilityProvider>
-              <main id="main-content">
-                {children}
-              </main>
-            </AccessibilityProvider>
+            <SecurityProvider>
+              <AccessibilityProvider>
+                <main id="main-content">
+                  {children}
+                </main>
+              </AccessibilityProvider>
+            </SecurityProvider>
           </ThemeRegistry>
         </AuthProvider>
       </body>
