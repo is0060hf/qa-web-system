@@ -100,4 +100,132 @@ function ImageGallery() {
     </div>
   );
 }
-``` 
+```
+
+## Claude AI Integration
+
+このプロジェクトには、AIコーディングアシスタント「Claude」が統合されており、pre-commitフックでコードレビューを自動実行します。
+
+### 前提条件
+
+- Node.js 18以上
+- Git
+- npm または yarn
+
+### セットアップ手順
+
+1. **Claude CLIのインストール**
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+2. **動作確認**
+   ```bash
+   claude --help
+   ```
+
+3. **Git hooks有効化確認**
+   ```bash
+   # pre-commitフックは既に設定されています
+   ls -la .git/hooks/pre-commit
+   ```
+
+### 基本的な使用方法
+
+#### コマンドラインでの使用
+
+```bash
+# 対話モードでClaude AIを起動
+claude
+
+# 非対話モードでファイルをレビュー
+claude --print "以下のコードをレビューしてください: $(cat src/app/page.tsx)"
+
+# git diffをレビュー
+claude --print "以下の変更をレビューしてください: $(git diff)"
+```
+
+#### エイリアスの使用（セットアップ後）
+
+```bash
+# エイリアスのセットアップ
+./setup-claude-aliases.sh
+source ~/.zshrc  # または ~/.bashrc
+
+# 利用可能なエイリアス
+cl              # Claude対話モード
+clp             # Claude非対話モード（--print）
+crf             # ファイルをレビュー
+crd             # git diffをレビュー
+crds            # ステージング済みの変更をレビュー
+cap             # プロジェクト構造を分析
+cfe             # エラー修正支援
+cgc             # コンポーネント生成
+cgt             # テスト生成
+```
+
+#### pre-commitフックでの自動レビュー
+
+Gitコミット時に自動的にClaudeがコードをレビューします：
+
+- TypeScript/JavaScriptファイルの変更を検出
+- バグ、既存コンポーネントの再実装、可読性、テスト不足をチェック
+- 問題がある場合は指摘事項を表示
+- コミットを続行するか選択可能
+
+#### VSCodeでの使用
+
+VSCodeタスクランナーから以下のタスクを実行できます（`Cmd/Ctrl + Shift + P` → 「Tasks: Run Task」）：
+
+- `Claude: 現在のファイルをレビュー` - 開いているファイルをレビュー
+- `Claude: git diffをレビュー` - 未ステージングの変更をレビュー
+- `Claude: ステージング変更をレビュー` - ステージング済みの変更をレビュー
+- `Claude: 対話モードを開始` - Claudeとの対話セッションを開始
+
+### トラブルシューティング
+
+問題が発生した場合は、診断ツールを実行してください：
+
+```bash
+./debug-claude-setup.sh
+```
+
+このツールは以下をチェックします：
+- claudeコマンドの存在
+- Node.jsバージョン（18以上）
+- Git hooksの権限
+- 環境変数（ANTHROPIC_API_KEY）
+- プロジェクト設定
+
+### カスタマイズ
+
+pre-commitフックは以下の観点でレビューを実行します：
+
+- **バグの検出**: 明らかなバグやエラーの指摘
+- **既存コンポーネントの活用**: 車輪の再発明を防ぐ
+- **可読性の向上**: 複雑すぎる実装の改善提案
+- **テストの必要性**: 新機能に対するテスト作成の提案
+
+レビューの観点を変更したい場合は、`.git/hooks/pre-commit` ファイルのプロンプトを編集してください。
+
+### 一般的なエラーと解決方法
+
+1. **「claudeコマンドが見つかりません」**
+   ```bash
+   npm install -g @anthropic-ai/claude-code
+   ```
+
+2. **「レビューが失敗しました」**
+   - APIキーが設定されていない可能性があります
+   - ネットワーク接続を確認してください
+
+3. **「Node.jsバージョンが古い」**
+   - Node.js 18以上にアップグレードしてください
+   - nvmを使用している場合: `nvm install 18 && nvm use 18`
+
+4. **「pre-commitフックが動作しない」**
+   ```bash
+   chmod +x .git/hooks/pre-commit
+   ```
+
+詳細な使用方法については、`claude --help` コマンドを実行してください。 

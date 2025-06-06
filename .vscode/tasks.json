@@ -1,0 +1,81 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Claude: 現在のファイルをレビュー",
+      "type": "shell",
+      "command": "claude",
+      "args": [
+        "--print",
+        "以下のファイルをレビューしてください。バグ、改善点、可読性の問題を指摘してください：\n\n${file}の内容:\n$(cat '${file}')"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: git diffをレビュー",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "claude --print \"以下のgit diffをレビューしてください。バグ、既存コンポーネントの再実装、可読性の問題、テスト不足を指摘してください：\n\n$(git diff)\""
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: ステージング変更をレビュー",
+      "type": "shell",
+      "command": "sh",
+      "args": [
+        "-c",
+        "claude --print \"以下のステージング済み変更をレビューしてください。バグ、既存コンポーネントの再実装、可読性の問題、テスト不足を指摘してください：\n\n$(git diff --cached)\""
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Claude: 対話モードを開始",
+      "type": "shell",
+      "command": "claude",
+      "args": [],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+} 

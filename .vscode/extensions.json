@@ -1,0 +1,36 @@
+{
+  "recommendations": [
+    // Task Runner
+    "actboy168.tasks",
+    "spmeesseman.vscode-taskexplorer",
+    
+    // 一般的な開発ツール
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    
+    // TypeScript/JavaScript
+    "ms-vscode.vscode-typescript-next",
+    
+    // Prisma
+    "prisma.prisma",
+    
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    
+    // YAML
+    "redhat.vscode-yaml",
+    
+    // React/Next.js
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+    
+    // テスト
+    "orta.vscode-jest",
+    
+    // アクセシビリティ
+    "deque-systems.vscode-axe-linter"
+  ]
+} 

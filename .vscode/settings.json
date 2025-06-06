@@ -1,0 +1,33 @@
+{
+  // Claude AI関連設定
+  "terminal.integrated.env.osx": {
+    "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}"
+  },
+  "terminal.integrated.env.linux": {
+    "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}"
+  },
+  "terminal.integrated.env.windows": {
+    "ANTHROPIC_API_KEY": "${env:ANTHROPIC_API_KEY}"
+  },
+  
+  // タスク実行設定
+  "task.autoDetect": "on",
+  "task.quickOpen.detail": true,
+  
+  // ファイル除外設定（レビュー結果を表示しない）
+  "files.exclude": {
+    "**/*.claude-tmp": true,
+    "**/claude-debug.log": true
+  },
+  
+  // 検索除外設定
+  "search.exclude": {
+    "**/*.claude-tmp": true,
+    "**/claude-debug.log": true
+  },
+  
+  // ファイル監視除外設定
+  "files.watcherExclude": {
+    "**/*.claude-tmp": true
+  }
+} 

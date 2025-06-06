@@ -5,3 +5,7 @@
 /.env.test
 node_modules
 /.next
+
+# Claude AI関連
+*.claude-tmp
+claude-debug.log
