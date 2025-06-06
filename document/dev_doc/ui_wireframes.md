@@ -2,7 +2,7 @@
 
 ## 1. はじめに
 
-本ドキュメントは、質問管理Webシステムのユーザーインターフェース（UI）の構造と主要コンポーネントを定義するワイヤーフレーム設計です。Material UI v5をベースとし、レスポンシブデザインを考慮します。
+本ドキュメントは、質問管理Webシステムのユーザーインターフェース（UI）の構造と主要コンポーネントを定義するワイヤーフレーム設計です。Material UI v7をベースとし、レスポンシブデザインを考慮します。
 
 ## 2. 全体レイアウト
 
@@ -112,12 +112,13 @@
 ### 3.5. 質問作成/編集画面
 
 *   **タイトル:** 新規質問作成 / 質問編集
+*   **フォーム実装:** React Hook Form + Zodによるバリデーション
 *   **フォーム:**
     *   プロジェクト選択 (作成時、ドロップダウン)
     *   質問タイトル入力 (TextField)
-    *   質問内容入力 (リッチテキストエディタ/Textarea)
+    *   質問内容入力 (MDEditor from @uiw/react-md-editor)
     *   担当者選択 (ユーザー選択コンポーネント、オートコンプリート)
-    *   回答期限設定 (DatePicker)
+    *   回答期限設定 (DatePicker from @mui/x-date-pickers)
     *   優先度選択 (Select/RadioGroup: 最高, 高, 中, 低)
     *   タグ選択 (MultiSelect/ChipInput, プロジェクト固有タグを表示)
     *   **回答形式選択:**
@@ -179,7 +180,7 @@
 
 ## 4. レスポンシブデザイン
 
-本システムはMaterial UI v5を活用し、以下のブレークポイントに基づいたレスポンシブデザインを実装します：
+本システムはMaterial UI v7を活用し、以下のブレークポイントに基づいたレスポンシブデザインを実装します：
 
 *   **xs:** 0px以上（スマートフォン - 縦向き）
 *   **sm:** 600px以上（スマートフォン - 横向き / 小型タブレット）
@@ -268,6 +269,37 @@
     >
       {/* 要素の方向と間隔がブレークポイントに応じて変化 */}
     </Stack>
+    ```
+
+*   **DataGrid:** テーブル表示には@mui/x-data-gridの`DataGrid`コンポーネントを使用します。
+    ```jsx
+    import { DataGrid } from '@mui/x-data-grid';
+    
+    <DataGrid
+      rows={data}
+      columns={columns}
+      pageSize={10}
+      rowsPerPageOptions={[10, 20, 50]}
+      pagination
+      checkboxSelection
+    />
+    ```
+
+*   **フォーム管理:** React Hook FormとZodを組み合わせてフォームの状態管理とバリデーションを実装します。
+    ```jsx
+    import { useForm } from 'react-hook-form';
+    import { zodResolver } from '@hookform/resolvers/zod';
+    import { z } from 'zod';
+    
+    const schema = z.object({
+      title: z.string().min(1, '必須項目です'),
+      content: z.string().min(1, '必須項目です'),
+      assigneeId: z.string().min(1, '担当者を選択してください'),
+    });
+    
+    const { register, handleSubmit, formState: { errors } } = useForm({
+      resolver: zodResolver(schema)
+    });
     ```
 
 ## 5. アクセシビリティ対応
@@ -386,4 +418,5 @@
 *   **状態管理(Zustand)とAPIキャッシュ(React Query)を活用**し、UIの状態とサーバーデータの同期を効率的に行います。
 *   **ローディング状態やエラーステート**を適切に表示します（スピナー、スケルトンローダー、エラーメッセージ）。
 *   **ダークモード**は初期実装では含めませんが、Material UIのテーマシステムを利用することで、将来的な追加が容易になる構造を検討します。
+*   **Markdownエディタ**として@uiw/react-md-editorを使用し、リッチなテキスト編集機能を提供します。
 

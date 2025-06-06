@@ -61,7 +61,7 @@
 
 *   **Method:** `POST`
 *   **Path:** `/api/auth/logout`
-*   **Description:** サーバーサイドでトークンを無効化します（実装による）。クライアントサイドでのトークン削除が主。
+*   **Description:** クライアントサイドでトークンを削除してログアウトします。（サーバーサイドの処理は特に行わない）
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Authenticated User
 *   **Success Response:** `200 OK`
@@ -104,8 +104,8 @@
 
 *   **Method:** `GET`
 *   **Path:** `/api/auth/me`
-*   **Description:** 現在認証されているユーザーの情報を取得します。
-*   **Authentication:** Required (JWT)
+*   **Description:** 現在認証されているユーザーの情報を取得します。トークンがない場合はnullを返します。
+*   **Authentication:** Optional (JWT)
 *   **Authorization:** Authenticated User
 *   **Success Response:** `200 OK`
     ```json
@@ -116,7 +116,7 @@
       "role": "USER" // or ADMIN
     }
     ```
-*   **Error Response:** `401 Unauthorized`
+*   **Error Response:** `200 OK` with `null` (トークンなし、または無効な場合)
 
 ## 2. ユーザー (Users)
 
@@ -716,19 +716,66 @@
 *   **URL Parameters:** `answerId`
 *   **Success Response:** `204 No Content`*   **Error Response:** `401 Unauthorized`, `403 Forbidden` (Not creator or question closed), `404 Not Found`
 
-## 9. 添付ファイル (Attachments)
+## 9. メディアファイル (Media)
 
-*   添付ファイルのアップロードは回答投稿 (`POST /api/questions/{questionId}/answers`) の一部として `multipart/form-data` で処理します。
-*   Vercel Blobを使用する場合、バックエンドはアップロード用の署名付きURLを生成し、クライアントが直接Blobにアップロードする方式も考えられます。
-    *   **Method:** `POST`
-    *   **Path:** `/api/attachments/upload-url`
-    *   **Description:** Vercel Blobへのアップロード用署名付きURLを生成します。
-    *   **Authentication:** Required (JWT)
-    *   **Authorization:** Authenticated User (with permission to answer/attach)
-    *   **Request Body:** `{ "fileName": "image.png", "contentType": "image/png", "answerId": "temp_or_real_id" }`
-    *   **Success Response:** `200 OK` `{ "uploadUrl": "signed_url", "blobUrl": "final_blob_url" }`
-    *   **Error Response:** `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`
-*   添付ファイルのダウンロードは、`Attachment` モデルに保存された `storageUrl` を直接利用します（アクセス権限はBlob側で設定）。
+### 9.1. メディアファイルアップロード
+
+*   **Method:** `POST`
+*   **Path:** `/api/media`
+*   **Description:** メディアファイルをアップロードします。
+*   **Authentication:** Required (JWT)
+*   **Authorization:** Authenticated User
+*   **Request Body:** (multipart/form-data)
+    ```
+    file: [binary file data]
+    ```
+*   **Success Response:** `201 Created`
+    ```json
+    {
+      "id": "media_file_cuid",
+      "fileName": "image.png",
+      "fileType": "image/png",
+      "fileSize": 102400,
+      "storageUrl": "https://blob-url...",
+      "uploaderId": "user_cuid",
+      "createdAt": "timestamp"
+    }
+    ```
+*   **Error Response:** `400 Bad Request` (ファイルなし、ファイルサイズ超過), `401 Unauthorized`, `413 Payload Too Large`
+
+### 9.2. メディアファイル取得
+
+*   **Method:** `GET`
+*   **Path:** `/api/media/{fileId}`
+*   **Description:** メディアファイル情報を取得します。
+*   **Authentication:** Required (JWT)
+*   **Authorization:** Authenticated User
+*   **URL Parameters:** `fileId`
+*   **Success Response:** `200 OK` (メディアファイル情報)
+*   **Error Response:** `401 Unauthorized`, `404 Not Found`
+
+### 9.3. メディアアップロードURL生成
+
+*   **Method:** `POST`
+*   **Path:** `/api/media/upload-url`
+*   **Description:** Vercel Blobへの直接アップロード用の署名付きURLを生成します。
+*   **Authentication:** Required (JWT)
+*   **Authorization:** Authenticated User
+*   **Request Body:**
+    ```json
+    {
+      "fileName": "video.mp4",
+      "contentType": "video/mp4"
+    }
+    ```
+*   **Success Response:** `200 OK`
+    ```json
+    {
+      "uploadUrl": "https://signed-upload-url...",
+      "fileId": "temp_file_id"
+    }
+    ```
+*   **Error Response:** `400 Bad Request`, `401 Unauthorized`
 
 ## 10. 回答フォームテンプレート (Answer Form Templates)
 
@@ -847,6 +894,46 @@
 *   **Authentication:** Required (JWT)
 *   **Authorization:** Authenticated User
 *   **Success Response:** `200 OK` `{ "updatedCount": 10 }`
+*   **Error Response:** `401 Unauthorized`
+
+## 12. Cronジョブ (Cron Jobs)
+
+### 12.1. 期限超過チェック
+
+*   **Method:** `POST`
+*   **Path:** `/api/cron/check-deadlines`
+*   **Description:** 期限切れの質問を検出し、通知を生成します。
+*   **Authentication:** API Key (x-api-key header)
+*   **Authorization:** Cron Service Only
+*   **Headers:** `x-api-key: CRON_API_KEY`
+*   **Success Response:** `200 OK`
+    ```json
+    {
+      "message": "N件の期限切れ質問に関する通知を生成しました",
+      "processed": 10,
+      "questionIds": ["question_id_1", "question_id_2", ...]
+    }
+    ```
+*   **Error Response:** `401 Unauthorized` (APIキー不正), `500 Internal Server Error`
+
+## 13. ダッシュボード (Dashboard)
+
+### 13.1. ダッシュボード統計情報取得
+
+*   **Method:** `GET`
+*   **Path:** `/api/dashboard`
+*   **Description:** ユーザーのダッシュボード用の統計情報を取得します。
+*   **Authentication:** Required (JWT)
+*   **Authorization:** Authenticated User
+*   **Success Response:** `200 OK`
+    ```json
+    {
+      "projectCount": 5,
+      "questionCount": 20,
+      "pendingQuestionCount": 3,
+      "overdueQuestionCount": 1
+    }
+    ```
 *   **Error Response:** `401 Unauthorized`
 
 

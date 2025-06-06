@@ -81,9 +81,9 @@
 
 *   **回答投稿:**
     *   担当回答者は、割り当てられた質問に対して回答を投稿できます。
-    *   自由記述形式の場合、テキストエリアに回答を入力します。
+    *   自由記述形式の場合、Markdownエディタで回答を入力します。
     *   回答フォーム形式の場合、定義されたフォーム項目に従って入力します。
-    *   回答には、テキストに加え、画像ファイルや動画ファイル（1GBまで）を添付できます。
+    *   回答には、テキストに加え、画像ファイルや動画ファイル（メディアファイルとして管理）を添付できます。
 *   **回答フォーム作成:**
     *   質問作成時または編集中に、カスタム回答フォームを作成できます。
     *   フォーム項目として、テキストフィールド（一行）、数値、ラジオボタン、ファイルアップロード、自由テキスト（複数行）の5種類を利用でき、各項目に必須設定が可能です。
@@ -124,15 +124,21 @@
 
 #### 2.2.1. 技術スタック
 
-*   **フロントエンド:** Next.js (v14以上), Material UI v5 (DataGrid, Chart含む)
-*   **バックエンド/ORM:** Prisma (最新安定版)
+*   **フロントエンド:** Next.js (v15.3.1), React (v19.1.0)
+*   **UIライブラリ:** Material UI v7.1.0 (DataGrid, Chart含む)
+*   **バックエンド/ORM:** Prisma (v6.7.0)
 *   **データベース:** Neon (サーバーレスPostgreSQL)
-*   **状態管理:** Zustand
-*   **APIキャッシュ:** React Query（TanStack Query）
+*   **状態管理:** Zustand (v5.0.4)
+*   **APIキャッシュ:** React Query（TanStack Query v5.75.2）
+*   **フォーム管理:** React Hook Form (v7.56.3)
+*   **バリデーション:** Zod (v3.24.4)
 *   **ストレージ:** Vercel Blob (添付ファイル用)
 *   **デプロイメント:** Vercel
-*   **テスト:** Jest/Vitest + React Testing Library (単体/結合), Playwright/Cypress (E2E)
+*   **テスト:** Jest + React Testing Library (単体/結合), Playwright/Cypress (E2E)
 *   **エラー監視:** Vercel標準機能 (+ Sentry 導入検討)
+*   **言語:** TypeScript (v5.8.3)
+*   **スタイリング:** Tailwind CSS (v4.1.5)
+*   **認証:** JWT (jsonwebtoken / jose)
 
 #### 2.2.2. パフォーマンス
 
@@ -167,7 +173,7 @@
 #### 2.2.7. テスト
 
 *   単体テスト、結合テスト、E2Eテストを実装し、品質を担保します。
-*   テストフレームワークとしてJest/Vitest、React Testing Library、Playwright/Cypressを利用します。
+*   テストフレームワークとしてJest、React Testing Library、Playwright/Cypressを利用します。
 *   テストカバレッジは、一般的なWebアプリケーションの水準（例: 70-80%程度）を目指しますが、具体的な目標値は開発状況に応じて調整します。
 
 #### 2.2.8. エラー監視

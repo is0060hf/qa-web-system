@@ -26,7 +26,7 @@
 2.  フロントエンドは入力値を検証します（メール形式、パスワード強度など）。
 3.  フロントエンドは `/api/auth/register` エンドポイントにPOSTリクエストを送信します。
 4.  バックエンドはメールアドレスの重複を確認します。
-5.  バックエンドはパスワードを安全なハッシュアルゴリズム（例: bcrypt, Argon2）でハッシュ化します。
+5.  バックエンドはパスワードを安全なハッシュアルゴリズム（bcryptjs）でハッシュ化します。
 6.  バックエンドは `User` テーブルに新しいユーザーレコードを作成します（デフォルトロールは `USER`）。
 7.  バックエンドは成功レスポンス（ユーザー情報）を返します。
 
@@ -36,27 +36,19 @@
 2.  フロントエンドは `/api/auth/login` エンドポイントにPOSTリクエストを送信します。
 3.  バックエンドは提供されたメールアドレスでユーザーを検索します。
 4.  ユーザーが見つかった場合、バックエンドは提供されたパスワードとデータベースに保存されているパスワードハッシュを比較します。
-5.  認証が成功した場合、バックエンドはユーザー情報（ID, email, name, role）を含むペイロードでJWT（JSON Web Token）とリフレッシュトークンを生成します。
-6.  バックエンドはJWT、リフレッシュトークン、およびユーザー情報をレスポンスとして返します。
-7.  フロントエンドはJWTを短期間の認証に使用し、リフレッシュトークンをセキュアな方法で保存します。
+5.  認証が成功した場合、バックエンドはユーザー情報（ID, email, name, role）を含むペイロードでJWT（JSON Web Token）を生成します。
+6.  バックエンドはJWTおよびユーザー情報をレスポンスとして返します。
+7.  フロントエンドはJWTをZustand storeに保存し、認証に使用します。
 8.  以降の認証が必要なリクエストでは、フロントエンドはJWTを `Authorization: Bearer <token>` ヘッダーに含めて送信します。
 
-### 2.3. トークン更新（トークンリフレッシュ）
-
-1.  アクセストークン（JWT）の有効期限が近づいた場合または切れた場合、フロントエンドは保存されているリフレッシュトークンを使用して新しいJWTを取得します。
-2.  フロントエンドは `/api/auth/refresh` エンドポイントにリフレッシュトークンを含むPOSTリクエストを送信します。
-3.  バックエンドはリフレッシュトークンを検証し、新しいJWTとリフレッシュトークン（必要に応じて）を生成して返します。
-4.  フロントエンドは新しいJWTを使用して認証された要求を続行します。
-
-### 2.4. ログアウト
+### 2.3. ログアウト
 
 1.  ユーザーがログアウト操作を行います。
-2.  フロントエンドは `/api/auth/logout` エンドポイントにリフレッシュトークンを含むPOSTリクエストを送信します。
-3.  バックエンドはリフレッシュトークンを無効化（ブラックリストに追加）します。
-4.  フロントエンドは保存しているJWTとリフレッシュトークンを削除します。
-5.  ユーザーはログイン画面にリダイレクトされます。
+2.  フロントエンドは `/api/auth/logout` エンドポイントにPOSTリクエストを送信します（任意）。
+3.  フロントエンドは保存しているJWTをZustand storeから削除します。
+4.  ユーザーはログイン画面にリダイレクトされます。
 
-### 2.5. パスワードリセット
+### 2.4. パスワードリセット
 
 1.  **リクエスト:**
     *   ユーザーは「パスワードをお忘れですか？」リンクをクリックし、メールアドレスを入力します。
@@ -74,7 +66,7 @@
     *   バックエンドは成功レスポンスを返します。
     *   ユーザーはログイン画面にリダイレクトされます。
 
-### 2.6. 認証エラー処理
+### 2.5. 認証エラー処理
 
 1. **クライアントサイドリダイレクト:**
    * APIリクエスト時に認証エラー（401 Unauthorized）が発生した場合、クライアントサイドで自動的にログイン画面へリダイレクトします。
@@ -93,106 +85,72 @@
 
 ### 3.1. トークン有効期限
 
-モダンなWebアプリケーションのベストプラクティスに従い、以下のトークン有効期限を設定します：
+実装されたトークン有効期限:
 
-*   **アクセストークン（JWT）:** 15分
-*   **リフレッシュトークン:** 7日間
+*   **アクセストークン（JWT）:** 15分（900秒）
 *   **パスワードリセットトークン:** 1時間
 
-### 3.2. リフレッシュトークン管理
+### 3.2. JWT実装
 
-リフレッシュトークンはHTTPOnly、SameSite=Strict、Secureフラグを持つクッキーとして保存します：
+JWTの処理は環境に応じて2つの実装を使用します:
+
+*   **通常のAPI Routes:** `jsonwebtoken` ライブラリ
+*   **Edge Runtime (Middleware):** `jose` ライブラリ
+
+Edge Runtimeでは、Node.js固有のAPIが使用できないため、`jose`ライブラリを使用してJWTの検証を行います。
 
 ```javascript
-// JWT発行時（ログイン成功時）
-res.setHeader('Set-Cookie', `refreshToken=${refreshToken}; HttpOnly; SameSite=Strict; Secure; Max-Age=${7 * 24 * 60 * 60};`);
-```
+// Edge Runtime用のJWT検証（jose使用）
+import { jwtVerify, SignJWT, decodeJwt } from 'jose';
 
-リフレッシュトークンの使用に関するセキュリティ対策：
-
-*   リフレッシュトークンは一度使用されたら新しいトークンを生成し、古いトークンは無効化します（Rotating Refresh Tokens）。
-*   リフレッシュトークンはデータベースに保存し、各トークンに以下の情報を記録します：
-    *   ユーザーID
-    *   トークン値（ハッシュ化）
-    *   有効期限
-    *   発行元IPアドレス
-    *   ユーザーエージェント情報（ブラウザ/デバイス識別用）
-
-```prisma
-// schema.prismaに追加するモデル
-model RefreshToken {
-  id            String    @id @default(cuid())
-  userId        String
-  tokenHash     String    @unique
-  expiresAt     DateTime
-  createdAt     DateTime  @default(now())
-  createdByIp   String?
-  userAgent     String?
-  isRevoked     Boolean   @default(false)
-  revokedAt     DateTime?
-  replacedByTokenId String?
-
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([tokenHash])
+export async function verifyTokenEdge(token: string): Promise<JwtPayload | null> {
+  try {
+    const secretKey = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secretKey);
+    return {
+      userId: payload.userId as string,
+      email: payload.email as string,
+      role: payload.role as string
+    };
+  } catch (error) {
+    return null;
+  }
 }
 ```
 
-### 3.3. 非アクティブセッション管理
+### 3.3. ミドルウェアによる認証
 
-長時間非アクティブ状態のセッションを管理するために、以下のポリシーを実装します：
+Next.jsのミドルウェア（`src/middleware.ts`）で、APIルートへのアクセスを制御します:
 
-1.  **自動ログアウト:** ユーザーが30分間操作を行わない場合、フロントエンド側で自動的にセッションを終了し、ログイン画面にリダイレクトします。
-    ```javascript
-    // フロントエンドのセッションタイムアウト管理
-    let inactivityTimer;
-    
-    function resetInactivityTimer() {
-      if (inactivityTimer) clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(logout, 30 * 60 * 1000); // 30分
-    }
-    
-    // ユーザーの操作（クリック、キーボード入力など）を検知してタイマーをリセット
-    document.addEventListener('click', resetInactivityTimer);
-    document.addEventListener('keypress', resetInactivityTimer);
-    ```
+```javascript
+// 認証が必要なAPIパス
+const AUTH_REQUIRED_PATHS = [
+  '/api/projects',
+  '/api/questions',
+  '/api/answers',
+  '/api/users',
+  '/api/invitations',
+  '/api/notifications',
+  '/api/dashboard',
+  '/api/answer-form-templates',
+];
 
-2.  **期限切れリフレッシュトークンの自動クリーンアップ:** バックエンド側で期限切れのリフレッシュトークンを定期的に削除するクリーンアップジョブを実装します。
-    ```javascript
-    // 毎日実行されるcronジョブ
-    async function cleanupExpiredRefreshTokens() {
-      await prisma.refreshToken.deleteMany({
-        where: {
-          OR: [
-            { expiresAt: { lt: new Date() } },
-            { isRevoked: true }
-          ]
-        }
-      });
-    }
-    ```
+// 認証不要なAPIパス
+const PUBLIC_PATHS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/reset-password',
+];
+```
 
-3.  **複数デバイスセッション管理:** ユーザーがアカウント設定から現在アクティブなセッション（リフレッシュトークン）を一覧表示し、特定のセッションをログアウト（リフレッシュトークンを無効化）できる機能を提供します。
-    ```javascript
-    // アクティブセッション取得API
-    async function getActiveSessions(userId) {
-      const activeSessions = await prisma.refreshToken.findMany({
-        where: {
-          userId: userId,
-          expiresAt: { gt: new Date() },
-          isRevoked: false
-        },
-        select: {
-          id: true,
-          createdAt: true,
-          createdByIp: true,
-          userAgent: true
-        }
-      });
-      return activeSessions;
-    }
-    ```
+ミドルウェアは以下の処理を行います:
+1. APIエンドポイントへのリクエストを検出
+2. 認証不要なパスかチェック
+3. `Authorization`ヘッダーからJWTトークンを取得
+4. トークンを検証し、ユーザー情報をヘッダーに追加（`x-user-id`, `x-user-email`, `x-user-role`）
+5. 認証失敗時は401エラーを返却
+
+特殊な処理として、`/api/auth/me`エンドポイントは認証なしでもアクセス可能とし、トークンがない場合はnullを返します。
 
 ## 4. 認可（アクセス制御）
 
@@ -231,12 +189,12 @@ model RefreshToken {
 
 ## 5. セキュリティ対策
 
-*   **パスワードハッシング:** bcryptやArgon2などの強力なアダプティブハッシング関数を使用し、ソルトを含めてパスワードを保存します。
+*   **パスワードハッシング:** bcryptjsを使用してパスワードをハッシュ化して保存します。
 *   **JWTセキュリティ:**
     *   HTTPSを強制し、通信経路上でのトークン盗聴を防ぎます。
-    *   JWT署名には強力なアルゴリズム（RS256またはES256）と十分な長さの秘密鍵を使用します。
+    *   JWT署名には環境変数で管理される秘密鍵を使用します。
     *   JWTペイロードには最小限の情報のみを含め、機密情報は含めません。
-    *   XSSによるトークン盗難リスクを軽減するため、アクセストークン（JWT）はJavaScriptからアクセスできない `HttpOnly` クッキー、またはメモリ内（状態管理ストア）に保存します。
+    *   JWTトークンの有効期限を15分と短く設定し、セキュリティリスクを軽減します。
 *   **レート制限:** ログイン試行、パスワードリセット要求などにレート制限を設け、ブルートフォース攻撃を防ぎます。
     ```javascript
     // レート制限実装例（Next.js API Routeミドルウェア）
@@ -263,12 +221,13 @@ model RefreshToken {
 *   **入力検証:** フロントエンドとバックエンドの両方で厳格な入力検証を行い、インジェクション攻撃などを防ぎます。
 *   **依存関係の管理:** 使用するライブラリ（認証ライブラリ、JWTライブラリなど）の脆弱性を定期的にチェックし、最新の状態に保ちます。
 
-## 6. 技術選定（再掲）
+## 6. 技術選定
 
-*   **パスワードハッシングライブラリ:** `bcrypt` (Node.js標準で利用しやすい)
-*   **JWTライブラリ:** `jsonwebtoken` (Node.jsで一般的)
-*   **認証ミドルウェア:** Next.jsのミドルウェアやAPIルート内でJWT検証とユーザー情報付与を行うカスタムロジック
-*   **リフレッシュトークン保存:** HTTPOnly Cookie
-*   **アクセストークン保存:** 状態管理（Zustand）＋必要に応じてメモリキャッシュ（React Query）
+*   **パスワードハッシングライブラリ:** `bcryptjs`
+*   **JWTライブラリ:** 
+    *   `jsonwebtoken` (通常のAPI Routes用)
+    *   `jose` (Edge Runtime/Middleware用)
+*   **認証ミドルウェア:** Next.jsのミドルウェアでJWT検証とユーザー情報付与を行うカスタムロジック
+*   **アクセストークン保存:** 状態管理（Zustand）
 *   **認可管理:** RBACアプローチでロールベースの権限制御
 
