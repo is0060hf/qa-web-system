@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
@@ -134,32 +134,7 @@
 <a name='L69'></a><a href='#L69'>69</a>
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a>
-<a name='L77'></a><a href='#L77'>77</a>
-<a name='L78'></a><a href='#L78'>78</a>
-<a name='L79'></a><a href='#L79'>79</a>
-<a name='L80'></a><a href='#L80'>80</a>
-<a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -203,7 +178,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -212,7 +186,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -229,25 +209,10 @@
 import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { getUploadUrlSchema } from '@/lib/validations/media';
-import { put } from '@vercel/blob';
+import { generateClientTokenFromReadWriteToken } from '@vercel/blob/client';
 import { getMimeType } from '@/lib/utils/blob';
 &nbsp;
-// 署名付きURL生成結果の型定義
-interface PresignedUrlResult {
-  url: string;
-  uploadUrl: string;
-}
-&nbsp;
-// 拡張されたPutオプション
-interface ExtendedPutOptions {
-  access: 'public';
-  handleUploadUrl: boolean;
-  contentType: string;
-  multipart: boolean;
-  token?: string;
-}
-&nbsp;
-// アップロード用署名付きURL生成
+// アップロード用クライアントトークン生成
 export async function <span class="fstat-no" title="function not covered" >POST(</span>req: NextRequest) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
@@ -283,19 +248,24 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       ? `${directory}/${user.id}/${uniqueFileName}`
       : `uploads/${user.id}/${uniqueFileName}`;
 &nbsp;
-    // Vercel Blobへのアップロード用署名付きURLを生成
-    // @ts-ignore - 型の互換性エラーを無視
-    const result = <span class="cstat-no" title="statement not covered" >await put(filePath, '', {</span>
-      access: 'public',
-      handleUploadUrl: true,
-      contentType,
-      multipart: true,
-      token: process.env.BLOB_READ_WRITE_TOKEN
-    } as ExtendedPutOptions) as PresignedUrlResult;
+    // クライアントトークンを生成
+    const clientToken = <span class="cstat-no" title="statement not covered" >await generateClientTokenFromReadWriteToken({</span>
+      token: process.env.BLOB_READ_WRITE_TOKEN!,
+      pathname: filePath,
+      addRandomSuffix: false, // すでにランダムサフィックスを追加済み
+      maximumSizeInBytes: 100 * 1024 * 1024, // 100MB
+      allowedContentTypes: [contentType],
+      validUntil: Date.now() + 60 * 60 * 1000, // 1時間有効
+    });
+&nbsp;
+    // Note: clientTokenを使った直接アップロードは、クライアント側で実装します
+    // ここでは簡易的にトークンとURLパターンを返します
+    const baseUrl = <span class="cstat-no" title="statement not covered" >process.env.BLOB_PUBLIC_URL || 'https://blob.vercel-storage.com';</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return NextResponse.json({</span>
-      uploadUrl: result.uploadUrl,
-      url: result.url,
+      clientToken,
+      uploadUrl: `${baseUrl}/upload`, // これは仮のURL
+      url: `${baseUrl}/${filePath}`, // アップロード完了後のURL（予測）
       fileName,
       fileType: contentType,
     });
@@ -313,7 +283,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-06T20:09:27.800Z
+                at 2025-06-07T00:25:12.916Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>
