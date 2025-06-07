@@ -21,8 +21,7 @@ import {
   Radio,
   CircularProgress,
   Alert,
-  IconButton,
-  Grid
+  IconButton
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -529,8 +528,8 @@ function EditQuestionPageClient({ id }: { id: string }) {
                     variant="outlined"
                     sx={{ p: 2 }}
                   >
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs={12} sm={5}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+                      <Box sx={{ flex: '1 1 250px' }}>
                         <Controller
                           name={`formFields.${index}.label`}
                           control={control}
@@ -546,8 +545,8 @@ function EditQuestionPageClient({ id }: { id: string }) {
                             />
                           )}
                         />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
+                      </Box>
+                      <Box sx={{ flex: '1 1 200px' }}>
                         <Controller
                           name={`formFields.${index}.fieldType`}
                           control={control}
@@ -564,8 +563,8 @@ function EditQuestionPageClient({ id }: { id: string }) {
                             </FormControl>
                           )}
                         />
-                      </Grid>
-                      <Grid item xs={8} sm={2}>
+                      </Box>
+                      <Box sx={{ flex: '0 0 auto' }}>
                         <Controller
                           name={`formFields.${index}.isRequired`}
                           control={control}
@@ -581,18 +580,18 @@ function EditQuestionPageClient({ id }: { id: string }) {
                             />
                           )}
                         />
-                      </Grid>
-                      <Grid item xs={4} sm={1}>
+                      </Box>
+                      <Box sx={{ flex: '0 0 auto' }}>
                         <IconButton
                           color="error"
                           onClick={() => handleRemoveField(index)}
                         >
                           <DeleteIcon />
                         </IconButton>
-                      </Grid>
+                      </Box>
 
                       {watch(`formFields.${index}.fieldType`) === 'RADIO' && (
-                        <Grid item xs={12}>
+                        <Box sx={{ flex: '1 1 100%' }}>
                           <Controller
                             name={`formFields.${index}.options`}
                             control={control}
@@ -634,9 +633,9 @@ function EditQuestionPageClient({ id }: { id: string }) {
                               />
                             )}
                           />
-                        </Grid>
+                        </Box>
                       )}
-                    </Grid>
+                    </Box>
                   </Paper>
                 ))}
               </Stack>

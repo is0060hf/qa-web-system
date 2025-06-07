@@ -124,13 +124,13 @@ export default function SearchResults({
                 size="small" 
                 label={status.label} 
                 color={status.color as any} 
-                icon={status.icon} 
+                {...(status.icon ? { icon: status.icon } : {})}
               />
               <Chip 
                 size="small" 
                 label={priority.label} 
                 color={priority.color as any} 
-                icon={priority.icon} 
+                {...(priority.icon ? { icon: priority.icon } : {})}
               />
             </Stack>
             <Typography variant="caption" color="text.secondary">
@@ -168,7 +168,7 @@ export default function SearchResults({
             size="small" 
             label={status.label} 
             color={status.color as any} 
-            icon={status.icon} 
+            {...(status.icon ? { icon: status.icon } : {})}
           />
         );
       }
@@ -189,7 +189,7 @@ export default function SearchResults({
             size="small" 
             label={priority.label} 
             color={priority.color as any} 
-            icon={priority.icon} 
+            {...(priority.icon ? { icon: priority.icon } : {})}
           />
         );
       }
@@ -198,17 +198,17 @@ export default function SearchResults({
       field: 'deadline',
       headerName: '期限',
       width: 120,
-      valueFormatter: (params) => {
-        if (!params.value) return '期限なし';
-        return format(new Date(params.value as string), 'yyyy/MM/dd', { locale: ja });
+      valueFormatter: (value) => {
+        if (!value) return '期限なし';
+        return format(new Date(value as string), 'yyyy/MM/dd', { locale: ja });
       },
     },
     {
       field: 'createdAt',
       headerName: '作成日時',
       width: 150,
-      valueFormatter: (params) => {
-        return format(new Date(params.value as string), 'yyyy/MM/dd HH:mm', { locale: ja });
+      valueFormatter: (value) => {
+        return format(new Date(value as string), 'yyyy/MM/dd HH:mm', { locale: ja });
       },
     }
   ];

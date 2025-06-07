@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Grid,
   Paper,
   Typography,
   Box,
@@ -130,46 +129,49 @@ export default function Dashboard() {
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 3 }}>
         {/* 統計カード */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
           <StatCard 
             title="割り当て質問"
             value={stats.assignedQuestions}
             description={`回答が必要な質問: ${stats.assignedQuestions}件`}
             bgcolor="primary.light"
           />
-        </Grid>
+        </Box>
         
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
           <StatCard 
             title="完了質問"
             value={stats.completedQuestions}
             description={`これまでに回答した質問: ${stats.completedQuestions}件`}
             bgcolor="success.light"
           />
-        </Grid>
+        </Box>
         
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
           <StatCard 
             title="期限間近"
             value={stats.nearDeadlineQuestions}
             description={`期限が3日以内の質問: ${stats.nearDeadlineQuestions}件`}
             bgcolor="warning.light"
           />
-        </Grid>
+        </Box>
         
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}>
           <StatCard 
             title="期限超過"
             value={stats.overdueQuestions}
             description={`期限を過ぎた質問: ${stats.overdueQuestions}件`}
             bgcolor="error.light"
           />
-        </Grid>
+        </Box>
 
+      </Box>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 3 }}>
         {/* 担当質問 */}
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardHeader 
               title="担当質問" 
@@ -247,10 +249,10 @@ export default function Dashboard() {
               )}
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
 
         {/* 作成質問 */}
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}>
           <Card elevation={0} sx={{ borderRadius: 2 }}>
             <CardHeader 
               title="作成質問" 
@@ -334,67 +336,66 @@ export default function Dashboard() {
               )}
             </CardContent>
           </Card>
-        </Grid>
+        </Box>
+      </Box>
 
-        {/* 最近のプロジェクト */}
-        <Grid size={12}>
-          <Card elevation={0} sx={{ borderRadius: 2 }}>
-            <CardHeader 
-              title="最近のプロジェクト" 
-              action={
-                <Button href="/projects" variant="text" color="primary">
-                  すべて見る
-                </Button>
-              }
-            />
-            <Divider />
-            {recentProjects.length > 0 ? (
-              <Grid container sx={{ p: 2 }}>
-                {recentProjects.map((project) => (
-                  <Grid key={project.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <Paper 
-                      elevation={0} 
-                      sx={{ 
-                        m: 1, 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid', 
-                        borderColor: 'divider',
-                        transition: 'all 0.3s',
-                        '&:hover': {
-                          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                          borderColor: 'primary.main',
-                        }
-                      }}
-                      component="a"
-                      href={`/projects/${project.id}`}
-                      style={{ textDecoration: 'none', display: 'block' }}
-                    >
-                      <Typography variant="h6" gutterBottom>
-                        {project.name}
+      {/* 最近のプロジェクト */}
+      <Box sx={{ mb: 3 }}>
+        <Card elevation={0} sx={{ borderRadius: 2 }}>
+          <CardHeader 
+            title="最近のプロジェクト" 
+            action={
+              <Button href="/projects" variant="text" color="primary">
+                すべて見る
+              </Button>
+            }
+          />
+          <Divider />
+          {recentProjects.length > 0 ? (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', p: 2 }}>
+              {recentProjects.map((project) => (
+                <Box key={project.id} sx={{ width: { xs: '100%', sm: '50%', md: '33.333%' }, p: 1 }}>
+                  <Paper 
+                    elevation={0} 
+                    sx={{ 
+                      p: 2, 
+                      borderRadius: 2, 
+                      border: '1px solid', 
+                      borderColor: 'divider',
+                      transition: 'all 0.3s',
+                      '&:hover': {
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                        borderColor: 'primary.main',
+                      }
+                    }}
+                    component="a"
+                    href={`/projects/${project.id}`}
+                    style={{ textDecoration: 'none', display: 'block' }}
+                  >
+                    <Typography variant="h6" gutterBottom>
+                      {project.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        質問: {project.questionsCount}
                       </Typography>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          質問: {project.questionsCount}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          回答: {project.answersCount}
-                        </Typography>
-                      </Box>
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Box sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="body1" color="text.secondary">
-                  最近のプロジェクトはありません
-                </Typography>
-              </Box>
-            )}
-          </Card>
-        </Grid>
-      </Grid>
+                      <Typography variant="body2" color="text.secondary">
+                        回答: {project.answersCount}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="body1" color="text.secondary">
+                最近のプロジェクトはありません
+              </Typography>
+            </Box>
+          )}
+        </Card>
+      </Box>
     </DashboardLayout>
   );
 } 

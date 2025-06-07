@@ -7,7 +7,7 @@ import {
   Button,
   Typography,
   Chip,
-  Grid,
+
   FormControl,
   InputLabel,
   Select,
@@ -120,25 +120,23 @@ export default function ProjectsPage() {
         </Button>
       </Box>
       
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
-          <FormControl fullWidth>
-            <InputLabel id="status-filter-label">ステータス</InputLabel>
-            <Select
-              labelId="status-filter-label"
-              id="status-filter"
-              value={statusFilter}
-              label="ステータス"
-              onChange={handleStatusFilterChange}
-            >
-              <MenuItem value="全て">全て</MenuItem>
-              <MenuItem value="アクティブ">アクティブ</MenuItem>
-              <MenuItem value="一時停止">一時停止</MenuItem>
-              <MenuItem value="完了">完了</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
+      <Box sx={{ mb: 4, maxWidth: 400 }}>
+        <FormControl fullWidth>
+          <InputLabel id="status-filter-label">ステータス</InputLabel>
+          <Select
+            labelId="status-filter-label"
+            id="status-filter"
+            value={statusFilter}
+            label="ステータス"
+            onChange={handleStatusFilterChange}
+          >
+            <MenuItem value="全て">全て</MenuItem>
+            <MenuItem value="アクティブ">アクティブ</MenuItem>
+            <MenuItem value="一時停止">一時停止</MenuItem>
+            <MenuItem value="完了">完了</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>

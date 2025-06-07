@@ -7,7 +7,7 @@ import {
   Button,
   Typography,
   Chip,
-  Grid,
+
   FormControl,
   InputLabel,
   Select,
@@ -205,8 +205,8 @@ export default function QuestionsPage() {
         </Button>
       </Box>
       
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid container item xs={12} md={4}>
+      <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ flex: '1 1 300px', maxWidth: 400 }}>
           <FormControl fullWidth>
             <InputLabel id="status-filter-label">ステータス</InputLabel>
             <Select
@@ -222,8 +222,8 @@ export default function QuestionsPage() {
               <MenuItem value="クローズ">クローズ</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
-        <Grid container item xs={12} md={4}>
+        </Box>
+        <Box sx={{ flex: '1 1 300px', maxWidth: 400 }}>
           <FormControl fullWidth>
             <InputLabel id="project-filter-label">プロジェクト</InputLabel>
             <Select
@@ -239,8 +239,8 @@ export default function QuestionsPage() {
               ))}
             </Select>
           </FormControl>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
       
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>

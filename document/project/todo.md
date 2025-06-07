@@ -63,6 +63,17 @@
 
 ## 🔧 重要度：中 - 機能は動作するが改善が必要
 
+### MUIコンポーネントの型エラー修正（2025/01/15 追加）
+- [ ] Gridコンポーネントのitemプロパティエラーへの対応
+  - MUI v6でGridコンポーネントの型定義が変更された可能性
+  - Grid2への移行を検討
+  - 影響箇所：
+    - `src/app/components/search/SearchForm.tsx`
+    - `src/app/questions/edit/[id]/page.tsx`
+    - その他Gridコンポーネントを使用している箇所
+- [ ] FormSelectFieldの型定義の改善
+  - onChangeハンドラーの型互換性の問題を根本的に解決
+
 ### UI/UX
 - [x] フォームビルダーUIの実装
   - [x] `src/app/components/questions/QuestionForm.tsx` - 370行目のTODOコメント

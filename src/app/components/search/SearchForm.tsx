@@ -5,7 +5,6 @@ import {
   Box,
   TextField,
   Button,
-  Grid,
   MenuItem,
   FormControlLabel,
   Checkbox,
@@ -195,14 +194,14 @@ export default function SearchForm({
         
         {/* 詳細検索フィルター */}
         <Collapse in={showAdvanced}>
-          <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             {/* プロジェクト */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
               <FormSelectField
                 name="projectId"
                 label="プロジェクト"
-                value={searchParams.projectId}
-                onChange={(e) => handleChange('projectId', e.target.value)}
+                value={searchParams.projectId || ''}
+                onChange={(e) => handleChange('projectId', e.target.value as string)}
                 options={[
                   { value: '', label: 'すべてのプロジェクト' },
                   ...projects
@@ -211,15 +210,15 @@ export default function SearchForm({
                 size="small"
                 disabled={isLoading}
               />
-            </Grid>
+            </Box>
             
             {/* 担当者 */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
               <FormSelectField
                 name="assigneeId"
                 label="担当者"
-                value={searchParams.assigneeId}
-                onChange={(e) => handleChange('assigneeId', e.target.value)}
+                value={searchParams.assigneeId || ''}
+                onChange={(e) => handleChange('assigneeId', e.target.value as string)}
                 options={[
                   { value: '', label: 'すべての担当者' },
                   ...assignees
@@ -228,44 +227,44 @@ export default function SearchForm({
                 size="small"
                 disabled={isLoading}
               />
-            </Grid>
+            </Box>
             
             {/* ステータス */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
               <FormSelectField
                 name="status"
                 label="ステータス"
-                value={searchParams.status}
-                onChange={(e) => handleChange('status', e.target.value)}
+                value={searchParams.status || ''}
+                onChange={(e) => handleChange('status', e.target.value as string)}
                 options={STATUS_OPTIONS}
                 fullWidth
                 size="small"
                 disabled={isLoading}
               />
-            </Grid>
+            </Box>
             
             {/* 優先度 */}
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
               <FormSelectField
                 name="priority"
                 label="優先度"
-                value={searchParams.priority}
-                onChange={(e) => handleChange('priority', e.target.value)}
+                value={searchParams.priority || ''}
+                onChange={(e) => handleChange('priority', e.target.value as string)}
                 options={PRIORITY_OPTIONS}
                 fullWidth
                 size="small"
                 disabled={isLoading}
               />
-            </Grid>
+            </Box>
             
             {/* タグ */}
             {tags.length > 0 && (
-              <Grid item xs={12} md={6}>
+              <Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}>
                 <FormSelectField
                   name="tagId"
                   label="タグ"
-                  value={searchParams.tagId}
-                  onChange={(e) => handleChange('tagId', e.target.value)}
+                  value={searchParams.tagId || ''}
+                  onChange={(e) => handleChange('tagId', e.target.value as string)}
                   options={[
                     { value: '', label: 'すべてのタグ' },
                     ...tags
@@ -274,11 +273,11 @@ export default function SearchForm({
                   size="small"
                   disabled={isLoading}
                 />
-              </Grid>
+              </Box>
             )}
             
             {/* 期限切れフラグ */}
-            <Grid item xs={12}>
+            <Box sx={{ flex: '1 1 100%' }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -289,8 +288,8 @@ export default function SearchForm({
                 }
                 label="期限切れの質問のみ表示"
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Collapse>
       </Box>
     </Paper>
