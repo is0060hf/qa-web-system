@@ -1,5 +1,97 @@
 // Jest setup file
 
+// Polyfill for Web APIs in Node.js environment
+global.Request = class Request {
+  constructor(input, init) {
+    this.url = input;
+    this.method = init?.method || 'GET';
+    this.headers = new Map();
+    if (init?.headers) {
+      Object.entries(init.headers).forEach(([key, value]) => {
+        this.headers.set(key, value);
+      });
+    }
+    this.body = init?.body;
+  }
+  
+  json() {
+    return Promise.resolve(JSON.parse(this.body || '{}'));
+  }
+  
+  text() {
+    return Promise.resolve(this.body || '');
+  }
+  
+  formData() {
+    return Promise.resolve(new FormData());
+  }
+};
+
+global.Response = class Response {
+  constructor(body, init) {
+    this.body = body;
+    this.status = init?.status || 200;
+    this.statusText = init?.statusText || 'OK';
+    this.headers = new Map();
+    if (init?.headers) {
+      Object.entries(init.headers).forEach(([key, value]) => {
+        this.headers.set(key, value);
+      });
+    }
+  }
+  
+  json() {
+    return Promise.resolve(typeof this.body === 'string' ? JSON.parse(this.body) : this.body);
+  }
+  
+  text() {
+    return Promise.resolve(typeof this.body === 'string' ? this.body : JSON.stringify(this.body));
+  }
+};
+
+global.Headers = class Headers extends Map {
+  constructor(init) {
+    super();
+    if (init) {
+      Object.entries(init).forEach(([key, value]) => {
+        this.set(key, value);
+      });
+    }
+  }
+};
+
+global.FormData = class FormData {
+  constructor() {
+    this.data = new Map();
+  }
+  
+  append(key, value) {
+    this.data.set(key, value);
+  }
+  
+  get(key) {
+    return this.data.get(key);
+  }
+  
+  set(key, value) {
+    this.data.set(key, value);
+  }
+  
+  has(key) {
+    return this.data.has(key);
+  }
+  
+  delete(key) {
+    this.data.delete(key);
+  }
+};
+
+// Mock navigator object
+global.navigator = {
+  onLine: true,
+  userAgent: 'jest-test-agent',
+};
+
 // Set up environment variables for testing
 process.env.JWT_SECRET = 'test-jwt-secret';
 process.env.CRON_API_KEY = 'test-cron-api-key';

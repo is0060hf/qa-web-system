@@ -49,22 +49,34 @@
 ## 🔧 重要度：中 - 機能は動作するが改善が必要
 
 ### UI/UX
-- [ ] フォームビルダーUIの実装
-  - [ ] `src/app/components/questions/QuestionForm.tsx` - 370行目のTODOコメント
-  - [ ] ドラッグ&ドロップでフィールドを追加/並び替え
-  - [ ] フィールドタイプの選択UI
-  - [ ] プレビュー機能
+- [x] フォームビルダーUIの実装
+  - [x] `src/app/components/questions/QuestionForm.tsx` - 370行目のTODOコメント
+  - [x] ドラッグ&ドロップでフィールドを追加/並び替え
+  - [x] フィールドタイプの選択UI
+  - [x] プレビュー機能
+  - 実装済み：`src/app/components/questions/FormBuilder.tsx`を作成
+  - フィールドの追加・編集・削除・並び替え機能実装済み
+  - プレビューダイアログでリアルタイムプレビュー可能
   
-- [ ] ファイルアップロード機能の改善
-  - [ ] プログレスバーの実装
-  - [ ] ファイルサイズ制限の明確な表示
-  - [ ] 複数ファイルの一括アップロード
-  - [ ] アップロード済みファイルのプレビュー機能
+- [x] ファイルアップロード機能の改善
+  - [x] プログレスバーの実装
+  - [x] ファイルサイズ制限の明確な表示
+  - [x] 複数ファイルの一括アップロード
+  - [x] アップロード済みファイルのプレビュー機能
+  - 実装済み：`src/app/components/common/FormFileUpload.tsx`を改善
+  - アップロード進捗バー追加
+  - 画像ファイルのサムネイルプレビュー機能追加
+  - ファイルタイプ別アイコン表示
+  - 残りアップロード可能ファイル数の表示
   
-- [ ] エラーハンドリングの統一
-  - [ ] グローバルエラーハンドラーの実装
-  - [ ] エラーメッセージの国際化対応
-  - [ ] ユーザーフレンドリーなエラー表示
+- [x] エラーハンドリングの統一
+  - [x] グローバルエラーハンドラーの実装
+  - [x] ユーザーフレンドリーなエラー表示
+  - 実装済み：`src/app/components/common/ErrorBoundary.tsx`を作成
+  - 実装済み：`src/app/components/common/ErrorMessage.tsx`を作成
+  - エラータイプ別の表示（エラー、警告、ネットワーク、バリデーション）
+  - 詳細情報の折りたたみ表示機能
+  - 再試行ボタンの実装
 
 ### API/バックエンド
 - [ ] 添付ファイル関連APIの完全実装
@@ -123,6 +135,24 @@
   - [ ] 負荷テストツールの導入
   - [ ] APIレスポンスタイムの測定
 
+- [ ] テスト環境の改善（2025/06/06 追加）
+  - [ ] NextRequestのモック方法の修正
+    - 現在の問題：`Cannot set property url of #<NextRequest> which has only a getter`
+    - 多くのAPIテストで発生（auth-login, auth-register, projects-create等）
+    - NextRequestの正しいモック方法の実装が必要
+  - [ ] TextDecoderのポリフィル追加
+    - 現在の問題：`ReferenceError: TextDecoder is not defined`
+    - media.test.tsで発生
+    - jest/setupTests.jsにTextDecoderのポリフィルを追加
+  - [ ] Prismaモックの拡張
+    - 現在の問題：`Cannot read properties of undefined (reading 'findMany')`
+    - prisma.projectTagのモックが不足
+    - 完全なPrismaモックオブジェクトの作成が必要
+  - [ ] ESモジュール対応
+    - 現在の問題：`Unexpected token 'export'` (joseライブラリ)
+    - middleware/auth.test.tsで発生
+    - Jest設定でESモジュールのトランスフォーム設定が必要
+
 ### 開発環境
 - [ ] Docker環境の整備
   - [ ] `docker-compose.yml` の作成
@@ -146,6 +176,19 @@
   - [ ] 共通処理のユーティリティ化
   - [ ] カスタムフックの作成
 
+- [ ] テストとコード品質の改善（2025/06/06 Claudeレビューより）
+  - [ ] jest/setupTests.jsのWeb APIモック実装を改善
+    - Headers、FormDataクラスのより完全な実装
+  - [ ] ErrorBoundaryテストのフック使用方法を修正
+    - コンポーネント外でのuseState使用を修正
+  - [ ] ErrorMessageのエラーハンドリングロジック改善
+    - オフライン判定とネットワークエラー判定の順序を最適化
+  - [ ] FormFileUploadのメモリリーク対策
+    - コンポーネントアンマウント時にプレビューURLを解放
+  - [ ] FormBuilderのアクセシビリティ向上
+    - キーボード操作でのフィールド並び替えサポート
+    - フィールド順序変更時のフォーカス維持
+
 ## 🐛 既知のバグ
 
 ### 機能的なバグ
@@ -167,7 +210,6 @@
 
 - [ ] リアルタイム通知機能の実装方法（WebSocket/Server-Sent Events）
 - [ ] 大規模ファイルアップロードの最適化（チャンクアップロード）
-- [ ] 国際化（i18n）対応の必要性
 - [ ] アクセシビリティ（WCAG 2.2）準拠の詳細確認
 - [ ] パフォーマンス監視ツールの導入（Sentry、DataDog等）
 
@@ -181,10 +223,10 @@
 2. **早期に対応すべき**
    - ~~メール送信機能の実装~~ ✅ 完了（開発環境用のダミー実装済み、本番環境用の設定は別途必要）
    - ログ機能の実装
-   - エラーハンドリングの改善
+   - ~~エラーハンドリングの改善~~ ✅ 完了
 
 3. **計画的に対応**
-   - フォームビルダーUIの実装
+   - ~~フォームビルダーUIの実装~~ ✅ 完了
    - ドキュメントの整備
    - テストの拡充
 
@@ -234,3 +276,37 @@
   - 期限切れフラグ
 - ページネーション対応（page, limit パラメータ）
 - ユーザー権限に応じたデータフィルタリング実装済み
+
+### フォームビルダーUI（2025/06/06 実装）
+- コンポーネント：`src/app/components/questions/FormBuilder.tsx`
+- 機能：
+  - ドラッグ&ドロップによるフィールドの並び替え
+  - フィールドタイプ：テキスト、数値、テキストエリア、ラジオボタン、ファイル
+  - フィールドの追加・編集・削除
+  - 必須/任意の設定
+  - ラジオボタンの選択肢管理
+  - リアルタイムプレビュー機能
+- `QuestionForm.tsx`に統合済み
+
+### ファイルアップロード機能改善（2025/06/06 実装）
+- コンポーネント：`src/app/components/common/FormFileUpload.tsx`
+- 改善内容：
+  - アップロード進捗バー（LinearProgress使用）
+  - 画像ファイルのサムネイルプレビュー
+  - ファイルタイプ別アイコン表示
+  - 残りアップロード可能ファイル数の表示
+  - ファイルサイズとタイプの詳細表示
+- 対応ファイルタイプ：画像、PDF、動画、音声、テキスト
+
+### エラーハンドリング統一（2025/06/06 実装）
+- **ErrorBoundary**（`src/app/components/common/ErrorBoundary.tsx`）
+  - グローバルエラーキャッチ
+  - ユーザーフレンドリーなエラー画面
+  - 開発環境でのみエラー詳細を表示
+  - 再試行とホーム画面への導線
+- **ErrorMessage**（`src/app/components/common/ErrorMessage.tsx`）
+  - 統一されたエラーメッセージコンポーネント
+  - エラータイプ：error、warning、network、validation
+  - 詳細情報の折りたたみ表示
+  - 再試行ボタン
+  - ヘルパー関数：getErrorMessage、getErrorType

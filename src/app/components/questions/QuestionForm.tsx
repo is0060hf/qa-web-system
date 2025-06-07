@@ -18,6 +18,7 @@ import FormDatePicker from '../common/FormDatePicker';
 import FormSelectField, { SelectOption } from '../common/FormSelectField';
 import FormRadioGroup, { RadioOption } from '../common/FormRadioGroup';
 import FormTagSelect, { TagOption } from '../common/FormTagSelect';
+import FormBuilder, { FormField, FieldType } from './FormBuilder';
 
 // 質問の優先度オプション
 const PRIORITY_OPTIONS: RadioOption[] = [
@@ -83,7 +84,7 @@ export interface QuestionFormData {
   tagIds: string[];
   answerFormat: string;
   answerFormTemplateId?: string;
-  answerFormFields?: any[]; // フォームビルダーで作成したフィールド
+  answerFormFields?: FormField[]; // フォームビルダーで作成したフィールド
 }
 
 export default function QuestionForm({ 
@@ -368,12 +369,16 @@ export default function QuestionForm({
                 data-testid="form-template-select"
               />
               
-              {/* TODO: フォームビルダーUIの実装 */}
-              <Box sx={{ mt: 2 }}>
-                <Typography color="text.secondary" variant="body2">
-                  フォームビルダーUIは次のステップで実装します
-                </Typography>
-              </Box>
+              {/* カスタムフォームビルダー */}
+              {!formData.answerFormTemplateId && (
+                <Box sx={{ mt: 2 }}>
+                  <FormBuilder
+                    fields={formData.answerFormFields || []}
+                    onChange={(fields) => handleChange('answerFormFields', fields)}
+                    disabled={isLoading}
+                  />
+                </Box>
+              )}
             </Box>
           )}
           

@@ -11,11 +11,20 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Paper
+  Paper,
+  LinearProgress,
+  Avatar,
+  ListItemAvatar
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import ImageIcon from '@mui/icons-material/Image';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import VideoFileIcon from '@mui/icons-material/VideoFile';
+import AudioFileIcon from '@mui/icons-material/AudioFile';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 interface FormFileUploadProps {
   name: string;
@@ -31,6 +40,31 @@ interface FormFileUploadProps {
   maxSize?: number; // in bytes
   maxFiles?: number;
   disabled?: boolean;
+  onUploadProgress?: (progress: number) => void; // アップロード進捗コールバック
+}
+
+// ファイルアイコンを取得
+const getFileIcon = (fileType: string) => {
+  if (fileType.startsWith('image/')) return <ImageIcon />;
+  if (fileType === 'application/pdf') return <PictureAsPdfIcon />;
+  if (fileType.startsWith('video/')) return <VideoFileIcon />;
+  if (fileType.startsWith('audio/')) return <AudioFileIcon />;
+  if (fileType.startsWith('text/')) return <TextFieldsIcon />;
+  return <InsertDriveFileIcon />;
+};
+
+// 画像ファイルのプレビューURLを生成
+const createImagePreview = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target?.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
+interface FileWithPreview extends File {
+  preview?: string;
 }
 
 export default function FormFileUpload({
@@ -46,11 +80,16 @@ export default function FormFileUpload({
   multiple = false,
   maxSize,
   maxFiles = 5,
-  disabled = false
+  disabled = false,
+  onUploadProgress
 }: FormFileUploadProps) {
   const [isDragActive, setIsDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
   
-  const handleFileChange = useCallback((newFiles: FileList | null) => {
+  // ファイル変更処理
+  const handleFileChange = useCallback(async (newFiles: FileList | null) => {
     if (!newFiles || disabled) return;
     
     // ファイル配列に変換
@@ -60,12 +99,51 @@ export default function FormFileUpload({
     const filesToUse = multiple ? filesArray : [filesArray[0]];
     
     // ファイル数の制限
-    const limitedFiles = filesToUse.slice(0, maxFiles);
+    const remainingSlots = maxFiles - value.length;
+    const limitedFiles = filesToUse.slice(0, remainingSlots);
     
     // サイズの検証
     const validFiles = maxSize 
       ? limitedFiles.filter(file => file.size <= maxSize)
       : limitedFiles;
+    
+    if (validFiles.length < limitedFiles.length) {
+      // サイズ制限でフィルタされたファイルがある場合の警告
+      console.warn(`${limitedFiles.length - validFiles.length}個のファイルがサイズ制限を超えています`);
+    }
+    
+    // 画像ファイルのプレビューを生成
+    const newPreviews: Record<string, string> = {};
+    for (const file of validFiles) {
+      if (file.type.startsWith('image/')) {
+        try {
+          const preview = await createImagePreview(file);
+          newPreviews[file.name] = preview;
+        } catch (error) {
+          console.error('プレビュー生成エラー:', error);
+        }
+      }
+    }
+    
+    setFilePreviews(prev => ({ ...prev, ...newPreviews }));
+    
+    // アップロード進捗のシミュレーション（実際のアップロード時はこれを置き換え）
+    if (onUploadProgress && validFiles.length > 0) {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
+      // 進捗のシミュレーション
+      const interval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsUploading(false);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
+    }
     
     // 既存のファイルと新しいファイルを結合（複数の場合）
     const updatedFiles = multiple 
@@ -73,7 +151,7 @@ export default function FormFileUpload({
       : validFiles;
     
     onChange(updatedFiles);
-  }, [value, onChange, multiple, maxSize, maxFiles, disabled]);
+  }, [value, onChange, multiple, maxSize, maxFiles, disabled, onUploadProgress]);
   
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     if (disabled) return;
@@ -107,10 +185,20 @@ export default function FormFileUpload({
   
   const removeFile = useCallback((index: number) => {
     if (disabled) return;
+    const removedFile = value[index];
     const newFiles = [...value];
     newFiles.splice(index, 1);
     onChange(newFiles);
-  }, [value, onChange, disabled]);
+    
+    // プレビューを削除
+    if (removedFile && filePreviews[removedFile.name]) {
+      setFilePreviews(prev => {
+        const newPreviews = { ...prev };
+        delete newPreviews[removedFile.name];
+        return newPreviews;
+      });
+    }
+  }, [value, onChange, disabled, filePreviews]);
   
   const formatFileSize = useCallback((bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -154,7 +242,8 @@ export default function FormFileUpload({
             borderColor: isDragActive ? 'primary.main' : error ? 'error.main' : 'divider',
             cursor: disabled ? 'default' : 'pointer',
             transition: 'all 0.2s ease',
-            opacity: disabled ? 0.7 : 1
+            opacity: disabled ? 0.7 : 1,
+            position: 'relative'
           }}
         >
           <input
@@ -165,7 +254,7 @@ export default function FormFileUpload({
             multiple={multiple}
             onChange={(e) => handleFileChange(e.target.files)}
             style={{ display: 'none' }}
-            disabled={disabled}
+            disabled={disabled || isUploading}
           />
           <label htmlFor={name}>
             <CloudUploadIcon color="primary" sx={{ fontSize: 48, mb: 1 }} />
@@ -180,7 +269,7 @@ export default function FormFileUpload({
                 variant="contained"
                 startIcon={<AttachFileIcon />}
                 size="small"
-                disabled={disabled}
+                disabled={disabled || isUploading}
               >
                 ファイルを選択
               </Button>
@@ -192,7 +281,7 @@ export default function FormFileUpload({
             )}
             {multiple && (
               <Typography variant="caption" display="block">
-                最大{maxFiles}ファイルまで
+                最大{maxFiles}ファイルまで（残り{maxFiles - value.length}ファイル）
               </Typography>
             )}
             {accept && (
@@ -201,6 +290,16 @@ export default function FormFileUpload({
               </Typography>
             )}
           </label>
+          
+          {/* アップロード進捗バー */}
+          {isUploading && (
+            <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 1 }}>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+              <Typography variant="caption" align="center" display="block" sx={{ mt: 0.5 }}>
+                アップロード中... {uploadProgress}%
+              </Typography>
+            </Box>
+          )}
         </Paper>
       </Box>
       
@@ -208,18 +307,41 @@ export default function FormFileUpload({
         <List dense sx={{ mt: 1 }}>
           {value.map((file, index) => (
             <ListItem key={`${file.name}-${index}`} sx={{ py: 0.5 }}>
+              <ListItemAvatar>
+                <Avatar
+                  variant="rounded"
+                  src={filePreviews[file.name]}
+                  sx={{ 
+                    width: 48, 
+                    height: 48,
+                    bgcolor: filePreviews[file.name] ? 'transparent' : 'action.selected'
+                  }}
+                >
+                  {!filePreviews[file.name] && getFileIcon(file.type)}
+                </Avatar>
+              </ListItemAvatar>
               <ListItemText
                 primary={file.name}
-                secondary={formatFileSize(file.size)}
-                primaryTypographyProps={{ variant: 'body2' }}
-                secondaryTypographyProps={{ variant: 'caption' }}
+                secondary={
+                  <Box>
+                    <Typography variant="caption" component="span">
+                      {formatFileSize(file.size)}
+                    </Typography>
+                    {file.type && (
+                      <Typography variant="caption" component="span" sx={{ ml: 1 }}>
+                        • {file.type}
+                      </Typography>
+                    )}
+                  </Box>
+                }
+                primaryTypographyProps={{ variant: 'body2', noWrap: true }}
               />
               <ListItemSecondaryAction>
                 <IconButton 
                   edge="end" 
                   size="small" 
                   onClick={() => removeFile(index)}
-                  disabled={disabled}
+                  disabled={disabled || isUploading}
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
