@@ -38,6 +38,7 @@ import {
 import DashboardLayout from '@/app/components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import MarkdownViewer from '@/components/common/MarkdownViewer';
+import { useAuth } from '@/app/hooks/useAuth';
 
 interface QuestionDetail {
   id: string;
@@ -88,6 +89,7 @@ interface AttachedFile {
 
 export default function AnswerPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { user } = useAuth();
   const resolvedParams = use(params);
   const questionId = resolvedParams.id;
 
@@ -106,6 +108,9 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
     () => fetchData<QuestionDetail>(`questions/${questionId}`),
     null
   );
+
+  // 回答権限のチェック
+  const canAnswer = question && user && question.assignee.id === user.id;
 
   const handleContentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setContent(event.target.value);
@@ -297,6 +302,31 @@ export default function AnswerPage({ params }: { params: Promise<{ id: string }>
         <Button variant="outlined" onClick={() => router.push('/questions')}>
           質問一覧に戻る
         </Button>
+      </DashboardLayout>
+    );
+  }
+
+  // 権限チェック - 担当者でない場合はエラー表示
+  if (!canAnswer) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ mb: 3 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => router.push(`/questions/${questionId}`)}
+            sx={{ mb: 2 }}
+          >
+            質問詳細に戻る
+          </Button>
+
+          <Alert severity="error" sx={{ mb: 4 }}>
+            この質問に回答する権限がありません。担当者のみが回答できます。
+          </Alert>
+          
+          <Typography variant="body1" color="text.secondary">
+            現在の担当者: {question.assignee.name}
+          </Typography>
+        </Box>
       </DashboardLayout>
     );
   }

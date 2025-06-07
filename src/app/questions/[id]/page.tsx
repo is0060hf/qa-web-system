@@ -48,6 +48,7 @@ import {
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import MarkdownViewer from '@/components/common/MarkdownViewer';
+import { useAuth } from '@/app/hooks/useAuth';
 
 // 実際のAPIレスポンスに合わせた型定義
 interface QuestionDetail {
@@ -148,6 +149,7 @@ function a11yProps(index: number) {
 
 export default function QuestionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { user } = useAuth();
   
   // React.use() を使用して params をアンラップ
   const resolvedParams = use(params);
@@ -167,6 +169,9 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     () => fetchData<QuestionDetail>(`questions/${questionId}`),
     null
   );
+
+  // 回答権限のチェック
+  const canAnswer = question && user && question.assignee.id === user.id;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -346,6 +351,8 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             variant="outlined"
             startIcon={<ReplyIcon />}
             onClick={() => router.push(`/questions/${questionId}/answer`)}
+            disabled={!canAnswer}
+            title={!canAnswer ? '担当者のみが回答できます' : ''}
           >
             回答する
           </Button>
@@ -388,6 +395,8 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             color="primary"
             startIcon={<ReplyIcon />}
             onClick={() => router.push(`/questions/${questionId}/answer`)}
+            disabled={!canAnswer}
+            title={!canAnswer ? '担当者のみが回答できます' : ''}
           >
             回答する
           </Button>
