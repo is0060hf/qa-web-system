@@ -165,8 +165,8 @@ export default function UserManagement() {
       field: 'createdAt', 
       headerName: '登録日時', 
       width: 180,
-      valueFormatter: (params) => {
-        return formatDate(params.value as string);
+      valueFormatter: (value) => {
+        return formatDate(value as string);
       },
     },
     {

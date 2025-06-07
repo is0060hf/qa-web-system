@@ -98,11 +98,11 @@ export async function GET(
 // 招待への応答（承認/拒否）
 export async function POST(
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
-    const token = params.token;
+    const { token } = await params;
     const { action } = await req.json();
 
     // アクションのバリデーション

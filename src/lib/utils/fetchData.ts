@@ -553,4 +553,12 @@ export const deleteData = async <T>(endpoint: string): Promise<T> => {
   return fetchData<T>(endpoint, {
     method: 'DELETE',
   });
+};
+
+/**
+ * UPDATE (PUT) リクエスト用のユーティリティ関数
+ * patchDataのエイリアスとして提供
+ */
+export const updateData = async <T>(endpoint: string, body: any): Promise<T> => {
+  return patchData<T>(endpoint, body);
 }; 

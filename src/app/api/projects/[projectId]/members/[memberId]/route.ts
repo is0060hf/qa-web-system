@@ -8,7 +8,7 @@ import { canManageProject } from '@/lib/utils/auth';
 // メンバーロール更新
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { projectId: string; memberId: string } }
+  { params }: { params: Promise<{ projectId: string; memberId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -17,7 +17,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, memberId } = params;
+    const { projectId, memberId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
@@ -85,7 +85,7 @@ export async function PATCH(
 // メンバー削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string; memberId: string } }
+  { params }: { params: Promise<{ projectId: string; memberId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -94,7 +94,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, memberId } = params;
+    const { projectId, memberId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);

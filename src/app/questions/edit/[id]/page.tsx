@@ -27,7 +27,7 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import ja from 'date-fns/locale/ja';
+import { ja } from 'date-fns/locale/ja';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
@@ -107,9 +107,8 @@ interface FormInput {
   templateName?: string;
 }
 
-export default function EditQuestionPage({ params }: { params: { id: string } }) {
+function EditQuestionPageClient({ id }: { id: string }) {
   const router = useRouter();
-  const { id } = params;
   const [question, setQuestion] = useState<Question | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -682,4 +681,9 @@ export default function EditQuestionPage({ params }: { params: { id: string } })
       </Box>
     </DashboardLayout>
   );
+}
+
+export default async function EditQuestionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <EditQuestionPageClient id={id} />;
 } 

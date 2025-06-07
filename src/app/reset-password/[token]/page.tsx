@@ -20,13 +20,10 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuthStore } from '../../stores/authStore';
 
 interface ResetPasswordPageProps {
-  params: {
-    token: string;
-  };
+  token: string;
 }
 
-export default function ResetPasswordPage({ params }: ResetPasswordPageProps) {
-  const { token } = params;
+function ResetPasswordPageClient({ token }: ResetPasswordPageProps) {
   const router = useRouter();
   const { resetPassword, isLoading } = useAuthStore();
   
@@ -229,4 +226,9 @@ export default function ResetPasswordPage({ params }: ResetPasswordPageProps) {
       </Box>
     </Container>
   );
+}
+
+export default async function ResetPasswordPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  return <ResetPasswordPageClient token={token} />;
 } 

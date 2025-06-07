@@ -8,7 +8,7 @@ import { canAccessProject, canManageProject } from '@/lib/utils/auth';
 // プロジェクト詳細取得
 export async function GET(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -17,7 +17,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = (await params).projectId;
+    const { projectId } = await params;
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = await canAccessProject(projectId, user);
@@ -77,7 +77,7 @@ export async function GET(
 // プロジェクト更新
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -86,7 +86,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = (await params).projectId;
+    const { projectId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
@@ -133,7 +133,7 @@ export async function PATCH(
 // プロジェクト削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -142,7 +142,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const projectId = (await params).projectId;
+    const { projectId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);

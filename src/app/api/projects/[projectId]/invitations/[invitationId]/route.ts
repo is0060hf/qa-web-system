@@ -7,7 +7,7 @@ import { InvitationStatus } from '@prisma/client';
 // 招待キャンセル
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string; invitationId: string } }
+  { params }: { params: Promise<{ projectId: string; invitationId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -16,7 +16,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, invitationId } = params;
+    const { projectId, invitationId } = await params;
     
     // 招待の存在確認
     const invitation = await prisma.invitation.findUnique({

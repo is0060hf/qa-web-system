@@ -16,7 +16,7 @@ const updateUserSchema = z.object({
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // 管理者権限チェック
@@ -28,7 +28,7 @@ export async function PATCH(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // リクエストデータの解析
     let body;
@@ -121,7 +121,7 @@ export async function PATCH(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // 管理者権限チェック
@@ -133,7 +133,7 @@ export async function DELETE(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const currentUser = getUserFromRequest(req);
 
     // 自分自身の削除を防止

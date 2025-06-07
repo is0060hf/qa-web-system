@@ -23,7 +23,7 @@ const updateTemplateSchema = z.object({
 // テンプレート詳細取得（GET）
 export async function GET(
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise<{ templateId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -31,7 +31,7 @@ export async function GET(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { templateId } = params;
+    const { templateId } = await params;
 
     // テンプレートを取得
     const template = await prisma.answerFormTemplate.findUnique({
@@ -69,7 +69,7 @@ export async function GET(
 // テンプレート更新（PATCH）
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise<{ templateId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -77,7 +77,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { templateId } = params;
+    const { templateId } = await params;
 
     // テンプレートの存在確認
     const template = await prisma.answerFormTemplate.findUnique({
@@ -142,7 +142,7 @@ export async function PATCH(
 // テンプレート削除（DELETE）
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise<{ templateId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -150,7 +150,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { templateId } = params;
+    const { templateId } = await params;
 
     // テンプレートの存在確認
     const template = await prisma.answerFormTemplate.findUnique({

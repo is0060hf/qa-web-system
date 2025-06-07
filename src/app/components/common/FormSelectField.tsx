@@ -17,7 +17,7 @@ export interface SelectOption {
   label: string;
 }
 
-interface FormSelectFieldProps extends Omit<SelectProps, 'error'> {
+interface FormSelectFieldProps extends Omit<SelectProps, 'error' | 'onChange'> {
   name: string;
   label: string;
   value: string;

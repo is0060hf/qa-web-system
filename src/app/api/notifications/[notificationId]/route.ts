@@ -5,7 +5,7 @@ import { getUserFromRequest } from '@/lib/utils/api';
 // 通知既読/未読設定
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -14,7 +14,7 @@ export async function PATCH(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { notificationId } = params;
+    const { notificationId } = await params;
     const { isRead } = await req.json();
 
     // 通知の存在確認
@@ -58,7 +58,7 @@ export async function PATCH(
 // 通知削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -67,7 +67,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { notificationId } = params;
+    const { notificationId } = await params;
 
     // 通知の存在確認
     const notification = await prisma.notification.findUnique({

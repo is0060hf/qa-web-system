@@ -6,7 +6,7 @@ import { canManageProject } from '@/lib/utils/auth';
 // プロジェクトタグ削除
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { projectId: string; tagId: string } }
+  { params }: { params: Promise<{ projectId: string; tagId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -15,7 +15,7 @@ export async function DELETE(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, tagId } = params;
+    const { projectId, tagId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
@@ -81,7 +81,7 @@ export async function DELETE(
 // 関連質問も含めてタグを強制削除するAPI
 export async function POST(
   req: NextRequest,
-  { params }: { params: { projectId: string; tagId: string } }
+  { params }: { params: Promise<{ projectId: string; tagId: string }> }
 ) {
   try {
     const user = getUserFromRequest(req);
@@ -90,7 +90,7 @@ export async function POST(
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const { projectId, tagId } = params;
+    const { projectId, tagId } = await params;
     
     // プロジェクト管理権限をチェック
     const accessCheck = await canManageProject(projectId, user);
