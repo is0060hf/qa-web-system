@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { updateProjectSchema } from '@/lib/validations/project';
@@ -39,7 +39,11 @@ export async function GET(
       userName: member.user.name || null,
       userEmail: member.user.email,
       role: member.role,
-      joinedAt: member.createdAt
+      joinedAt: member.createdAt,
+      profileImage: member.user.profileImage ? {
+        id: member.user.profileImage.id,
+        storageUrl: member.user.profileImage.storageUrl
+      } : null
     }));
 
     // プロジェクトの質問情報も取得

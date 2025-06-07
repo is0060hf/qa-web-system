@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { addProjectMemberSchema } from '@/lib/validations/project';
@@ -34,6 +34,12 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
       },
@@ -119,6 +125,12 @@ export async function POST(
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
       },

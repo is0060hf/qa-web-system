@@ -232,6 +232,21 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
     router.push('/notifications');
   };
 
+  const handleProfileClick = () => {
+    handleUserMenuClose();
+    router.push('/settings');
+  };
+
+  const handleLogout = async () => {
+    handleUserMenuClose();
+    try {
+      await fetchData('auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar>
@@ -391,14 +406,11 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleUserMenuClose}>
-          <AccountCircle sx={{ mr: 2 }} /> プロフィール
-        </MenuItem>
-        <MenuItem onClick={handleUserMenuClose}>
-          <SettingsIcon sx={{ mr: 2 }} /> 設定
+        <MenuItem onClick={handleProfileClick}>
+          <AccountCircle sx={{ mr: 2 }} /> プロフィール・設定
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleUserMenuClose}>
+        <MenuItem onClick={handleLogout}>
           <LogoutIcon sx={{ mr: 2 }} /> ログアウト
         </MenuItem>
       </Menu>

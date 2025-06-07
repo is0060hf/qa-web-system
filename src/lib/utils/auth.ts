@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Role, ProjectRole } from '@prisma/client';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 
 interface User {
   id: string;
@@ -31,6 +31,12 @@ export async function canAccessProject(
                 id: true,
                 name: true,
                 email: true,
+                profileImage: {
+                  select: {
+                    id: true,
+                    storageUrl: true,
+                  },
+                },
               },
             },
           },
