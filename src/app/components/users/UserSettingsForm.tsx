@@ -10,17 +10,24 @@ import {
   Alert,
   CircularProgress,
   Divider,
-  TextField
+  TextField,
+  Avatar,
+  IconButton,
+  Tooltip
 } from '@mui/material';
+import { PhotoCamera, Delete } from '@mui/icons-material';
 import FormTextField from '../common/FormTextField';
 
 // ユーザー設定フォームのプロパティ
 interface UserSettingsFormProps {
   onSubmit: (data: UserSettingsData) => Promise<void>;
   onPasswordChange: (data: PasswordChangeData) => Promise<void>;
+  onProfileImageUpload?: (file: File) => Promise<string>; // Returns the image URL
+  onProfileImageRemove?: () => Promise<void>;
   initialData: {
     name: string;
     email: string;
+    profileImageUrl?: string;
   };
   isLoading?: boolean;
   error?: string;
@@ -42,6 +49,8 @@ export interface PasswordChangeData {
 export default function UserSettingsForm({ 
   onSubmit,
   onPasswordChange,
+  onProfileImageUpload,
+  onProfileImageRemove,
   initialData,
   isLoading = false, 
   error,
@@ -51,6 +60,10 @@ export default function UserSettingsForm({
   const [profileData, setProfileData] = useState<UserSettingsData>({
     name: initialData.name || ''
   });
+
+  // プロフィール画像の状態
+  const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(initialData.profileImageUrl);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // パスワード変更の状態
   const [passwordData, setPasswordData] = useState<PasswordChangeData>({
@@ -139,6 +152,49 @@ export default function UserSettingsForm({
     return Object.keys(errors).length === 0;
   };
 
+  // 画像アップロードハンドラー
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !onProfileImageUpload) return;
+
+    // 画像ファイルのみ許可
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください');
+      return;
+    }
+
+    // ファイルサイズ制限（5MB）
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ファイルサイズは5MB以下にしてください');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const newImageUrl = await onProfileImageUpload(file);
+      setProfileImageUrl(newImageUrl);
+    } catch (error) {
+      alert('画像のアップロードに失敗しました');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  // 画像削除ハンドラー
+  const handleImageRemove = async () => {
+    if (!onProfileImageRemove) return;
+
+    setIsUploadingImage(true);
+    try {
+      await onProfileImageRemove();
+      setProfileImageUrl(undefined);
+    } catch (error) {
+      alert('画像の削除に失敗しました');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   // プロフィール更新のハンドラ
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,6 +247,53 @@ export default function UserSettingsForm({
         )}
         
         <Box component="form" onSubmit={handleProfileSubmit} noValidate sx={{ mb: 4 }}>
+          {/* プロフィール画像 */}
+          <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              src={profileImageUrl}
+              sx={{ width: 100, height: 100, bgcolor: 'primary.main' }}
+            >
+              {!profileImageUrl && (initialData.name || 'U').charAt(0).toUpperCase()}
+            </Avatar>
+            <Box>
+              <input
+                accept="image/*"
+                style={{ display: 'none' }}
+                id="profile-image-upload"
+                type="file"
+                onChange={handleImageUpload}
+                disabled={isLoading || isUploadingImage}
+              />
+              <label htmlFor="profile-image-upload">
+                <Tooltip title="プロフィール画像を変更">
+                  <IconButton
+                    color="primary"
+                    aria-label="upload picture"
+                    component="span"
+                    disabled={isLoading || isUploadingImage}
+                  >
+                    {isUploadingImage ? <CircularProgress size={24} /> : <PhotoCamera />}
+                  </IconButton>
+                </Tooltip>
+              </label>
+              {profileImageUrl && onProfileImageRemove && (
+                <Tooltip title="プロフィール画像を削除">
+                  <IconButton
+                    color="error"
+                    aria-label="delete picture"
+                    onClick={handleImageRemove}
+                    disabled={isLoading || isUploadingImage}
+                  >
+                    <Delete />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                推奨: 正方形の画像、最大5MB
+              </Typography>
+            </Box>
+          </Box>
+
           <FormTextField
             name="name"
             label="氏名"

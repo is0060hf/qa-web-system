@@ -12,6 +12,7 @@ export default function SettingsPage() {
   const [userData, setUserData] = useState<{
     name: string;
     email: string;
+    profileImageUrl?: string;
   } | null>(null);
   
   // ローディングと通信状態
@@ -25,11 +26,12 @@ export default function SettingsPage() {
     const fetchUserData = async () => {
       try {
         setIsLoading(true);
-        const data = await fetchData<{name: string; email: string}>('auth/me', {});
+        const data = await fetchData<{name: string; email: string; profileImage?: {storageUrl: string}}>('auth/me', {});
         
         setUserData({
           name: data.name || '',
-          email: data.email
+          email: data.email,
+          profileImageUrl: data.profileImage?.storageUrl
         });
       } catch (err) {
         console.error('Failed to fetch user data:', err);
@@ -103,6 +105,32 @@ export default function SettingsPage() {
     }
   };
 
+  // プロフィール画像アップロード処理
+  const handleProfileImageUpload = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetchData<{url: string}>('users/me/profile-image', {
+      method: 'POST',
+      body: formData
+    });
+    
+    // 成功したらユーザーデータを更新
+    setUserData(prev => prev ? {...prev, profileImageUrl: response.url} : null);
+    
+    return response.url;
+  };
+
+  // プロフィール画像削除処理
+  const handleProfileImageRemove = async () => {
+    await fetchData('users/me/profile-image', {
+      method: 'DELETE'
+    });
+    
+    // 成功したらユーザーデータを更新
+    setUserData(prev => prev ? {...prev, profileImageUrl: undefined} : null);
+  };
+
   return (
     <DashboardLayout>
       <Box sx={{ maxWidth: 'md', mx: 'auto' }}>
@@ -120,6 +148,8 @@ export default function SettingsPage() {
               initialData={userData}
               onSubmit={handleProfileUpdate}
               onPasswordChange={handlePasswordChange}
+              onProfileImageUpload={handleProfileImageUpload}
+              onProfileImageRemove={handleProfileImageRemove}
               isLoading={isSubmitting}
               error={error || undefined}
               successMessage={successMessage || undefined}

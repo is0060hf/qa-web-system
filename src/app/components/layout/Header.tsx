@@ -68,6 +68,15 @@ interface HeaderProps {
   handleDrawerOpen: () => void;
 }
 
+interface UserData {
+  id: string;
+  name: string | null;
+  email: string;
+  profileImage?: {
+    storageUrl: string;
+  };
+}
+
 export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const router = useRouter();
   const [anchorElNotifications, setAnchorElNotifications] = useState<null | HTMLElement>(null);
@@ -75,9 +84,24 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
   
   const isNotificationsMenuOpen = Boolean(anchorElNotifications);
   const isUserMenuOpen = Boolean(anchorElUser);
+  
+  // ユーザー情報を取得
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const data = await fetchData<UserData>('auth/me', {});
+        setUserData(data);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+    
+    fetchUserData();
+  }, []);
   
   // 通知一覧を取得
   const fetchNotifications = async () => {
@@ -254,7 +278,12 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
               onClick={handleUserMenuOpen}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>U</Avatar>
+              <Avatar 
+                sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}
+                src={userData?.profileImage?.storageUrl}
+              >
+                {userData ? (userData.name || userData.email).charAt(0).toUpperCase() : 'U'}
+              </Avatar>
             </IconButton>
           </Tooltip>
         </Box>

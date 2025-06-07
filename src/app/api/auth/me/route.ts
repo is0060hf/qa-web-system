@@ -27,6 +27,12 @@ export async function GET(req: NextRequest) {
         name: true,
         email: true,
         role: true,
+        profileImage: {
+          select: {
+            id: true,
+            storageUrl: true,
+          }
+        }
       }
     });
     
