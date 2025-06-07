@@ -69,11 +69,19 @@ interface QuestionDetail {
     id: string;
     name: string;
     email: string;
+    profileImage?: {
+      id: string;
+      storageUrl: string;
+    } | null;
   };
   assignee: {
     id: string;
     name: string;
     email: string;
+    profileImage?: {
+      id: string;
+      storageUrl: string;
+    } | null;
   };
   tags: Array<{
     id: string;
@@ -99,6 +107,10 @@ interface QuestionDetail {
       id: string;
       name: string;
       email: string;
+      profileImage?: {
+        id: string;
+        storageUrl: string;
+      } | null;
     };
     formResponses: Array<{
       id: string;
@@ -318,7 +330,10 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
               担当者:
             </Typography>
             <Tooltip title={question.assignee.name}>
-              <Avatar sx={{ width: 28, height: 28, fontSize: '0.875rem' }}>
+              <Avatar 
+                sx={{ width: 28, height: 28, fontSize: '0.875rem' }}
+                src={question.assignee.profileImage?.storageUrl}
+              >
                 {question.assignee.name.charAt(0)}
               </Avatar>
             </Tooltip>
@@ -408,7 +423,10 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
               <Card key={answer.id} elevation={0} sx={{ borderRadius: 2 }}>
                 <CardHeader
                   avatar={
-                    <Avatar sx={{ bgcolor: 'primary.main' }}>
+                    <Avatar 
+                      sx={{ bgcolor: 'primary.main' }}
+                      src={answer.user.profileImage?.storageUrl}
+                    >
                       {answer.user.name.charAt(0)}
                     </Avatar>
                   }

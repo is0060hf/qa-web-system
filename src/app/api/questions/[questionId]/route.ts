@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 
 // 質問詳細取得
@@ -34,6 +34,12 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
         assignee: {
@@ -41,6 +47,12 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
         tags: {
@@ -64,6 +76,12 @@ export async function GET(
                 id: true,
                 name: true,
                 email: true,
+                profileImage: {
+                  select: {
+                    id: true,
+                    storageUrl: true,
+                  },
+                },
               },
             },
             formData: {
@@ -121,11 +139,19 @@ export async function GET(
         id: question.creator.id,
         name: question.creator.name || question.creator.email,
         email: question.creator.email,
+        profileImage: question.creator.profileImage ? {
+          id: question.creator.profileImage.id,
+          storageUrl: question.creator.profileImage.storageUrl,
+        } : null,
       },
       assignee: {
         id: question.assignee.id,
         name: question.assignee.name || question.assignee.email,
         email: question.assignee.email,
+        profileImage: question.assignee.profileImage ? {
+          id: question.assignee.profileImage.id,
+          storageUrl: question.assignee.profileImage.storageUrl,
+        } : null,
       },
       tags: question.tags.map(qt => ({
         id: qt.tag.id,

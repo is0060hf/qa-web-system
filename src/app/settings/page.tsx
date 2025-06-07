@@ -107,28 +107,55 @@ export default function SettingsPage() {
 
   // プロフィール画像アップロード処理
   const handleProfileImageUpload = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    const response = await fetchData<{url: string}>('users/me/profile-image', {
-      method: 'POST',
-      body: formData
-    });
-    
-    // 成功したらユーザーデータを更新
-    setUserData(prev => prev ? {...prev, profileImageUrl: response.url} : null);
-    
-    return response.url;
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetchData<{url: string}>('users/me/profile-image', {
+        method: 'POST',
+        body: formData
+      });
+      
+      // 成功したらユーザーデータを更新
+      setUserData(prev => prev ? {...prev, profileImageUrl: response.url} : null);
+      setSuccessMessage('プロフィール画像を更新しました');
+      
+      // 3秒後に成功メッセージをクリア
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+      
+      return response.url;
+    } catch (err) {
+      console.error('Profile image upload error:', err);
+      setError(err instanceof Error ? err.message : 'プロフィール画像のアップロードに失敗しました');
+      throw err;
+    }
   };
 
   // プロフィール画像削除処理
   const handleProfileImageRemove = async () => {
-    await fetchData('users/me/profile-image', {
-      method: 'DELETE'
-    });
-    
-    // 成功したらユーザーデータを更新
-    setUserData(prev => prev ? {...prev, profileImageUrl: undefined} : null);
+    try {
+      setError(null);
+      setSuccessMessage(null);
+      
+      await fetchData('users/me/profile-image', {
+        method: 'DELETE'
+      });
+      
+      // 成功したらユーザーデータを更新
+      setUserData(prev => prev ? {...prev, profileImageUrl: undefined} : null);
+      setSuccessMessage('プロフィール画像を削除しました');
+      
+      // 3秒後に成功メッセージをクリア
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+    } catch (err) {
+      console.error('Profile image remove error:', err);
+      setError(err instanceof Error ? err.message : 'プロフィール画像の削除に失敗しました');
+      throw err;
+    }
   };
 
   return (

@@ -87,6 +87,10 @@ interface ProjectMember {
   userEmail: string;
   role: string;
   joinedAt: string;
+  profileImage?: {
+    id: string;
+    storageUrl: string;
+  } | null;
 }
 
 interface Question {
@@ -471,7 +475,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     }
                   >
                     <ListItemAvatar>
-                      <Avatar>
+                      <Avatar src={member.profileImage?.storageUrl}>
                         {/* ユーザー名が存在する場合のみ最初の文字を表示、そうでなければ代替テキスト */}
                         {member.userName ? member.userName.charAt(0) : (member.userEmail ? member.userEmail.charAt(0) : 'U')}
                       </Avatar>

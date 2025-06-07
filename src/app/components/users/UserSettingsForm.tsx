@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { PhotoCamera, Delete } from '@mui/icons-material';
 import FormTextField from '../common/FormTextField';
+import ErrorMessage from '../common/ErrorMessage';
 
 // ユーザー設定フォームのプロパティ
 interface UserSettingsFormProps {
@@ -64,6 +65,7 @@ export default function UserSettingsForm({
   // プロフィール画像の状態
   const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(initialData.profileImageUrl);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   // パスワード変更の状態
   const [passwordData, setPasswordData] = useState<PasswordChangeData>({
@@ -157,15 +159,18 @@ export default function UserSettingsForm({
     const file = event.target.files?.[0];
     if (!file || !onProfileImageUpload) return;
 
+    // エラーをクリア
+    setImageError(null);
+
     // 画像ファイルのみ許可
     if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください');
+      setImageError('画像ファイル（JPEG, PNG, GIF, WebP）を選択してください');
       return;
     }
 
     // ファイルサイズ制限（5MB）
     if (file.size > 5 * 1024 * 1024) {
-      alert('ファイルサイズは5MB以下にしてください');
+      setImageError('ファイルサイズは5MB以下にしてください');
       return;
     }
 
@@ -173,8 +178,9 @@ export default function UserSettingsForm({
     try {
       const newImageUrl = await onProfileImageUpload(file);
       setProfileImageUrl(newImageUrl);
+      setImageError(null);
     } catch (error) {
-      alert('画像のアップロードに失敗しました');
+      setImageError('画像のアップロードに失敗しました。しばらく経ってから再試行してください。');
     } finally {
       setIsUploadingImage(false);
     }
@@ -184,12 +190,16 @@ export default function UserSettingsForm({
   const handleImageRemove = async () => {
     if (!onProfileImageRemove) return;
 
+    // エラーをクリア
+    setImageError(null);
+
     setIsUploadingImage(true);
     try {
       await onProfileImageRemove();
       setProfileImageUrl(undefined);
+      setImageError(null);
     } catch (error) {
-      alert('画像の削除に失敗しました');
+      setImageError('画像の削除に失敗しました。しばらく経ってから再試行してください。');
     } finally {
       setIsUploadingImage(false);
     }
@@ -248,8 +258,17 @@ export default function UserSettingsForm({
         
         <Box component="form" onSubmit={handleProfileSubmit} noValidate sx={{ mb: 4 }}>
           {/* プロフィール画像 */}
-          <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
+          <Box sx={{ mb: 4 }}>
+            {imageError && (
+              <ErrorMessage
+                message={imageError}
+                type="error"
+                onClose={() => setImageError(null)}
+                sx={{ mb: 2 }}
+              />
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
               src={profileImageUrl}
               sx={{ width: 100, height: 100, bgcolor: 'primary.main' }}
             >
@@ -293,6 +312,7 @@ export default function UserSettingsForm({
               </Typography>
             </Box>
           </Box>
+        </Box>
 
           <FormTextField
             name="name"

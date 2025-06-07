@@ -46,6 +46,10 @@ interface Question {
   creator: {
     id: string;
     name: string;
+    profileImage?: {
+      id: string;
+      storageUrl: string;
+    } | null;
   };
 }
 
@@ -95,9 +99,12 @@ const columns = [
     id: 'creator',
     label: '質問者',
     minWidth: 120,
-    format: (value: { id: string; name: string }) => (
+    format: (value: { id: string; name: string; profileImage?: { id: string; storageUrl: string; } | null }) => (
       <Tooltip title={value.name}>
-        <Avatar sx={{ width: 28, height: 28, fontSize: '0.875rem' }}>
+        <Avatar 
+          sx={{ width: 28, height: 28, fontSize: '0.875rem' }}
+          src={value.profileImage?.storageUrl}
+        >
           {value.name.charAt(0)}
         </Avatar>
       </Tooltip>

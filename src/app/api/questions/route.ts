@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { Role } from '@prisma/client';
 
@@ -133,6 +133,12 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           }
         },
         assignee: {
@@ -140,6 +146,12 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           }
         },
         tags: {
