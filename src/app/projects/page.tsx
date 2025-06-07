@@ -23,6 +23,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import DataTable from '../components/common/DataTable';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import { MockProject } from '@/mocks/projects';
+import { getProjectStatusChipColor } from '@/lib/utils/muiHelpers';
 
 // テーブルのカラム定義
 const columns = [
@@ -46,21 +47,7 @@ const columns = [
     minWidth: 120,
     align: 'center' as const,
     format: (value: string) => {
-      let color = '';
-      switch (value) {
-        case 'アクティブ':
-          color = 'success';
-          break;
-        case '一時停止':
-          color = 'warning';
-          break;
-        case '完了':
-          color = 'info';
-          break;
-        default:
-          color = 'default';
-      }
-      return <Chip label={value} color={color as any} size="small" />;
+      return <Chip label={value} color={getProjectStatusChipColor(value)} size="small" />;
     },
   },
   {

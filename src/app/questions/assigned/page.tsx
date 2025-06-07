@@ -31,7 +31,8 @@ import { ja } from 'date-fns/locale';
 import { format, isPast, differenceInDays } from 'date-fns';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import DataTable from '../../components/common/DataTable';
-import { fetchData } from '@/lib/utils/fetchData';
+import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
+import { getStatusChipColor, getPriorityChipColor } from '@/lib/utils/muiHelpers';
 
 // 質問の型定義
 interface Question {
@@ -58,22 +59,6 @@ interface Project {
   id: string;
   name: string;
 }
-
-// ステータスのマッピング
-const statusMapping = {
-  NEW: '新規',
-  IN_PROGRESS: '回答中',
-  PENDING_APPROVAL: '承認待ち',
-  CLOSED: 'クローズ',
-};
-
-// 優先度のマッピング
-const priorityMapping = {
-  HIGHEST: '最高',
-  HIGH: '高',
-  MEDIUM: '中',
-  LOW: '低',
-};
 
 // カラム定義
 const columns = [
@@ -115,51 +100,29 @@ const columns = [
     label: 'ステータス',
     minWidth: 120,
     align: 'center' as const,
-    format: (value: 'NEW' | 'IN_PROGRESS' | 'PENDING_APPROVAL' | 'CLOSED') => {
-      let color = '';
-      switch (value) {
-        case 'NEW':
-          color = 'info';
-          break;
-        case 'IN_PROGRESS':
-          color = 'primary';
-          break;
-        case 'PENDING_APPROVAL':
-          color = 'warning';
-          break;
-        case 'CLOSED':
-          color = 'success';
-          break;
-        default:
-          color = 'default';
-      }
-      return <Chip label={statusMapping[value]} color={color as any} size="small" />;
+    format: (value: string) => {
+      const statusMapping: { [key: string]: string } = {
+        'NEW': '新規',
+        'IN_PROGRESS': '回答中',
+        'PENDING_APPROVAL': '承認待ち',
+        'CLOSED': 'クローズ'
+      };
+      return <Chip label={statusMapping[value]} color={getStatusChipColor(value)} size="small" />;
     },
   },
   {
     id: 'priority',
     label: '優先度',
-    minWidth: 80,
+    minWidth: 100,
     align: 'center' as const,
-    format: (value: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW') => {
-      let color = '';
-      switch (value) {
-        case 'HIGHEST':
-          color = 'error';
-          break;
-        case 'HIGH':
-          color = 'error';
-          break;
-        case 'MEDIUM':
-          color = 'warning';
-          break;
-        case 'LOW':
-          color = 'info';
-          break;
-        default:
-          color = 'default';
-      }
-      return <Chip label={priorityMapping[value]} color={color as any} size="small" variant="outlined" />;
+    format: (value: string) => {
+      const priorityMapping: { [key: string]: string } = {
+        'HIGHEST': '最高',
+        'HIGH': '高',
+        'MEDIUM': '中',
+        'LOW': '低'
+      };
+      return <Chip label={priorityMapping[value]} color={getPriorityChipColor(value)} size="small" variant="outlined" />;
     },
   },
   {

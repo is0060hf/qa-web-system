@@ -49,6 +49,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import MarkdownViewer from '@/components/common/MarkdownViewer';
 import { useAuth } from '@/app/hooks/useAuth';
+import { getStatusChipColor } from '@/lib/utils/muiHelpers';
 
 // 実際のAPIレスポンスに合わせた型定義
 interface QuestionDetail {
@@ -215,18 +216,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return 'primary';
-      case 'PENDING_APPROVAL':
-        return 'warning';
-      case 'CLOSED':
-        return 'success';
-      case 'NEW':
-        return 'info';
-      default:
-        return 'default';
-    }
+    return getStatusChipColor(status);
   };
 
   const getStatusLabel = (status: string) => {
@@ -313,7 +303,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             )}
             <Chip 
               label={getStatusLabel(question.status)} 
-              color={getStatusColor(question.status) as any}
+              color={getStatusColor(question.status)}
             />
             <Chip 
               label={`優先度: ${getPriorityLabel(question.priority)}`}

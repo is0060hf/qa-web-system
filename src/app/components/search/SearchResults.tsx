@@ -14,18 +14,9 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { 
-  FiberNew as NewIcon,
-  Sync as InProgressIcon,
-  HourglassEmpty as PendingIcon,
-  CheckCircle as ClosedIcon,
-  PriorityHigh as HighestPriorityIcon,
-  ArrowUpward as HighPriorityIcon,
-  Remove as MediumPriorityIcon,
-  ArrowDownward as LowPriorityIcon
-} from '@mui/icons-material';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { getStatusChipColor, getPriorityChipColor } from '@/lib/utils/muiHelpers';
 
 // 質問の型定義
 export interface Question {
@@ -70,35 +61,35 @@ export default function SearchResults({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
-  // ステータスに基づいて表示するアイコンとチップの色を取得
-  const getStatusInfo = (status: Question['status']) => {
+  // ステータスに基づいて表示するラベルを取得
+  const getStatusLabel = (status: Question['status']) => {
     switch (status) {
       case 'NEW':
-        return { icon: <NewIcon />, color: 'info', label: '新規' };
+        return '新規';
       case 'IN_PROGRESS':
-        return { icon: <InProgressIcon />, color: 'warning', label: '回答中' };
+        return '回答中';
       case 'PENDING_APPROVAL':
-        return { icon: <PendingIcon />, color: 'secondary', label: '承認待ち' };
+        return '承認待ち';
       case 'CLOSED':
-        return { icon: <ClosedIcon />, color: 'success', label: 'クローズ' };
+        return 'クローズ';
       default:
-        return { icon: null, color: 'default', label: '' };
+        return '';
     }
   };
   
-  // 優先度に基づいて表示するアイコンとチップの色を取得
-  const getPriorityInfo = (priority: Question['priority']) => {
+  // 優先度に基づいて表示するラベルを取得
+  const getPriorityLabel = (priority: Question['priority']) => {
     switch (priority) {
       case 'HIGHEST':
-        return { icon: <HighestPriorityIcon />, color: 'error', label: '最高' };
+        return '最高';
       case 'HIGH':
-        return { icon: <HighPriorityIcon />, color: 'warning', label: '高' };
+        return '高';
       case 'MEDIUM':
-        return { icon: <MediumPriorityIcon />, color: 'info', label: '中' };
+        return '中';
       case 'LOW':
-        return { icon: <LowPriorityIcon />, color: 'default', label: '低' };
+        return '低';
       default:
-        return { icon: null, color: 'default', label: '' };
+        return '';
     }
   };
   
@@ -111,8 +102,6 @@ export default function SearchResults({
       minWidth: 200,
       renderCell: (params: GridRenderCellParams<Question>) => {
         const question = params.row;
-        const status = getStatusInfo(question.status);
-        const priority = getPriorityInfo(question.priority);
         
         return (
           <Box sx={{ py: 1 }}>
@@ -122,15 +111,14 @@ export default function SearchResults({
             <Stack direction="row" spacing={1} sx={{ mb: 0.5 }}>
               <Chip 
                 size="small" 
-                label={status.label} 
-                color={status.color as any} 
-                {...(status.icon ? { icon: status.icon } : {})}
+                label={getStatusLabel(question.status)} 
+                color={getStatusChipColor(question.status)} 
               />
               <Chip 
                 size="small" 
-                label={priority.label} 
-                color={priority.color as any} 
-                {...(priority.icon ? { icon: priority.icon } : {})}
+                label={getPriorityLabel(question.priority)} 
+                color={getPriorityChipColor(question.priority)} 
+                variant="outlined"
               />
             </Stack>
             <Typography variant="caption" color="text.secondary">
@@ -162,13 +150,11 @@ export default function SearchResults({
       headerName: 'ステータス',
       width: 120,
       renderCell: (params: GridRenderCellParams<Question>) => {
-        const status = getStatusInfo(params.value as Question['status']);
         return (
           <Chip 
             size="small" 
-            label={status.label} 
-            color={status.color as any} 
-            {...(status.icon ? { icon: status.icon } : {})}
+            label={getStatusLabel(params.value as Question['status'])} 
+            color={getStatusChipColor(params.value as Question['status'])} 
           />
         );
       }
@@ -183,13 +169,12 @@ export default function SearchResults({
       headerName: '優先度',
       width: 100,
       renderCell: (params: GridRenderCellParams<Question>) => {
-        const priority = getPriorityInfo(params.value as Question['priority']);
         return (
           <Chip 
             size="small" 
-            label={priority.label} 
-            color={priority.color as any} 
-            {...(priority.icon ? { icon: priority.icon } : {})}
+            label={getPriorityLabel(params.value as Question['priority'])} 
+            color={getPriorityChipColor(params.value as Question['priority'])} 
+            variant="outlined"
           />
         );
       }

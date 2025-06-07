@@ -49,6 +49,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData } from '@/lib/utils/fetchData';
 import ProjectForm from '../../components/projects/ProjectForm';
 import { useProjectStore } from '../../stores/projectStore';
+import { getProjectStatusChipColor, getStatusChipColor } from '@/lib/utils/muiHelpers';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -185,34 +186,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'アクティブ':
-        return 'success';
-      case '一時停止':
-        return 'warning';
-      case '完了':
-        return 'info';
-      default:
-        return 'default';
-    }
+    return getProjectStatusChipColor(status);
   };
 
   const getQuestionStatusColor = (status: string) => {
-    switch (status) {
-      case '回答中':
-      case 'IN_PROGRESS':
-        return 'primary';
-      case '承認待ち':
-      case 'PENDING_APPROVAL':
-        return 'warning';
-      case 'クローズ':
-      case 'CLOSED':
-        return 'success';
-      case 'NEW':
-        return 'info';
-      default:
-        return 'default';
-    }
+    return getStatusChipColor(status);
   };
 
   const handleUpdateProject = async (name: string, description: string) => {
@@ -361,7 +339,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </Typography>
           <Chip 
             label={project.status} 
-            color={getStatusColor(project.status) as any}
+            color={getStatusColor(project.status)}
             sx={{ mr: 1 }}
           />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -421,7 +399,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                     secondaryAction={
                       <Chip 
                         label={question.status} 
-                        color={getQuestionStatusColor(question.status) as any}
+                        color={getQuestionStatusColor(question.status)}
                         size="small"
                       />
                     }

@@ -9,7 +9,8 @@ import {
   SelectProps, 
   Typography, 
   Box, 
-  FormHelperText 
+  FormHelperText,
+  SelectChangeEvent
 } from '@mui/material';
 
 export interface SelectOption {
@@ -17,11 +18,11 @@ export interface SelectOption {
   label: string;
 }
 
-interface FormSelectFieldProps extends Omit<SelectProps, 'error' | 'onChange'> {
+interface FormSelectFieldProps extends Omit<SelectProps<string>, 'error' | 'onChange'> {
   name: string;
   label: string;
   value: string;
-  onChange: (e: React.ChangeEvent<{ name?: string; value: unknown }>) => void;
+  onChange: (event: SelectChangeEvent<string>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   options: SelectOption[];
   error?: string;
@@ -66,8 +67,8 @@ export default function FormSelectField({
           id={name}
           name={name}
           value={value}
-          onChange={onChange as any}
-          onBlur={onBlur as any}
+          onChange={onChange}
+          onBlur={onBlur}
           displayEmpty
           {...rest}
         >

@@ -27,6 +27,7 @@ import DashboardLayout from '../components/layout/DashboardLayout';
 import DataTable from '../components/common/DataTable';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import { MockQuestion } from '@/mocks/questions';
+import { getStatusChipColor, getPriorityChipColor } from '@/lib/utils/muiHelpers';
 
 // テーブルのカラム定義
 const columns = [
@@ -72,21 +73,7 @@ const columns = [
     minWidth: 120,
     align: 'center' as const,
     format: (value: string) => {
-      let color = '';
-      switch (value) {
-        case '回答中':
-          color = 'primary';
-          break;
-        case '承認待ち':
-          color = 'warning';
-          break;
-        case 'クローズ':
-          color = 'success';
-          break;
-        default:
-          color = 'default';
-      }
-      return <Chip label={value} color={color as any} size="small" />;
+      return <Chip label={value} color={getStatusChipColor(value)} size="small" />;
     },
   },
   {
@@ -95,21 +82,7 @@ const columns = [
     minWidth: 80,
     align: 'center' as const,
     format: (value: string) => {
-      let color = '';
-      switch (value) {
-        case '高':
-          color = 'error';
-          break;
-        case '中':
-          color = 'warning';
-          break;
-        case '低':
-          color = 'info';
-          break;
-        default:
-          color = 'default';
-      }
-      return <Chip label={value} color={color as any} size="small" variant="outlined" />;
+      return <Chip label={value} color={getPriorityChipColor(value)} size="small" variant="outlined" />;
     },
   },
   {
