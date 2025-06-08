@@ -415,19 +415,34 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
           </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Button
-            variant="outlined"
-            startIcon={<ReplyIcon />}
-            onClick={() => router.push(`/questions/${questionId}/answer`)}
-            disabled={!canAnswer}
-            title={!canAnswer ? '担当者のみが回答できます' : ''}
-          >
-            回答する
-          </Button>
+          {question.answers.length > 0 && question.status === 'PENDING_APPROVAL' && canConfirm ? (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<CheckCircleIcon />}
+              onClick={handleAcceptAnswer}
+              disabled={isUpdatingStatus}
+            >
+              回答を確認して完了にする
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              startIcon={<ReplyIcon />}
+              onClick={() => router.push(`/questions/${questionId}/answer`)}
+              disabled={!canAnswer || question.status === 'CLOSED'}
+              title={
+                !canAnswer ? '担当者のみが回答できます' : 
+                question.status === 'CLOSED' ? '完了した質問には回答できません' : ''
+              }
+            >
+              回答する
+            </Button>
+          )}
           <Button
             variant="outlined"
             startIcon={<EditIcon />}
-            onClick={() => router.push(`/questions/${questionId}/edit`)}
+            onClick={() => router.push(`/questions/edit/${questionId}`)}
           >
             編集
           </Button>
@@ -457,19 +472,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {question.status === 'PENDING_APPROVAL' && canConfirm && (
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<CheckCircleIcon />}
-              onClick={handleAcceptAnswer}
-              disabled={isUpdatingStatus}
-            >
-              回答を確認して完了にする
-            </Button>
-          )}
-          <Box sx={{ flex: 1 }} />
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             variant="contained"
             color="primary"

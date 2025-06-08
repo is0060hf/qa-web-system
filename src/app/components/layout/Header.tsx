@@ -60,10 +60,8 @@ interface Notification {
 // API レスポンス型
 interface NotificationsResponse {
   notifications: Notification[];
-  unreadCount: number;
-  total: number;
-  page: number;
-  limit: number;
+  nextCursor: string | null;
+  totalUnread: number;
 }
 
 interface HeaderProps {
@@ -113,13 +111,12 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
       // 直接fetch ではなく fetchData 関数を使用
       const data = await fetchData<NotificationsResponse>('notifications', {
         params: {
-          limit: '5',
-          unreadOnly: 'true'
+          limit: '5'
         }
       });
       
       setNotifications(data.notifications);
-      setUnreadCount(data.unreadCount);
+      setUnreadCount(data.totalUnread);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {

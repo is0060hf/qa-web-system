@@ -114,10 +114,10 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
     const fetchUnreadCount = async () => {
       try {
         // 直接fetchの代わりにfetchData関数を使用
-        const data = await fetchData<{ unreadCount: number }>('notifications', {
+        const data = await fetchData<{ notifications: any[], nextCursor: string | null, totalUnread: number }>('notifications', {
           params: { limit: '0' }
         });
-        setUnreadCount(data.unreadCount);
+        setUnreadCount(data.totalUnread);
       } catch (error) {
         console.error('Failed to fetch unread notifications count:', error);
       }
