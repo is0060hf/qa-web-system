@@ -104,6 +104,30 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
     fetchUserData();
   }, []);
   
+  // 未読通知数を取得
+  const fetchUnreadCount = async () => {
+    try {
+      const data = await fetchData<NotificationsResponse>('notifications', {
+        params: {
+          limit: '0'
+        }
+      });
+      setUnreadCount(data.totalUnread);
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+    }
+  };
+
+  // 初期表示時と定期的に未読通知数を取得
+  useEffect(() => {
+    fetchUnreadCount();
+    
+    // 60秒ごとに未読通知数を更新
+    const intervalId = setInterval(fetchUnreadCount, 60000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
   // 通知一覧を取得
   const fetchNotifications = async () => {
     setIsLoading(true);
@@ -111,11 +135,12 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
       // 直接fetch ではなく fetchData 関数を使用
       const data = await fetchData<NotificationsResponse>('notifications', {
         params: {
-          limit: '5'
+          limit: '5',
+          unread: 'true' // 未読のみを取得
         }
       });
       
-      setNotifications(data.notifications);
+      setNotifications(data.notifications.filter(n => !n.isRead)); // 念のため未読のみフィルタリング
       setUnreadCount(data.totalUnread);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);

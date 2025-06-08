@@ -13,10 +13,8 @@ import { fetchData } from '@/lib/utils/fetchData';
 // APIから取得する通知データの型
 interface NotificationsResponse {
   notifications: Notification[];
-  unreadCount: number;
-  total: number;
-  page: number;
-  limit: number;
+  nextCursor: string | null;
+  totalUnread: number;
 }
 
 export default function NotificationsPage() {
@@ -27,6 +25,7 @@ export default function NotificationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [unreadOnly, setUnreadOnly] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
   
   // ローディングと通信状態
   const [isLoading, setIsLoading] = useState(true);
@@ -41,15 +40,16 @@ export default function NotificationsPage() {
       // 直接fetchではなく、fetchData関数を使用
       const data = await fetchData<NotificationsResponse>('notifications', {
         params: {
-          page: currentPage.toString(),
           limit: pageSize.toString(),
-          ...(unreadOnly && { unreadOnly: 'true' })
+          ...(unreadOnly && { unread: 'true' }) // unreadOnlyではなくunreadパラメータを使用
         }
       });
       
       setNotifications(data.notifications);
-      setUnreadCount(data.unreadCount);
-      setTotal(data.total);
+      setUnreadCount(data.totalUnread);
+      setNextCursor(data.nextCursor);
+      // 総数は未読フィルタ時は未読数、そうでない場合は取得したデータから推定
+      setTotal(unreadOnly ? data.totalUnread : data.notifications.length + (data.nextCursor ? 1 : 0));
       
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
