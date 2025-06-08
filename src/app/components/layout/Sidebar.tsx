@@ -14,6 +14,8 @@ import {
   ListItemText,
   Collapse,
   Badge,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -96,6 +98,8 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleQuestionsClick = () => {
     setQuestionsOpen(!questionsOpen);
@@ -127,8 +131,9 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
     return () => clearInterval(intervalId);
   }, []);
 
-  return (
-    <Drawer variant="permanent" open={open}>
+  // モバイルとデスクトップで異なるドロワーコンテンツ
+  const drawerContent = (
+    <>
       <DrawerHeader>
         <IconButton onClick={handleDrawerClose}>
           <ChevronLeftIcon />
@@ -350,6 +355,43 @@ export default function Sidebar({ open, handleDrawerClose }: SidebarProps) {
           </ListItem>
         )}
       </List>
-    </Drawer>
+    </>
+  );
+
+  // モバイルの場合はtemporary、デスクトップの場合はpermanent
+  return (
+    <MuiDrawer
+      variant={isMobile ? 'temporary' : 'permanent'}
+      open={open}
+      onClose={isMobile ? handleDrawerClose : undefined}
+      ModalProps={isMobile ? {
+        keepMounted: true, // Better open performance on mobile.
+      } : undefined}
+      sx={{
+        ...(isMobile ? {
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: drawerWidth,
+          },
+        } : {
+          display: { xs: 'none', md: 'block' },
+          width: drawerWidth,
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
+          boxSizing: 'border-box',
+          ...(open && {
+            ...openedMixin(theme),
+            '& .MuiDrawer-paper': openedMixin(theme),
+          }),
+          ...(!open && {
+            ...closedMixin(theme),
+            '& .MuiDrawer-paper': closedMixin(theme),
+          }),
+        }),
+      }}
+    >
+      {drawerContent}
+    </MuiDrawer>
   );
 } 

@@ -4,6 +4,7 @@ import { validateRequest } from '@/lib/utils/api';
 import { z } from 'zod';
 import { put } from '@vercel/blob';
 import crypto from 'crypto';
+import { validateFile, sanitizeFileName, getFileSizeLimit, ALL_ALLOWED_FILE_TYPES } from '@/lib/utils/fileValidation';
 
 // リクエストスキーマ
 const uploadUrlSchema = z.object({
@@ -11,29 +12,6 @@ const uploadUrlSchema = z.object({
   contentType: z.string().min(1, 'コンテンツタイプは必須です'),
   answerId: z.string().optional(), // 一時的または実際の回答ID
 });
-
-// ファイルサイズ制限（1GB）
-const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1GB in bytes
-
-// 許可されるファイルタイプ
-const ALLOWED_FILE_TYPES = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'video/mp4',
-  'video/mpeg',
-  'video/quicktime',
-  'video/webm',
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'text/plain',
-  'text/csv',
-];
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,10 +28,15 @@ export async function POST(req: NextRequest) {
 
     const { fileName, contentType, answerId } = validation.data;
 
-    // ファイルタイプの検証
-    if (!ALLOWED_FILE_TYPES.includes(contentType)) {
+    // ファイルバリデーション
+    const fileValidation = await validateFile(
+      { name: fileName, type: contentType, size: 0 },
+      { checkContent: false, skipSizeCheck: true } // URL生成時は内容とサイズチェックをスキップ
+    );
+
+    if (!fileValidation.isValid) {
       return NextResponse.json(
-        { error: '許可されていないファイルタイプです' },
+        { error: fileValidation.error },
         { status: 400 }
       );
     }
@@ -61,8 +44,11 @@ export async function POST(req: NextRequest) {
     // ユニークなファイル名を生成（衝突を避けるため）
     const timestamp = Date.now();
     const randomString = crypto.randomBytes(8).toString('hex');
-    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFileName = fileValidation.sanitizedFileName || sanitizeFileName(fileName);
     const uniqueFileName = `${user.id}/${timestamp}-${randomString}-${sanitizedFileName}`;
+
+    // ファイルサイズ制限を取得
+    const maxSize = getFileSizeLimit(contentType);
 
     // Vercel Blobへのアップロード用署名付きURLを生成
     // 注: 実際の実装では、Vercel Blobの署名付きURL生成方法に従います
@@ -80,7 +66,8 @@ export async function POST(req: NextRequest) {
         uploadUrl,
         blobUrl,
         fileName: uniqueFileName,
-        maxSize: MAX_FILE_SIZE,
+        maxSize,
+        allowedTypes: ALL_ALLOWED_FILE_TYPES,
         // クライアントがアップロード時に使用するための一時トークン
         uploadToken: crypto.randomBytes(32).toString('hex'),
       });
@@ -94,7 +81,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('アップロードURL生成エラー:', error);
     return NextResponse.json(
-      { error: 'アップロードURLの生成に失敗しました' },
+      { error: 'サーバーエラーが発生しました' },
       { status: 500 }
     );
   }

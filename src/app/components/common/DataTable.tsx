@@ -21,13 +21,16 @@ import {
   Search as SearchIcon,
   Clear as ClearIcon,
 } from '@mui/icons-material';
+import TruncatedText from '@/components/common/TruncatedText';
 
 interface Column<T = any> {
   id: string;
   label: string;
   minWidth?: number;
+  maxWidth?: number;
   align?: 'right' | 'left' | 'center';
   format?: (value: any, row: T) => string | React.ReactNode;
+  noWrap?: boolean;
 }
 
 interface DataTableProps<T = Record<string, any>> {
@@ -126,7 +129,11 @@ export default function DataTable<T extends Record<string, any>>({
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth, fontWeight: 600 }}
+                  style={{ 
+                    minWidth: column.minWidth, 
+                    maxWidth: column.maxWidth,
+                    fontWeight: 600 
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -147,9 +154,36 @@ export default function DataTable<T extends Record<string, any>>({
                   >
                     {columns.map((column) => {
                       const value = row[column.id];
+                      const formattedValue = column.format ? column.format(value, row) : value;
+                      
                       return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format ? column.format(value, row) : value}
+                        <TableCell 
+                          key={column.id} 
+                          align={column.align}
+                          style={{ 
+                            maxWidth: column.maxWidth,
+                            padding: '16px',
+                          }}
+                        >
+                          {(() => {
+                            const shouldWrap = column.noWrap === false;
+                            
+                            if (!shouldWrap && typeof formattedValue === 'string') {
+                              return (
+                                <TruncatedText 
+                                  text={formattedValue} 
+                                  maxWidth={column.maxWidth || '100%'}
+                                />
+                              );
+                            }
+                            
+                            if (!shouldWrap && formattedValue && typeof formattedValue === 'object' && 'props' in formattedValue) {
+                              // React要素の場合は直接レンダリング（TruncatedTextにラップすると二重になるため）
+                              return formattedValue;
+                            }
+                            
+                            return formattedValue;
+                          })()}
                         </TableCell>
                       );
                     })}

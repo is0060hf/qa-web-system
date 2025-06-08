@@ -17,6 +17,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getStatusChipColor, getPriorityChipColor } from '@/lib/utils/muiHelpers';
+import TruncatedText from '@/components/common/TruncatedText';
 
 // 質問の型定義
 export interface Question {
@@ -104,10 +105,13 @@ export default function SearchResults({
         const question = params.row;
         
         return (
-          <Box sx={{ py: 1 }}>
-            <Typography variant="body1" sx={{ fontWeight: 500, mb: 0.5 }}>
-              {question.title}
-            </Typography>
+          <Box sx={{ py: 1, overflow: 'hidden' }}>
+            <TruncatedText 
+              text={question.title}
+              variant="body1" 
+              sx={{ fontWeight: 500, mb: 0.5 }}
+              maxWidth="100%"
+            />
             <Stack direction="row" spacing={1} sx={{ mb: 0.5 }}>
               <Chip 
                 size="small" 
@@ -121,11 +125,22 @@ export default function SearchResults({
                 variant="outlined"
               />
             </Stack>
-            <Typography variant="caption" color="text.secondary">
-              プロジェクト: {question.projectName} | 
-              担当: {question.assigneeName} | 
-              {question.deadline && `期限: ${format(new Date(question.deadline), 'yyyy/MM/dd', { locale: ja })}`}
-            </Typography>
+            {(() => {
+              const deadlineText = question.deadline 
+                ? `期限: ${format(new Date(question.deadline), 'yyyy/MM/dd', { locale: ja })}`
+                : '';
+              const infoText = `プロジェクト: ${question.projectName} | 担当: ${question.assigneeName}`;
+              const fullText = deadlineText ? `${infoText} | ${deadlineText}` : infoText;
+              
+              return (
+                <TruncatedText
+                  text={fullText}
+                  variant="caption" 
+                  color="text.secondary"
+                  maxWidth="100%"
+                />
+              );
+            })()}
           </Box>
         );
       }
@@ -139,11 +154,27 @@ export default function SearchResults({
       headerName: 'タイトル',
       flex: 1,
       minWidth: 200,
+      renderCell: (params: GridRenderCellParams<Question>) => {
+        return (
+          <TruncatedText 
+            text={params.value as string}
+            maxWidth="100%"
+          />
+        );
+      }
     },
     {
       field: 'projectName',
       headerName: 'プロジェクト',
       width: 150,
+      renderCell: (params: GridRenderCellParams<Question>) => {
+        return (
+          <TruncatedText 
+            text={params.value as string}
+            maxWidth="100%"
+          />
+        );
+      }
     },
     {
       field: 'status',
@@ -163,6 +194,14 @@ export default function SearchResults({
       field: 'assigneeName',
       headerName: '担当者',
       width: 120,
+      renderCell: (params: GridRenderCellParams<Question>) => {
+        return (
+          <TruncatedText 
+            text={params.value as string}
+            maxWidth="100%"
+          />
+        );
+      }
     },
     {
       field: 'priority',
