@@ -35,6 +35,8 @@ import {
   FormControlLabel,
   Radio,
   Autocomplete,
+  Stack,
+  Tooltip,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -44,12 +46,15 @@ import {
   AssignmentTurnedIn as AssignmentTurnedInIcon,
   Assignment as AssignmentIcon,
   HelpOutline as HelpOutlineIcon,
+  Warning as WarningIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData } from '@/lib/utils/fetchData';
 import ProjectForm from '../../components/projects/ProjectForm';
 import { useProjectStore } from '../../stores/projectStore';
 import { getProjectStatusChipColor, getStatusChipColor } from '@/lib/utils/muiHelpers';
+import { getStatusLabel, getPriorityLabel, calculateQuestionUrgency, getUrgencyColor } from '@/lib/utils/statusHelpers';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -98,8 +103,11 @@ interface Question {
   id: string;
   title: string;
   status: string;
+  priority: string;
+  deadline: string | null;
   createdBy: string;
   createdAt: string;
+  answers?: Array<{ id: string }>;
 }
 
 interface ProjectDetails {
@@ -391,35 +399,82 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <Paper elevation={0} sx={{ borderRadius: 2 }}>
           <List>
             {project.questions && project.questions.length > 0 ? (
-              project.questions.map((question, index) => (
-                <Box key={question.id}>
-                  <ListItem
-                    component="div"
-                    sx={{ px: 3, py: 2 }}
-                    secondaryAction={
-                      <Chip 
-                        label={question.status} 
-                        color={getQuestionStatusColor(question.status)}
-                        size="small"
-                      />
-                    }
-                  >
-                    <Box onClick={() => router.push(`/questions/${question.id}`)} 
-                         sx={{ display: 'flex', alignItems: 'center', width: '100%', cursor: 'pointer' }}>
-                      <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: 'primary.main' }}>
-                          <AssignmentIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={question.title}
-                        secondary={`作成日: ${new Date(question.createdAt).toLocaleDateString('ja-JP')}`}
-                      />
-                    </Box>
-                  </ListItem>
-                  {index < (project.questions?.length ?? 0) - 1 && <Divider variant="inset" component="li" />}
-                </Box>
-              ))
+              project.questions.map((question, index) => {
+                const urgency = calculateQuestionUrgency(
+                  question.status as any,
+                  question.priority as any,
+                  question.deadline ? new Date(question.deadline) : null,
+                  question.answers ? question.answers.length > 0 : false
+                );
+                
+                return (
+                  <Box key={question.id}>
+                    <ListItem
+                      component="div"
+                      sx={{ px: 3, py: 2 }}
+                      secondaryAction={
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          {urgency.level !== 'low' && (
+                            <Tooltip title={urgency.reasons.join('、')}>
+                              <IconButton size="small" color={getUrgencyColor(urgency.level)}>
+                                {urgency.level === 'critical' ? <ErrorIcon /> : <WarningIcon />}
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          <Chip 
+                            label={`優先度: ${getPriorityLabel(question.priority)}`} 
+                            size="small"
+                            variant="outlined"
+                            color={
+                              question.priority === 'HIGHEST' ? 'error' :
+                              question.priority === 'HIGH' ? 'warning' :
+                              'default'
+                            }
+                          />
+                          <Chip 
+                            label={getStatusLabel(question.status)} 
+                            color={getQuestionStatusColor(question.status)}
+                            size="small"
+                          />
+                        </Stack>
+                      }
+                    >
+                      <Box onClick={() => router.push(`/questions/${question.id}`)} 
+                           sx={{ display: 'flex', alignItems: 'center', width: '100%', cursor: 'pointer' }}>
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: urgency.level === 'critical' ? 'error.main' : 'primary.main' }}>
+                            <AssignmentIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="body1">{question.title}</Typography>
+                              {question.deadline && new Date(question.deadline) < new Date() && (
+                                <Chip
+                                  label="期限切れ"
+                                  size="small"
+                                  color="error"
+                                  sx={{ height: 20 }}
+                                />
+                              )}
+                            </Box>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                作成日: {new Date(question.createdAt).toLocaleDateString('ja-JP')}
+                                {question.deadline && `　期限: ${new Date(question.deadline).toLocaleDateString('ja-JP')}`}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </Box>
+                    </ListItem>
+                    {index < (project.questions?.length ?? 0) - 1 && <Divider variant="inset" component="li" />}
+                  </Box>
+                );
+              })
             ) : (
               <ListItem sx={{ px: 3, py: 2 }}>
                 <ListItemText primary="質問がありません" />

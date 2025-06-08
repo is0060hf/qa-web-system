@@ -44,12 +44,15 @@ import {
   AccessTime as AccessTimeIcon,
   Person as PersonIcon,
   Tag as TagIcon,
+  Comment as CommentIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import MarkdownViewer from '@/components/common/MarkdownViewer';
 import { useAuth } from '@/app/hooks/useAuth';
 import { getStatusChipColor } from '@/lib/utils/muiHelpers';
+import { getStatusLabel, getPriorityLabel } from '@/lib/utils/statusHelpers';
 
 // 実際のAPIレスポンスに合わせた型定義
 interface QuestionDetail {
@@ -160,6 +163,22 @@ function a11yProps(index: number) {
   };
 }
 
+interface Thread {
+  id: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  creator: {
+    id: string;
+    name: string;
+    email: string;
+    profileImage?: {
+      id: string;
+      storageUrl: string;
+    } | null;
+  };
+}
+
 export default function QuestionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { user } = useAuth();
@@ -171,6 +190,10 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
   const [tabValue, setTabValue] = useState(0);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [comment, setComment] = useState('');
+  const [threads, setThreads] = useState<Record<string, Thread[]>>({});
+  const [activeAnswerId, setActiveAnswerId] = useState<string | null>(null);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   // 質問データの取得
   const { 
@@ -183,8 +206,13 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     null
   );
 
-  // 回答権限のチェック
+  // 回答権限と確認権限のチェック
   const canAnswer = question && user && question.assignee.id === user.id;
+  const canConfirm = question && user && (
+    question.creator.id === user.id || 
+    question.assignee.id === user.id ||
+    user.role === 'ADMIN'
+  );
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -205,48 +233,83 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     setComment(event.target.value);
   };
 
-  const handleSubmitComment = async () => {
-    // 現在のスキーマではコメント機能は実装されていません
-    console.log('コメント機能は後で実装します');
+  const handleSubmitComment = async (answerId: string) => {
+    if (!comment.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const response = await fetchData<Thread>(
+        `questions/${questionId}/answers/${answerId}/threads`,
+        {
+          method: 'POST',
+          body: { content: comment },
+        }
+      );
+
+      // スレッドリストを更新
+      setThreads(prev => ({
+        ...prev,
+        [answerId]: [...(prev[answerId] || []), response],
+      }));
+      setComment('');
+    } catch (error) {
+      console.error('コメント投稿エラー:', error);
+      alert('コメントの投稿に失敗しました');
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
-  const handleAcceptAnswer = async (answerId: string) => {
-    // 承認機能は後で実装します
-    console.log('承認機能は後で実装します');
+  const handleAcceptAnswer = async () => {
+    if (!canConfirm) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      await fetchData(`questions/${questionId}/status`, {
+        method: 'PATCH',
+        body: { status: 'CLOSED' },
+      });
+      
+      // データを再取得
+      refetch();
+      alert('質問を完了としてマークしました');
+    } catch (error) {
+      console.error('ステータス更新エラー:', error);
+      alert('ステータスの更新に失敗しました');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  // スレッドの取得
+  const fetchThreads = async (answerId: string) => {
+    try {
+      const response = await fetchData<Thread[]>(
+        `questions/${questionId}/answers/${answerId}/threads`
+      );
+      setThreads(prev => ({
+        ...prev,
+        [answerId]: response,
+      }));
+    } catch (error) {
+      console.error('スレッド取得エラー:', error);
+    }
+  };
+
+  // 回答のスレッドを展開
+  const toggleThreads = (answerId: string) => {
+    if (activeAnswerId === answerId) {
+      setActiveAnswerId(null);
+    } else {
+      setActiveAnswerId(answerId);
+      if (!threads[answerId]) {
+        fetchThreads(answerId);
+      }
+    }
   };
 
   const getStatusColor = (status: string) => {
     return getStatusChipColor(status);
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return '回答中';
-      case 'PENDING_APPROVAL':
-        return '承認待ち';
-      case 'CLOSED':
-        return 'クローズ';
-      case 'NEW':
-        return '新規';
-      default:
-        return status;
-    }
-  };
-
-  const getPriorityLabel = (priority: string) => {
-    switch (priority) {
-      case 'HIGHEST':
-        return '最高';
-      case 'HIGH':
-        return '高';
-      case 'MEDIUM':
-        return '中';
-      case 'LOW':
-        return '低';
-      default:
-        return priority;
-    }
   };
 
   if (isLoading) {
@@ -394,14 +457,29 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {question.status === 'PENDING_APPROVAL' && canConfirm && (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<CheckCircleIcon />}
+              onClick={handleAcceptAnswer}
+              disabled={isUpdatingStatus}
+            >
+              回答を確認して完了にする
+            </Button>
+          )}
+          <Box sx={{ flex: 1 }} />
           <Button
             variant="contained"
             color="primary"
             startIcon={<ReplyIcon />}
             onClick={() => router.push(`/questions/${questionId}/answer`)}
-            disabled={!canAnswer}
-            title={!canAnswer ? '担当者のみが回答できます' : ''}
+            disabled={!canAnswer || question.status === 'CLOSED'}
+            title={
+              !canAnswer ? '担当者のみが回答できます' : 
+              question.status === 'CLOSED' ? '完了した質問には回答できません' : ''
+            }
           >
             回答する
           </Button>
@@ -422,6 +500,14 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
                   }
                   title={answer.user.name}
                   subheader={`回答日: ${new Date(answer.createdAt).toLocaleDateString('ja-JP')}`}
+                  action={
+                    <IconButton
+                      onClick={() => toggleThreads(answer.id)}
+                      color={activeAnswerId === answer.id ? 'primary' : 'default'}
+                    >
+                      <CommentIcon />
+                    </IconButton>
+                  }
                 />
                 <Divider />
                 <CardContent>
@@ -463,6 +549,67 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
                     </Box>
                   )}
                 </CardContent>
+                
+                {/* スレッド表示 */}
+                {activeAnswerId === answer.id && (
+                  <>
+                    <Divider />
+                    <Box sx={{ p: 2, bgcolor: 'grey.50' }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        コメント
+                      </Typography>
+                      
+                      {threads[answer.id]?.length > 0 ? (
+                        <Stack spacing={2} sx={{ mb: 2 }}>
+                          {threads[answer.id].map((thread) => (
+                            <Box key={thread.id} sx={{ display: 'flex', gap: 1 }}>
+                              <Avatar
+                                sx={{ width: 32, height: 32, fontSize: '0.875rem' }}
+                                src={thread.creator.profileImage?.storageUrl}
+                              >
+                                {thread.creator.name.charAt(0)}
+                              </Avatar>
+                              <Box sx={{ flex: 1 }}>
+                                <Typography variant="body2" fontWeight="bold">
+                                  {thread.creator.name}
+                                </Typography>
+                                <Typography variant="body2">
+                                  {thread.content}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {new Date(thread.createdAt).toLocaleString('ja-JP')}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                          コメントはまだありません
+                        </Typography>
+                      )}
+                      
+                      {/* コメント投稿フォーム */}
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          placeholder="コメントを入力..."
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          disabled={isSubmittingComment || question.status === 'CLOSED'}
+                        />
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleSubmitComment(answer.id)}
+                          disabled={!comment.trim() || isSubmittingComment || question.status === 'CLOSED'}
+                        >
+                          <SendIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </>
+                )}
               </Card>
             ))}
           </Stack>

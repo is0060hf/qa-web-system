@@ -89,6 +89,7 @@ interface Question {
     id: string;
     fields: FormField[];
   } | null;
+  answers?: Array<{ id: string }>; // 回答の有無を確認
 }
 
 // フォームの入力値の型定義
@@ -115,6 +116,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasAnswers, setHasAnswers] = useState(false);
 
   // React Hook Form の設定
   const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormInput>({
@@ -145,6 +147,10 @@ function EditQuestionPageClient({ id }: { id: string }) {
         // 質問データを取得
         const questionData = await fetchData<Question>(`questions/${id}`);
         setQuestion(questionData);
+        
+        // 回答の有無をチェック
+        const answersExist = questionData.answers && questionData.answers.length > 0;
+        setHasAnswers(!!answersExist);
         
         // フォームにデータをセット
         setValue('title', questionData.title);
@@ -455,6 +461,13 @@ function EditQuestionPageClient({ id }: { id: string }) {
           <Typography variant="h6" gutterBottom>
             回答形式
           </Typography>
+          
+          {hasAnswers && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              この質問には既に回答がついているため、回答フォームの変更はできません。
+            </Alert>
+          )}
+          
           <Controller
             name="answerFormType"
             control={control}
@@ -467,11 +480,13 @@ function EditQuestionPageClient({ id }: { id: string }) {
                   value="free"
                   control={<Radio />}
                   label="自由記述"
+                  disabled={hasAnswers}
                 />
                 <FormControlLabel
                   value="form"
                   control={<Radio />}
                   label="回答フォームを使用"
+                  disabled={hasAnswers}
                 />
               </RadioGroup>
             )}
@@ -483,7 +498,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                 name="templateId"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth sx={{ mb: 3 }}>
+                  <FormControl fullWidth sx={{ mb: 3 }} disabled={hasAnswers}>
                     <InputLabel>テンプレートから選択</InputLabel>
                     <Select
                       {...field}
@@ -516,6 +531,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                   onClick={handleAddField}
                   variant="outlined"
                   size="small"
+                  disabled={hasAnswers}
                 >
                   フィールド追加
                 </Button>
@@ -542,6 +558,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                               size="small"
                               error={!!errors.formFields?.[index]?.label}
                               helperText={errors.formFields?.[index]?.label?.message}
+                              disabled={hasAnswers}
                             />
                           )}
                         />
@@ -551,7 +568,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                           name={`formFields.${index}.fieldType`}
                           control={control}
                           render={({ field }) => (
-                            <FormControl fullWidth size="small">
+                            <FormControl fullWidth size="small" disabled={hasAnswers}>
                               <InputLabel>タイプ</InputLabel>
                               <Select {...field} label="タイプ">
                                 <MenuItem value="TEXT">テキスト</MenuItem>
@@ -574,6 +591,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                                 <Radio
                                   checked={field.value}
                                   onChange={(e) => field.onChange(e.target.checked)}
+                                  disabled={hasAnswers}
                                 />
                               }
                               label="必須"
@@ -585,6 +603,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                         <IconButton
                           color="error"
                           onClick={() => handleRemoveField(index)}
+                          disabled={hasAnswers}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -611,6 +630,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                                 onChange={(_, newValue) => {
                                   field.onChange(newValue);
                                 }}
+                                disabled={hasAnswers}
                                 renderInput={(params) => (
                                   <TextField
                                     {...params}
@@ -649,6 +669,7 @@ function EditQuestionPageClient({ id }: { id: string }) {
                       <Radio
                         checked={field.value}
                         onChange={(e) => field.onChange(e.target.checked)}
+                        disabled={hasAnswers}
                       />
                     )}
                   />

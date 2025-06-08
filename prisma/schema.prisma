@@ -84,6 +84,7 @@ model User {
   sentInvitations Invitation[]  @relation("SentInvitations") // Invitations sent by the user
   passwordResetTokens PasswordResetToken[] // Password reset tokens for the user
   profileImage   MediaFile?     @relation("UserProfileImage", fields: [profileImageId], references: [id])
+  threads        Thread[]       // Threads/comments created by the user
 }
 
 model Project {
@@ -184,6 +185,7 @@ model Answer {
   creator     User       @relation(fields: [creatorId], references: [id])
   mediaFiles  AnswerMediaFile[] // Relation to media files through join table
   formData    AnswerFormData[] // Data for custom form fields, if applicable
+  threads     Thread[]   // Comments/threads on this answer
 
   @@index([questionId])
   @@index([creatorId])
@@ -328,6 +330,21 @@ model PasswordResetToken {
   @@index([userId])
   @@index([token])
   @@index([expiresAt])
+}
+
+model Thread {
+  id         String    @id @default(cuid())
+  content    String
+  answerId   String
+  creatorId  String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  answer     Answer    @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  creator    User      @relation(fields: [creatorId], references: [id])
+
+  @@index([answerId])
+  @@index([creatorId])
 }
 
 
