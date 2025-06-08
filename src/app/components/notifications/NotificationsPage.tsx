@@ -95,8 +95,9 @@ export default function NotificationsPage() {
     if (!notification.isRead) {
       try {
         // 直接fetchではなく、fetchData関数を使用
-        await fetchData<{ success: boolean; id: string }>(`notifications/${notification.id}/read`, {
-          method: 'PATCH'
+        await fetchData<Notification>(`notifications/${notification.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ isRead: true })
         });
         
         // 既読状態を更新（APIから再取得しない場合）

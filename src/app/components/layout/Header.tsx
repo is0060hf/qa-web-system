@@ -131,8 +131,9 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const markAsRead = async (notificationId: string) => {
     try {
       // 直接fetch ではなく fetchData 関数を使用
-      await fetchData<{ success: boolean; id: string }>(`notifications/${notificationId}/read`, {
-        method: 'PATCH'
+      await fetchData<Notification>(`notifications/${notificationId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ isRead: true })
       });
       
       // 既読状態を更新
@@ -317,7 +318,6 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: 'hidden',
             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
             mt: 1.5,
             width: 320,
@@ -333,7 +333,7 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <Box sx={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
           <MenuList sx={{ py: 0 }}>
             {isLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
@@ -348,17 +348,31 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
             ) : (
               notifications.map((notification, index) => (
                 <div key={notification.id}>
-                  <MenuItem onClick={() => handleNotificationClick(notification)}>
+                  <MenuItem 
+                    onClick={() => handleNotificationClick(notification)}
+                    sx={{ 
+                      whiteSpace: 'normal',
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                      }
+                    }}
+                  >
                     <Box sx={{ display: 'flex', width: '100%' }}>
-                      <Box sx={{ mr: 1.5, mt: 0.5 }}>
+                      <Box sx={{ mr: 1.5, mt: 0.5, flexShrink: 0 }}>
                         {getNotificationIcon(notification.type)}
                       </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden'
+                      }}>
                         <TruncatedText 
                           text={notification.message}
                           variant="subtitle2" 
                           sx={{ fontWeight: notification.isRead ? 'normal' : 'medium' }}
-                          maxWidth="100%"
+                          display="block"
                         />
                         <Typography variant="caption" color="text.secondary">
                           {formatDistanceToNow(new Date(notification.createdAt), {

@@ -8,6 +8,7 @@ interface TruncatedTextProps extends TypographyProps {
   maxWidth?: number | string;
   lines?: number;
   showTooltip?: boolean;
+  display?: 'inline-block' | 'block';
 }
 
 /**
@@ -16,12 +17,14 @@ interface TruncatedTextProps extends TypographyProps {
  * @param maxWidth 最大幅（デフォルト: 100%）
  * @param lines 表示する最大行数（デフォルト: 1）
  * @param showTooltip ツールチップを表示するか（デフォルト: true）
+ * @param display 表示形式（デフォルト: 'inline-block'）
  */
 export default function TruncatedText({
   text,
   maxWidth = '100%',
   lines = 1,
   showTooltip = true,
+  display = 'inline-block',
   ...typographyProps
 }: TruncatedTextProps) {
   const truncatedStyle = {
@@ -56,7 +59,11 @@ export default function TruncatedText({
 
   return (
     <Tooltip title={text} enterDelay={500} leaveDelay={200}>
-      <span style={{ display: 'inline-block', maxWidth: '100%' }}>
+      <span style={{ 
+        display: display,
+        maxWidth: '100%',
+        minWidth: 0
+      }}>
         {content}
       </span>
     </Tooltip>
