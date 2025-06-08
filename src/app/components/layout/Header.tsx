@@ -9,6 +9,7 @@ import {
   Badge,
   Menu,
   MenuItem,
+  MenuList,
   Box,
   Avatar,
   Tooltip,
@@ -316,11 +317,13 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: 'visible',
+            overflow: 'hidden',
             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
             mt: 1.5,
             width: 320,
             maxHeight: 400,
+            display: 'flex',
+            flexDirection: 'column',
             '& .MuiMenuItem-root': {
               px: 2,
               py: 1.5,
@@ -330,48 +333,52 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : notifications.length === 0 ? (
-          <Box sx={{ p: 2, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              未読の通知はありません
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            {notifications.map((notification) => (
-              <div key={notification.id}>
-                <MenuItem onClick={() => handleNotificationClick(notification)}>
-                  <Box sx={{ display: 'flex', width: '100%' }}>
-                    <Box sx={{ mr: 1.5, mt: 0.5 }}>
-                      {getNotificationIcon(notification.type)}
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
+          <MenuList sx={{ py: 0 }}>
+            {isLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : notifications.length === 0 ? (
+              <Box sx={{ p: 2, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  未読の通知はありません
+                </Typography>
+              </Box>
+            ) : (
+              notifications.map((notification, index) => (
+                <div key={notification.id}>
+                  <MenuItem onClick={() => handleNotificationClick(notification)}>
+                    <Box sx={{ display: 'flex', width: '100%' }}>
+                      <Box sx={{ mr: 1.5, mt: 0.5 }}>
+                        {getNotificationIcon(notification.type)}
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                        <TruncatedText 
+                          text={notification.message}
+                          variant="subtitle2" 
+                          sx={{ fontWeight: notification.isRead ? 'normal' : 'medium' }}
+                          maxWidth="100%"
+                        />
+                        <Typography variant="caption" color="text.secondary">
+                          {formatDistanceToNow(new Date(notification.createdAt), {
+                            addSuffix: true,
+                            locale: ja
+                          })}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
-                      <TruncatedText 
-                        text={notification.message}
-                        variant="subtitle2" 
-                        sx={{ fontWeight: notification.isRead ? 'normal' : 'medium' }}
-                        maxWidth="100%"
-                      />
-                      <Typography variant="caption" color="text.secondary">
-                        {formatDistanceToNow(new Date(notification.createdAt), {
-                          addSuffix: true,
-                          locale: ja
-                        })}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </MenuItem>
-                <Divider />
-              </div>
-            ))}
-          </>
-        )}
+                  </MenuItem>
+                  {index < notifications.length - 1 && <Divider />}
+                </div>
+              ))
+            )}
+          </MenuList>
+        </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5 }}>
+        <Divider />
+        
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 1.5, flexShrink: 0 }}>
           <Button 
             size="small" 
             onClick={markAllAsRead}
