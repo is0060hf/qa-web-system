@@ -34,6 +34,8 @@ import { ja } from 'date-fns/locale';
 import ThemeToggleButton from '../../../components/theme/ThemeToggleButton';
 // fetchData関数をインポート
 import { fetchData } from '@/lib/utils/fetchData';
+// TruncatedTextコンポーネントをインポート
+import TruncatedText from '@/components/common/TruncatedText';
 
 // 通知の種類
 enum NotificationType {
@@ -347,10 +349,13 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
                     <Box sx={{ mr: 1.5, mt: 0.5 }}>
                       {getNotificationIcon(notification.type)}
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: notification.isRead ? 'normal' : 'medium' }}>
-                        {notification.message}
-                      </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minWidth: 0 }}>
+                      <TruncatedText 
+                        text={notification.message}
+                        variant="subtitle2" 
+                        sx={{ fontWeight: notification.isRead ? 'normal' : 'medium' }}
+                        maxWidth="100%"
+                      />
                       <Typography variant="caption" color="text.secondary">
                         {formatDistanceToNow(new Date(notification.createdAt), {
                           addSuffix: true,
