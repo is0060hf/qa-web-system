@@ -4,9 +4,10 @@ import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { createProjectSchema } from '@/lib/validations/project';
 import { Role } from '@prisma/client';
+import { withLogging, logAuditEvent, logError } from '@/lib/utils/logger';
 
 // プロジェクト一覧を取得
-export async function GET(req: NextRequest) {
+const _GET = async (req: NextRequest) => {
   try {
     const user = getUserFromRequest(req);
     
@@ -90,16 +91,18 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(projects);
   } catch (error) {
-    console.error('プロジェクト一覧取得エラー:', error);
+    logError(error, { operation: 'GET_PROJECTS', userId: getUserFromRequest(req)?.id });
     return NextResponse.json(
       { error: 'プロジェクト一覧の取得に失敗しました' },
       { status: 500 }
     );
   }
-}
+};
+
+export const GET = withLogging(_GET);
 
 // 新規プロジェクト作成
-export async function POST(req: NextRequest) {
+const _POST = async (req: NextRequest) => {
   try {
     const user = getUserFromRequest(req);
     
@@ -160,12 +163,22 @@ export async function POST(req: NextRequest) {
       });
     });
 
+    // 監査ログ: プロジェクト作成成功
+    if (project) {
+      logAuditEvent('CREATE_PROJECT', user.id, 'Project', project.id, {
+        projectName: project.name,
+        description: project.description,
+      });
+    }
+
     return NextResponse.json(project, { status: 201 });
   } catch (error) {
-    console.error('プロジェクト作成エラー:', error);
+    logError(error, { operation: 'CREATE_PROJECT', userId: getUserFromRequest(req)?.id });
     return NextResponse.json(
       { error: 'プロジェクトの作成に失敗しました' },
       { status: 500 }
     );
   }
-} 
+};
+
+export const POST = withLogging(_POST); 

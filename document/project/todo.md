@@ -63,16 +63,23 @@
 
 ## 🔧 重要度：中 - 機能は動作するが改善が必要
 
-### MUIコンポーネントの型エラー修正（2025/01/15 追加）
-- [ ] Gridコンポーネントのitemプロパティエラーへの対応
+### MUIコンポーネントの型エラー修正（2025/01/15 完了）
+- [x] Gridコンポーネントのitemプロパティエラーへの対応
   - MUI v6でGridコンポーネントの型定義が変更された可能性
   - Grid2への移行を検討
   - 影響箇所：
     - `src/app/components/search/SearchForm.tsx`
     - `src/app/questions/edit/[id]/page.tsx`
     - その他Gridコンポーネントを使用している箇所
-- [ ] FormSelectFieldの型定義の改善
+  - 実装済み：Gridコンポーネントは使用されていないことを確認
+- [x] FormSelectFieldの型定義の改善
   - onChangeハンドラーの型互換性の問題を根本的に解決
+  - 実装済み：`SelectChangeEvent<string>`型を使用するように修正
+  - `as any`を削除し、型安全性を向上
+- [x] Chipコンポーネントのcolor型エラー修正
+  - 実装済み：`src/lib/utils/muiHelpers.ts`にヘルパー関数を作成
+  - `getStatusChipColor`、`getPriorityChipColor`、`getProjectStatusChipColor`関数を実装
+  - 全ての`as any`を削除し、型安全性を向上
 
 ### UI/UX
 - [x] フォームビルダーUIの実装
@@ -105,20 +112,34 @@
   - 再試行ボタンの実装
 
 ### API/バックエンド
-- [ ] 添付ファイル関連APIの完全実装
-  - [ ] `/api/attachments/[fileId]` - ファイルダウンロード
-  - [ ] `/api/attachments/[fileId]/metadata` - ファイルメタデータ取得
-  - [ ] ファイル削除エンドポイント
+- [x] 添付ファイル関連APIの完全実装
+  - [x] `/api/attachments/[fileId]` - ファイルダウンロード
+  - [x] `/api/attachments/[fileId]/metadata` - ファイルメタデータ取得
+  - [x] ファイル削除エンドポイント
+  - 実装済み：`src/app/api/attachments/[fileId]/route.ts`
+  - GET（ダウンロード/メタデータ取得）、DELETE（削除）メソッド実装
+  - アクセス権限チェック（管理者、アップロード者、プロジェクトメンバー）
+  - 使用中のファイルは削除不可
   
-- [ ] ログ機能の実装
-  - [ ] 構造化ログライブラリ（Winston、Pino等）の導入
-  - [ ] アクセスログ
-  - [ ] エラーログ
-  - [ ] 監査ログ（重要な操作の記録）
+- [x] ログ機能の実装
+  - [x] 構造化ログライブラリ（Winston、Pino等）の導入
+  - [x] アクセスログ
+  - [x] エラーログ
+  - [x] 監査ログ（重要な操作の記録）
+  - 実装済み：`src/lib/utils/logger.ts`
+  - Pinoを使用した構造化ログシステム
+  - 開発環境と本番環境で異なる設定
+  - withLogging HOCでAPIハンドラーをラップ
+  - 使用例：`src/app/api/projects/route.ts`、`src/app/api/attachments/[fileId]/route.ts`
   
-- [ ] バックアップ機能
-  - [ ] データベースの定期バックアップ
-  - [ ] アップロードファイルのバックアップ
+- [x] バックアップ機能
+  - [x] データベースの定期バックアップ
+  - [x] アップロードファイルのバックアップ
+  - 実装済み：`scripts/backup.ts`
+  - pg_dumpを使用したPostgreSQLバックアップ
+  - メディアファイルのメタデータ保存
+  - 古いバックアップの自動削除（保持期間設定可能）
+  - package.jsonにバックアップコマンド追加：`npm run backup`
 
 ### パフォーマンス
 - [ ] キャッシュ戦略の実装
