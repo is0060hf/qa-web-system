@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { Role } from '@prisma/client';
 
@@ -21,32 +20,22 @@ export function generateTestToken(
 
 /**
  * テスト用のNextRequestを作成
+ * グローバルモックのMockNextRequestを使用
  */
 export function createMockRequest(
   method: string = 'GET',
   url: string = 'https://example.com/api/test',
   headers: Record<string, string> = {},
   body?: any
-): NextRequest {
-  // ヘッダーの準備
-  const requestHeaders = new Headers();
-  Object.entries(headers).forEach(([key, value]) => {
-    requestHeaders.set(key, value);
-  });
-
-  // リクエストの作成
-  const request = new NextRequest(url, {
+): any {
+  // Mock implementation directly creates the object
+  const mockRequest = new (global as any).Request(url, {
     method,
-    headers: requestHeaders,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
   });
 
-  // リクエストをモック拡張
-  if (body) {
-    // @ts-ignore: NextRequestのjsonメソッドをモック
-    request.json = jest.fn().mockResolvedValue(body);
-  }
-
-  return request;
+  return mockRequest;
 }
 
 /**
@@ -59,7 +48,7 @@ export function createAuthenticatedRequest(
   email: string = 'test@example.com',
   role: string = Role.USER,
   body?: any
-): NextRequest {
+): any {
   const token = generateTestToken(userId, email, role);
 
   return createMockRequest(
@@ -76,31 +65,32 @@ export function createAuthenticatedRequest(
 }
 
 /**
- * NextResponseのjsonメソッドをモック
+ * NextResponseオブジェクトを作成するヘルパー
  */
-export function mockNextResponseJson() {
-  // NextResponse.jsonの元の実装を保存
-  const originalJsonMethod = NextResponse.json;
-  
-  // モック実装で置き換え
-  jest.spyOn(NextResponse, 'json').mockImplementation(
-    (body: any, init?: ResponseInit) => {
-      // 簡易的なNextResponseを返す
-      const response = originalJsonMethod(body, init);
-      
-      // status とbody を簡単に取得できるように拡張
-      Object.defineProperties(response, {
-        status: {
-          get: () => init?.status || 200,
-        },
-        body: {
-          get: () => body,
-        },
-      });
-      
-      return response;
+export function createMockResponse(data: any, status: number = 200, headers: Record<string, string> = {}) {
+  const mockResponse = new (global as any).Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'content-type': 'application/json',
+      ...headers
     }
-  );
+  });
+
+  return mockResponse;
+}
+
+/**
+ * NextResponse.jsonの結果をシミュレート
+ */
+export function expectJsonResponse(response: any, expectedData: any, expectedStatus: number = 200) {
+  expect(response.status).toBe(expectedStatus);
+  
+  // JSONレスポンスの内容をチェック
+  if (typeof response.body === 'string') {
+    expect(JSON.parse(response.body)).toEqual(expectedData);
+  } else {
+    expect(response.body).toEqual(expectedData);
+  }
 }
 
 /**

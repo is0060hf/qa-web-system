@@ -182,23 +182,27 @@
   - [ ] 負荷テストツールの導入
   - [ ] APIレスポンスタイムの測定
 
-- [ ] テスト環境の改善（2025/06/06 追加）
-  - [ ] NextRequestのモック方法の修正
-    - 現在の問題：`Cannot set property url of #<NextRequest> which has only a getter`
-    - 多くのAPIテストで発生（auth-login, auth-register, projects-create等）
-    - NextRequestの正しいモック方法の実装が必要
-  - [ ] TextDecoderのポリフィル追加
-    - 現在の問題：`ReferenceError: TextDecoder is not defined`
-    - media.test.tsで発生
-    - jest/setupTests.jsにTextDecoderのポリフィルを追加
-  - [ ] Prismaモックの拡張
-    - 現在の問題：`Cannot read properties of undefined (reading 'findMany')`
-    - prisma.projectTagのモックが不足
-    - 完全なPrismaモックオブジェクトの作成が必要
-  - [ ] ESモジュール対応
-    - 現在の問題：`Unexpected token 'export'` (joseライブラリ)
-    - middleware/auth.test.tsで発生
-    - Jest設定でESモジュールのトランスフォーム設定が必要
+- [x] テスト環境の改善（2025/06/06 追加）
+  - [x] NextRequestのモック方法の修正
+    - ~~現在の問題：`Cannot set property url of #<NextRequest> which has only a getter`~~
+    - ~~多くのAPIテストで発生（auth-login, auth-register, projects-create等）~~
+    - ~~NextRequestの正しいモック方法の実装が必要~~
+    - 解決済み：MockNextRequestクラスを作成し、すべてのgetterプロパティを適切に定義
+  - [x] TextDecoderのポリフィル追加
+    - ~~現在の問題：`ReferenceError: TextDecoder is not defined`~~
+    - ~~media.test.tsで発生~~
+    - ~~jest/setupTests.jsにTextDecoderのポリフィルを追加~~
+    - 解決済み：TextDecoderとTextEncoderのポリフィルを実装
+  - [x] Prismaモックの拡張
+    - ~~現在の問題：`Cannot read properties of undefined (reading 'findMany')`~~
+    - ~~prisma.projectTagのモックが不足~~
+    - ~~完全なPrismaモックオブジェクトの作成が必要~~
+    - 解決済み：すべての必要なモデル（projectTag、projectMember、passwordResetToken、thread）を追加
+  - [x] ESモジュール対応
+    - ~~現在の問題：`Unexpected token 'export'` (joseライブラリ)~~
+    - ~~middleware/auth.test.tsで発生~~
+    - ~~Jest設定でESモジュールのトランスフォーム設定が必要~~
+    - 解決済み：transformIgnorePatternsにjoseを追加、babel.config.jsを作成して適切な設定を実装
 
 ### 開発環境
 - [ ] Docker環境の整備
