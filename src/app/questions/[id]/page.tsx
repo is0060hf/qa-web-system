@@ -7,7 +7,6 @@ import {
   Typography,
   Chip,
   Paper,
-
   Button,
   Tabs,
   Tab,
@@ -32,6 +31,11 @@ import {
   Tooltip,
   CircularProgress,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -213,6 +217,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     question.assignee.id === user.id ||
     user.role === 'ADMIN'
   );
+  const isCreator = question && user && question.creator.id === user.id;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -281,6 +286,28 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
     }
   };
 
+  const handleStatusChange = async (event: SelectChangeEvent<string>) => {
+    if (!isCreator) return;
+
+    const newStatus = event.target.value;
+    setIsUpdatingStatus(true);
+    try {
+      await fetchData(`questions/${questionId}/status`, {
+        method: 'PATCH',
+        body: { status: newStatus },
+      });
+      
+      // データを再取得
+      refetch();
+      alert('ステータスを更新しました');
+    } catch (error) {
+      console.error('ステータス更新エラー:', error);
+      alert('ステータスの更新に失敗しました');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   // スレッドの取得
   const fetchThreads = async (answerId: string) => {
     try {
@@ -291,10 +318,33 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
         ...prev,
         [answerId]: response,
       }));
+      return response;
     } catch (error) {
       console.error('スレッド取得エラー:', error);
+      return [];
     }
   };
+
+  // 初期表示時に全ての回答のスレッドを取得し、コメントがある回答のアコーディオンを開く
+  useEffect(() => {
+    if (question?.answers) {
+      const fetchAllThreads = async () => {
+        const threadPromises = question.answers.map(async (answer) => {
+          const threads = await fetchThreads(answer.id);
+          return { answerId: answer.id, threads };
+        });
+        
+        const results = await Promise.all(threadPromises);
+        const firstAnswerWithComments = results.find(result => result.threads.length > 0);
+        
+        if (firstAnswerWithComments) {
+          setActiveAnswerId(firstAnswerWithComments.answerId);
+        }
+      };
+      
+      fetchAllThreads();
+    }
+  }, [question?.answers]);
 
   // 回答のスレッドを展開
   const toggleThreads = (answerId: string) => {
@@ -414,30 +464,50 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
             ))}
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          {question.answers.length > 0 && question.status === 'PENDING_APPROVAL' && canConfirm ? (
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<CheckCircleIcon />}
-              onClick={handleAcceptAnswer}
-              disabled={isUpdatingStatus}
-            >
-              回答を確認して完了にする
-            </Button>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          {isCreator ? (
+            <FormControl sx={{ minWidth: 180 }}>
+              <InputLabel>ステータス</InputLabel>
+              <Select
+                value={question.status}
+                label="ステータス"
+                onChange={handleStatusChange}
+                disabled={isUpdatingStatus}
+                size="small"
+              >
+                <MenuItem value="OPEN">新規</MenuItem>
+                <MenuItem value="IN_PROGRESS">回答中</MenuItem>
+                <MenuItem value="PENDING_APPROVAL">確認待ち</MenuItem>
+                <MenuItem value="CLOSED">完了</MenuItem>
+              </Select>
+            </FormControl>
           ) : (
-            <Button
-              variant="outlined"
-              startIcon={<ReplyIcon />}
-              onClick={() => router.push(`/questions/${questionId}/answer`)}
-              disabled={!canAnswer || question.status === 'CLOSED'}
-              title={
-                !canAnswer ? '担当者のみが回答できます' : 
-                question.status === 'CLOSED' ? '完了した質問には回答できません' : ''
-              }
-            >
-              回答する
-            </Button>
+            <>
+              {question.answers.length > 0 && question.status === 'PENDING_APPROVAL' && canConfirm ? (
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<CheckCircleIcon />}
+                  onClick={handleAcceptAnswer}
+                  disabled={isUpdatingStatus}
+                >
+                  回答を確認して完了にする
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  startIcon={<ReplyIcon />}
+                  onClick={() => router.push(`/questions/${questionId}/answer`)}
+                  disabled={!canAnswer || question.status === 'CLOSED'}
+                  title={
+                    !canAnswer ? '担当者のみが回答できます' : 
+                    question.status === 'CLOSED' ? '完了した質問には回答できません' : ''
+                  }
+                >
+                  回答する
+                </Button>
+              )}
+            </>
           )}
           <Button
             variant="outlined"
