@@ -57,6 +57,7 @@ import MarkdownViewer from '@/components/common/MarkdownViewer';
 import { useAuth } from '@/app/hooks/useAuth';
 import { getStatusChipColor } from '@/lib/utils/muiHelpers';
 import { getStatusLabel, getPriorityLabel } from '@/lib/utils/statusHelpers';
+import { useToast } from '@/hooks/useToast';
 
 // 実際のAPIレスポンスに合わせた型定義
 interface QuestionDetail {
@@ -186,6 +187,7 @@ interface Thread {
 export default function QuestionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { user } = useAuth();
+  const toast = useToast();
   
   // React.use() を使用して params をアンラップ
   const resolvedParams = use(params);
@@ -259,7 +261,7 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       setComment('');
     } catch (error) {
       console.error('コメント投稿エラー:', error);
-      alert('コメントの投稿に失敗しました');
+      toast.showError('コメントの投稿に失敗しました');
     } finally {
       setIsSubmittingComment(false);
     }
@@ -277,10 +279,10 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       
       // データを再取得
       refetch();
-      alert('質問を完了としてマークしました');
+      toast.showSuccess('質問を完了としてマークしました');
     } catch (error) {
       console.error('ステータス更新エラー:', error);
-      alert('ステータスの更新に失敗しました');
+      toast.showError('ステータスの更新に失敗しました');
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -299,10 +301,10 @@ export default function QuestionDetailPage({ params }: { params: Promise<{ id: s
       
       // データを再取得
       refetch();
-      alert('ステータスを更新しました');
+      toast.showSuccess('ステータスを更新しました');
     } catch (error) {
       console.error('ステータス更新エラー:', error);
-      alert('ステータスの更新に失敗しました');
+      toast.showError('ステータスの更新に失敗しました');
     } finally {
       setIsUpdatingStatus(false);
     }

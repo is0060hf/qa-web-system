@@ -55,6 +55,7 @@ import ProjectForm from '../../components/projects/ProjectForm';
 import { useProjectStore } from '../../stores/projectStore';
 import { getProjectStatusChipColor, getStatusChipColor } from '@/lib/utils/muiHelpers';
 import { getStatusLabel, getPriorityLabel, calculateQuestionUrgency, getUrgencyColor } from '@/lib/utils/statusHelpers';
+import { useToast } from '@/hooks/useToast';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -132,6 +133,7 @@ interface User {
 // params の型を Promise として定義
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const toast = useToast();
   
   // React.use() を使用して params をアンラップ
   const resolvedParams = use(params);
@@ -289,7 +291,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         setOpenInviteDialog(false);
         
         // サクセスメッセージ
-        alert('招待メールを送信しました');
+        toast.showSuccess('招待メールを送信しました');
       } else {
         // 既存ユーザー選択による招待
         if (!selectedUser) {
@@ -303,7 +305,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         setOpenInviteDialog(false);
         
         // サクセスメッセージ
-        alert(`${selectedUser.name || selectedUser.email}をプロジェクトメンバーとして追加しました`);
+        toast.showSuccess(`${selectedUser.name || selectedUser.email}をプロジェクトメンバーとして追加しました`);
         
         // プロジェクト情報（メンバーリスト）を再取得して更新
         fetchProjectData();

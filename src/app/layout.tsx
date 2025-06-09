@@ -5,6 +5,7 @@ import AuthProvider from './auth-provider';
 import { AccessibilityProvider } from '../components/providers/AccessibilityProvider';
 import ThemeRegistry from '../components/providers/ThemeRegistry';
 import { SecurityProvider } from '../components/providers/SecurityProvider';
+import ToastProvider from '../components/providers/ToastProvider';
 
 // フォント設定
 const inter = Inter({
@@ -42,13 +43,15 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <ThemeRegistry>
-            <SecurityProvider>
-              <AccessibilityProvider>
-                <main id="main-content">
-                  {children}
-                </main>
-              </AccessibilityProvider>
-            </SecurityProvider>
+            <ToastProvider>
+              <SecurityProvider>
+                <AccessibilityProvider>
+                  <main id="main-content">
+                    {children}
+                  </main>
+                </AccessibilityProvider>
+              </SecurityProvider>
+            </ToastProvider>
           </ThemeRegistry>
         </AuthProvider>
       </body>

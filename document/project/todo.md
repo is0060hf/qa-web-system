@@ -256,6 +256,21 @@
     - 未ログインの場合の動作
     - 権限エラー画面の表示確認
 
+### トースト通知システムの改善（2025/01/17 完了）
+- [x] ブラウザデフォルトalert()の置き換え
+  - Material-UIのSnackbarを使用したトースト通知システムを実装
+  - `src/components/common/Toast.tsx`にトーストコンポーネント作成
+  - `src/components/providers/ToastProvider.tsx`にコンテキストプロバイダー作成
+  - `src/hooks/useToast.ts`にカスタムフック作成
+  - 4種類のトーストタイプ（success、error、warning、info）をサポート
+  - 複数トーストの同時表示と自動削除機能
+  - 右下からのスライドアニメーション
+  - 全ページ共通で使用可能な再利用可能コンポーネント
+- [x] 既存のalert()をトースト通知に置き換え
+  - 質問詳細画面のステータス更新とコメント投稿
+  - プロジェクト詳細画面のメンバー招待
+  - ToastProviderをrootレイアウトに追加
+
 - [ ] 認証・セキュリティの改善（2025/01/17 Claudeレビューより）
   - [ ] JWTリフレッシュトークンの完全実装
     - /api/auth/refreshエンドポイントの実装
