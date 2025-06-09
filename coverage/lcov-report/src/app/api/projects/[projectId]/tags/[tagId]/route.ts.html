@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -353,20 +353,20 @@ import { canManageProject } from '@/lib/utils/auth';
 // プロジェクトタグ削除
 export async function <span class="fstat-no" title="function not covered" >DELETE(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string; tagId: string } }
+  { params }: { params: Promise&lt;{ projectId: string; tagId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { projectId, tagId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { projectId, tagId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -378,7 +378,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!tag) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'タグが見つかりません' },
         { status: 404 }
@@ -386,7 +386,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // タグが正しいプロジェクトに属しているか確認
-<span class="cstat-no" title="statement not covered" >    if (tag.projectId !== projectId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (tag.projectId !== projectId) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このプロジェクトに属するタグではありません' },
         { status: 403 }
@@ -394,7 +394,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // タグを使用している質問の数を確認
-<span class="cstat-no" title="statement not covered" >    if (tag.questions.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (tag.questions.length &gt; 0) {</span>
       // タグを使用している質問がある場合、警告メッセージを返す
       // クライアント側でこの警告に対して確認を求めることができる
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
@@ -428,20 +428,20 @@ export async function <span class="fstat-no" title="function not covered" >DELET
 // 関連質問も含めてタグを強制削除するAPI
 export async function <span class="fstat-no" title="function not covered" >POST(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string; tagId: string } }
+  { params }: { params: Promise&lt;{ projectId: string; tagId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { projectId, tagId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { projectId, tagId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -450,7 +450,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       where: { id: tagId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!tag) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!tag) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'タグが見つかりません' },
         { status: 404 }
@@ -458,7 +458,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // タグが正しいプロジェクトに属しているか確認
-<span class="cstat-no" title="statement not covered" >    if (tag.projectId !== projectId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (tag.projectId !== projectId) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このプロジェクトに属するタグではありません' },
         { status: 403 }
@@ -493,7 +493,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../../../prettify.js"></script>
         <script>

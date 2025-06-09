@@ -462,8 +462,8 @@
 <a name='L397'></a><a href='#L397'>397</a>
 <a name='L398'></a><a href='#L398'>398</a>
 <a name='L399'></a><a href='#L399'>399</a>
-<a name='L400'></a><a href='#L400'>400</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L400'></a><a href='#L400'>400</a>
+<a name='L401'></a><a href='#L401'>401</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -648,6 +648,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -815,9 +818,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -865,7 +867,6 @@
 &nbsp;
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Grid,
   Paper,
   Typography,
   Box,
@@ -993,46 +994,49 @@ export default function <span class="fstat-no" title="function not covered" >Das
         &lt;/Typography&gt;
       &lt;/Box&gt;
 &nbsp;
-      &lt;Grid container spacing={3}&gt;
+      &lt;Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 3 }}&gt;
         {/* 統計カード */}
-        &lt;Grid size={{ xs: 12, sm: 6, md: 3 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}&gt;
           &lt;StatCard 
             title="割り当て質問"
             value={stats.assignedQuestions}
             description={`回答が必要な質問: ${stats.assignedQuestions}件`}
             bgcolor="primary.light"
           /&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
         
-        &lt;Grid size={{ xs: 12, sm: 6, md: 3 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}&gt;
           &lt;StatCard 
             title="完了質問"
             value={stats.completedQuestions}
             description={`これまでに回答した質問: ${stats.completedQuestions}件`}
             bgcolor="success.light"
           /&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
         
-        &lt;Grid size={{ xs: 12, sm: 6, md: 3 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}&gt;
           &lt;StatCard 
             title="期限間近"
             value={stats.nearDeadlineQuestions}
             description={`期限が3日以内の質問: ${stats.nearDeadlineQuestions}件`}
             bgcolor="warning.light"
           /&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
         
-        &lt;Grid size={{ xs: 12, sm: 6, md: 3 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' } }}&gt;
           &lt;StatCard 
             title="期限超過"
             value={stats.overdueQuestions}
             description={`期限を過ぎた質問: ${stats.overdueQuestions}件`}
             bgcolor="error.light"
           /&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
 &nbsp;
+      &lt;/Box&gt;
+&nbsp;
+      &lt;Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mb: 3 }}&gt;
         {/* 担当質問 */}
-        &lt;Grid size={{ xs: 12, md: 6 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}&gt;
           &lt;Card elevation={0} sx={{ borderRadius: 2 }}&gt;
             &lt;CardHeader 
               title="担当質問" 
@@ -1110,10 +1114,10 @@ export default function <span class="fstat-no" title="function not covered" >Das
               )}
             &lt;/CardContent&gt;
           &lt;/Card&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
 &nbsp;
         {/* 作成質問 */}
-        &lt;Grid size={{ xs: 12, md: 6 }}&gt;
+        &lt;Box sx={{ width: { xs: '100%', md: 'calc(50% - 12px)' } }}&gt;
           &lt;Card elevation={0} sx={{ borderRadius: 2 }}&gt;
             &lt;CardHeader 
               title="作成質問" 
@@ -1197,67 +1201,66 @@ export default function <span class="fstat-no" title="function not covered" >Das
               )}
             &lt;/CardContent&gt;
           &lt;/Card&gt;
-        &lt;/Grid&gt;
+        &lt;/Box&gt;
+      &lt;/Box&gt;
 &nbsp;
-        {/* 最近のプロジェクト */}
-        &lt;Grid size={12}&gt;
-          &lt;Card elevation={0} sx={{ borderRadius: 2 }}&gt;
-            &lt;CardHeader 
-              title="最近のプロジェクト" 
-              action={
-                &lt;Button href="/projects" variant="text" color="primary"&gt;
-                  すべて見る
-                &lt;/Button&gt;
-              }
-            /&gt;
-            &lt;Divider /&gt;
-            {recentProjects.length &gt; 0 ? (
-              &lt;Grid container sx={{ p: 2 }}&gt;
-                {recentProjects.map(<span class="fstat-no" title="function not covered" >(p</span>roject) =&gt; (
-<span class="cstat-no" title="statement not covered" >                  &lt;Grid key={project.id} size={{ xs: 12, sm: 6, md: 4 }}&gt;</span>
-                    &lt;Paper 
-                      elevation={0} 
-                      sx={{ 
-                        m: 1, 
-                        p: 2, 
-                        borderRadius: 2, 
-                        border: '1px solid', 
-                        borderColor: 'divider',
-                        transition: 'all 0.3s',
-                        '&amp;:hover': {
-                          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-                          borderColor: 'primary.main',
-                        }
-                      }}
-                      component="a"
-                      href={`/projects/${project.id}`}
-                      style={{ textDecoration: 'none', display: 'block' }}
-                    &gt;
-                      &lt;Typography variant="h6" gutterBottom&gt;
-                        {project.name}
+      {/* 最近のプロジェクト */}
+      &lt;Box sx={{ mb: 3 }}&gt;
+        &lt;Card elevation={0} sx={{ borderRadius: 2 }}&gt;
+          &lt;CardHeader 
+            title="最近のプロジェクト" 
+            action={
+              &lt;Button href="/projects" variant="text" color="primary"&gt;
+                すべて見る
+              &lt;/Button&gt;
+            }
+          /&gt;
+          &lt;Divider /&gt;
+          {recentProjects.length &gt; 0 ? (
+            &lt;Box sx={{ display: 'flex', flexWrap: 'wrap', p: 2 }}&gt;
+              {recentProjects.map(<span class="fstat-no" title="function not covered" >(p</span>roject) =&gt; (
+<span class="cstat-no" title="statement not covered" >                &lt;Box key={project.id} sx={{ width: { xs: '100%', sm: '50%', md: '33.333%' }, p: 1 }}&gt;</span>
+                  &lt;Paper 
+                    elevation={0} 
+                    sx={{ 
+                      p: 2, 
+                      borderRadius: 2, 
+                      border: '1px solid', 
+                      borderColor: 'divider',
+                      transition: 'all 0.3s',
+                      '&amp;:hover': {
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                        borderColor: 'primary.main',
+                      }
+                    }}
+                    component="a"
+                    href={`/projects/${project.id}`}
+                    style={{ textDecoration: 'none', display: 'block' }}
+                  &gt;
+                    &lt;Typography variant="h6" gutterBottom&gt;
+                      {project.name}
+                    &lt;/Typography&gt;
+                    &lt;Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}&gt;
+                      &lt;Typography variant="body2" color="text.secondary"&gt;
+                        質問: {project.questionsCount}
                       &lt;/Typography&gt;
-                      &lt;Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}&gt;
-                        &lt;Typography variant="body2" color="text.secondary"&gt;
-                          質問: {project.questionsCount}
-                        &lt;/Typography&gt;
-                        &lt;Typography variant="body2" color="text.secondary"&gt;
-                          回答: {project.answersCount}
-                        &lt;/Typography&gt;
-                      &lt;/Box&gt;
-                    &lt;/Paper&gt;
-                  &lt;/Grid&gt;
-                ))}
-              &lt;/Grid&gt;
-            ) : (
-              &lt;Box sx={{ p: 3, textAlign: 'center' }}&gt;
-                &lt;Typography variant="body1" color="text.secondary"&gt;
-                  最近のプロジェクトはありません
-                &lt;/Typography&gt;
-              &lt;/Box&gt;
-            )}
-          &lt;/Card&gt;
-        &lt;/Grid&gt;
-      &lt;/Grid&gt;
+                      &lt;Typography variant="body2" color="text.secondary"&gt;
+                        回答: {project.answersCount}
+                      &lt;/Typography&gt;
+                    &lt;/Box&gt;
+                  &lt;/Paper&gt;
+                &lt;/Box&gt;
+              ))}
+            &lt;/Box&gt;
+          ) : (
+            &lt;Box sx={{ p: 3, textAlign: 'center' }}&gt;
+              &lt;Typography variant="body1" color="text.secondary"&gt;
+                最近のプロジェクトはありません
+              &lt;/Typography&gt;
+            &lt;/Box&gt;
+          )}
+        &lt;/Card&gt;
+      &lt;/Box&gt;
     &lt;/DashboardLayout&gt;
   );
 } </pre></td></tr></table></pre>
@@ -1267,7 +1270,7 @@ export default function <span class="fstat-no" title="function not covered" >Das
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:15:41.060Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

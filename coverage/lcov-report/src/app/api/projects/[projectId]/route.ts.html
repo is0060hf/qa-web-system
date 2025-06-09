@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
@@ -227,7 +227,11 @@
 <a name='L162'></a><a href='#L162'>162</a>
 <a name='L163'></a><a href='#L163'>163</a>
 <a name='L164'></a><a href='#L164'>164</a>
-<a name='L165'></a><a href='#L165'>165</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -263,6 +267,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -392,7 +400,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { validateRequest } from '@/lib/utils/api';
 import { updateProjectSchema } from '@/lib/validations/project';
@@ -401,20 +409,20 @@ import { canAccessProject, canManageProject } from '@/lib/utils/auth';
 // プロジェクト詳細取得
 export async function <span class="fstat-no" title="function not covered" >GET(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise&lt;{ projectId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const projectId = <span class="cstat-no" title="statement not covered" >(await params).projectId;</span>
+    const { projectId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -432,7 +440,11 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
       userName: member.user.name || null,
       userEmail: member.user.email,
       role: member.role,
-      joinedAt: member.createdAt
+      joinedAt: member.createdAt,
+      profileImage: member.user.profileImage ? {
+        id: member.user.profileImage.id,
+        storageUrl: member.user.profileImage.storageUrl
+      } : null
     }));
 &nbsp;
     // プロジェクトの質問情報も取得
@@ -466,26 +478,26 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 // プロジェクト更新
 export async function <span class="fstat-no" title="function not covered" >PATCH(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise&lt;{ projectId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const projectId = <span class="cstat-no" title="statement not covered" >(await params).projectId;</span>
+    const { projectId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // リクエストデータのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, updateProjectSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -522,20 +534,20 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 // プロジェクト削除
 export async function <span class="fstat-no" title="function not covered" >DELETE(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise&lt;{ projectId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const projectId = <span class="cstat-no" title="statement not covered" >(await params).projectId;</span>
+    const { projectId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -562,7 +574,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

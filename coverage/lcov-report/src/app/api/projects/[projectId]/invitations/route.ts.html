@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/31</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
@@ -705,7 +705,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -713,7 +713,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     
     // プロジェクトへのアクセス権をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -759,7 +759,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -767,13 +767,13 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // リクエストデータのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, inviteToProjectSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -790,7 +790,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       });
 &nbsp;
       // 既にプロジェクトメンバーか確認
-<span class="cstat-no" title="statement not covered" >      if (existingUser) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (existingUser) {</span>
         const isAlreadyMember = <span class="cstat-no" title="statement not covered" >await prisma.projectMember.findUnique({</span>
           where: {
             projectId_userId: {
@@ -800,7 +800,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
           }
         });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (isAlreadyMember) {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (isAlreadyMember) {</span>
 <span class="cstat-no" title="statement not covered" >          return NextResponse.json(</span>
             { error: 'このユーザーは既にプロジェクトメンバーです' },
             { status: 409 }
@@ -817,7 +817,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (existingInvitation) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (existingInvitation) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'このメールアドレスは既に招待されています' },
           { status: 409 }
@@ -887,7 +887,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         select: { id: true, email: true, name: true }
       });
       
-<span class="cstat-no" title="statement not covered" >      if (!targetUser) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!targetUser) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '指定されたユーザーが見つかりません' },
           { status: 404 }
@@ -904,7 +904,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         }
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (isAlreadyMember) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (isAlreadyMember) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'このユーザーは既にプロジェクトメンバーです' },
           { status: 409 }
@@ -920,7 +920,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (existingInvitation) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (existingInvitation) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'このユーザーは既に招待されています' },
           { status: 409 }
@@ -1006,7 +1006,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../../prettify.js"></script>
         <script>

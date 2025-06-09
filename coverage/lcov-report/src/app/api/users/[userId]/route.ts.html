@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/24</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
@@ -446,7 +446,7 @@ import { z } from 'zod';
 const updateUserSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   name: z.string().max(100, '名前は100文字以内で入力してください').optional(),
   role: z.enum(['USER', 'ADMIN'], {
-    errorMap: <span class="fstat-no" title="function not covered" >()</span> =&gt; (<span class="cstat-no" title="statement not covered" >{ message: '役割は USER または ADMIN である必要があります' })</span>,
+    errorMap: <span class="fstat-no" title="function not covered" >() =</span>&gt; (<span class="cstat-no" title="statement not covered" >{ message: '役割は USER または ADMIN である必要があります' })</span>,
   }).optional(),
 });
 &nbsp;
@@ -455,19 +455,19 @@ const updateUserSchema = <span class="cstat-no" title="statement not covered" >z
  */
 export async function <span class="fstat-no" title="function not covered" >PATCH(</span>
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise&lt;{ userId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // 管理者権限チェック
     const isAdmin = <span class="cstat-no" title="statement not covered" >isAdminRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!isAdmin) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '管理者権限が必要です' },
         { status: 403 }
       );
     }
 &nbsp;
-    const { userId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { userId } = <span class="cstat-no" title="statement not covered" >await params;</span>
 &nbsp;
     // リクエストデータの解析
     let body;
@@ -485,7 +485,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      data = updateUserSchema.parse(body);</span>
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      if (error instanceof z.ZodError) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (error instanceof z.ZodError) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'バリデーションエラー', details: error.errors },
           { status: 400 }
@@ -495,7 +495,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     }
 &nbsp;
     // 更新するデータがない場合
-<span class="cstat-no" title="statement not covered" >    if (Object.keys(data).length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (Object.keys(data).length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '更新するデータがありません' },
         { status: 400 }
@@ -507,7 +507,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       where: { id: userId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingUser) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingUser) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
@@ -515,12 +515,12 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     }
 &nbsp;
     // 最終管理者の役割変更を防止
-<span class="cstat-no" title="statement not covered" >    if (data.role === 'USER' &amp;&amp; existingUser.role === 'ADMIN') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (data.role === 'USER' &amp;&amp; existingUser.role === 'ADMIN') {</span>
       const adminCount = <span class="cstat-no" title="statement not covered" >await prisma.user.count({</span>
         where: { role: 'ADMIN' },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (adminCount &lt;= 1) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (adminCount &lt;= 1) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '最後の管理者の役割を変更することはできません' },
           { status: 400 }
@@ -560,23 +560,23 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
  */
 export async function <span class="fstat-no" title="function not covered" >DELETE(</span>
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise&lt;{ userId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // 管理者権限チェック
     const isAdmin = <span class="cstat-no" title="statement not covered" >isAdminRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!isAdmin) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '管理者権限が必要です' },
         { status: 403 }
       );
     }
 &nbsp;
-    const { userId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { userId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     const currentUser = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
     // 自分自身の削除を防止
-<span class="cstat-no" title="statement not covered" >    if (currentUser?.id === userId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (currentUser?.id === userId) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '自分自身を削除することはできません' },
         { status: 400 }
@@ -588,7 +588,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
       where: { id: userId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingUser) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingUser) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
@@ -596,12 +596,12 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // 最終管理者の削除を防止
-<span class="cstat-no" title="statement not covered" >    if (existingUser.role === 'ADMIN') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingUser.role === 'ADMIN') {</span>
       const adminCount = <span class="cstat-no" title="statement not covered" >await prisma.user.count({</span>
         where: { role: 'ADMIN' },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (adminCount &lt;= 1) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (adminCount &lt;= 1) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '最後の管理者を削除することはできません' },
           { status: 400 }
@@ -631,7 +631,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

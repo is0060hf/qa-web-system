@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/193</span>
+                <span class='fraction'>0/195</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/152</span>
+                <span class='fraction'>0/115</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/19</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/180</span>
+                <span class='fraction'>0/182</span>
             </div>
         
             
@@ -618,7 +618,15 @@
 <a name='L553'></a><a href='#L553'>553</a>
 <a name='L554'></a><a href='#L554'>554</a>
 <a name='L555'></a><a href='#L555'>555</a>
-<a name='L556'></a><a href='#L556'>556</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L556'></a><a href='#L556'>556</a>
+<a name='L557'></a><a href='#L557'>557</a>
+<a name='L558'></a><a href='#L558'>558</a>
+<a name='L559'></a><a href='#L559'>559</a>
+<a name='L560'></a><a href='#L560'>560</a>
+<a name='L561'></a><a href='#L561'>561</a>
+<a name='L562'></a><a href='#L562'>562</a>
+<a name='L563'></a><a href='#L563'>563</a>
+<a name='L564'></a><a href='#L564'>564</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1173,6 +1181,14 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React from 'react';
 &nbsp;
 // 直接モックデータファイルを参照せず、型だけをインポート
@@ -1309,7 +1325,7 @@ interface AuthModule {
 }
 &nbsp;
 // 実際のデータモジュールを動的にインポート
-const getDataModule = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (moduleName: string): Promise&lt;any&gt; =&gt; {</span>
+const getDataModule = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>(moduleName: string): Promise&lt;any&gt; =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  try {</span>
 <span class="cstat-no" title="statement not covered" >    switch (moduleName) {</span>
       case 'questions':
@@ -1345,7 +1361,7 @@ type FetchOptions = {
  * データソースの種類を判断する関数
  * NEXT_PUBLIC_DATA_SOURCE=mock の場合はモックデータを使用
  */
-const shouldUseMockData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span>: boolean =&gt; {</span>
+const shouldUseMockData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(): boolean =</span>&gt; {</span>
   // 環境変数をログ出力（デバッグ用）
 <span class="cstat-no" title="statement not covered" >  console.log('NODE_ENV:', process.env.NODE_ENV);</span>
 <span class="cstat-no" title="statement not covered" >  console.log('NEXT_PUBLIC_DATA_SOURCE:', process.env.NEXT_PUBLIC_DATA_SOURCE);</span>
@@ -1359,9 +1375,9 @@ const shouldUseMockData = <span class="cstat-no" title="statement not covered" >
  * テスト環境またはデータソース設定がmockの場合はモックデータを、
  * それ以外の環境では実際のAPIを使用
  */
-export const fetchData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync &lt;T&gt;(endpoint: EndpointType, options: FetchOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span>: Promise&lt;T&gt; =&gt; {</span>
+export const fetchData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>&lt;T&gt;(endpoint: EndpointType, options: FetchOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span>: Promise&lt;T&gt; =&gt; {</span>
   // 環境変数を確認
-<span class="cstat-no" title="statement not covered" >  if (shouldUseMockData()) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (shouldUseMockData()) {</span>
 <span class="cstat-no" title="statement not covered" >    return getMockData(endpoint, options) as T;</span>
   }
   
@@ -1374,7 +1390,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
   // クエリパラメータの構築
   const queryParams = <span class="cstat-no" title="statement not covered" >new URLSearchParams();</span>
 <span class="cstat-no" title="statement not covered" >  Object.entries(params).forEach(<span class="fstat-no" title="function not covered" >([</span>key, value]) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (value) <span class="cstat-no" title="statement not covered" >queryParams.append(key, value);</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (value) <span class="cstat-no" title="statement not covered" >queryParams.append(key, value);</span></span>
   });
   
   const queryString = <span class="cstat-no" title="statement not covered" >queryParams.toString() ? `?${queryParams.toString()}` : '';</span>
@@ -1384,7 +1400,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
   const authHeaders: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
   
   // authStoreからトークンを取得
-<span class="cstat-no" title="statement not covered" >  if (typeof window !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof window !== 'undefined') {</span>
     const authStorage = <span class="cstat-no" title="statement not covered" >localStorage.getItem('auth-storage');</span>
 <span class="cstat-no" title="statement not covered" >    if (authStorage) {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
@@ -1404,10 +1420,10 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
     }
     
     // CSRFトークンをCookieから取得（存在する場合）
-<span class="cstat-no" title="statement not covered" >    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {</span>
       const csrfToken = <span class="cstat-no" title="statement not covered" >document.cookie</span>
         .split('; ')
-        .find(<span class="fstat-no" title="function not covered" >ro</span>w =&gt; <span class="cstat-no" title="statement not covered" >row.startsWith('csrf-token='))</span>
+        .find(<span class="fstat-no" title="function not covered" >row </span>=&gt; <span class="cstat-no" title="statement not covered" >row.startsWith('csrf-token='))</span>
         ?.split('=')[1];
       
 <span class="cstat-no" title="statement not covered" >      if (csrfToken) {</span>
@@ -1427,7 +1443,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
   };
   
   // FormDataでない場合のみContent-Typeを設定
-<span class="cstat-no" title="statement not covered" >  if (!isFormData &amp;&amp; !headers['Content-Type']) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!isFormData &amp;&amp; !headers['Content-Type']) {</span>
 <span class="cstat-no" title="statement not covered" >    requestHeaders['Content-Type'] = 'application/json';</span>
   }
   
@@ -1447,7 +1463,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
   const response = <span class="cstat-no" title="statement not covered" >await fetch(url, requestOptions);</span>
 <span class="cstat-no" title="statement not covered" >  console.log(`[fetchData] Response status: ${response.status}`);</span>
   
-<span class="cstat-no" title="statement not covered" >  if (!response.ok) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!response.ok) {</span>
     let errorData;
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      errorData = await response.json();</span>
@@ -1459,7 +1475,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
 <span class="cstat-no" title="statement not covered" >    console.error(`[fetchData] Response headers:`, response.headers);</span>
     
     // 認証エラー（401）の場合、ログインページにリダイレクト
-<span class="cstat-no" title="statement not covered" >    if (response.status === 401 &amp;&amp; typeof window !== 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (response.status === 401 &amp;&amp; typeof window !== 'undefined') {</span>
       // 現在のURLをリダイレクト先として保存（戻れるようにするため）
       const currentPath = <span class="cstat-no" title="statement not covered" >window.location.pathname;</span>
       const redirectUrl = <span class="cstat-no" title="statement not covered" >`/login?reason=unauthorized&amp;redirect=${encodeURIComponent(currentPath)}`;</span>
@@ -1489,7 +1505,7 @@ export const fetchData = <span class="cstat-no" title="statement not covered" ><
 /**
  * モックデータ取得関数
  */
-const getMockData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (endpoint: EndpointType, options: FetchOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span>: Promise&lt;unknown&gt; =&gt; {</span>
+const getMockData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>(endpoint: EndpointType, options: FetchOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span>: Promise&lt;unknown&gt; =&gt; {</span>
   const { method = <span class="branch-0 cbranch-no" title="branch not covered" >'GET',</span> body, params = <span class="branch-0 cbranch-no" title="branch not covered" >{} </span>} = <span class="cstat-no" title="statement not covered" >options;</span>
   
   // URLからIDを抽出 (例: 'questions/123' → '123')
@@ -1499,54 +1515,54 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
   };
 &nbsp;
   // モックデータの取得
-<span class="cstat-no" title="statement not covered" >  if (endpoint.startsWith('questions')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.startsWith('questions')) {</span>
     const questionsModule = <span class="cstat-no" title="statement not covered" >await getDataModule('questions') as QuestionsModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!questionsModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!questionsModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
     
     const { mockQuestions } = <span class="cstat-no" title="statement not covered" >questionsModule;</span>
     
     const id = <span class="cstat-no" title="statement not covered" >extractId(endpoint);</span>
-<span class="cstat-no" title="statement not covered" >    if (id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (id) {</span>
       // 特定の質問の詳細を返す
 <span class="cstat-no" title="statement not covered" >      return mockQuestions.find(<span class="fstat-no" title="function not covered" >(q</span>: MockQuestion) =&gt; <span class="cstat-no" title="statement not covered" >q.id === id)</span> || null;</span>
     }
     
     // フィルタリング処理
     let filteredQuestions = <span class="cstat-no" title="statement not covered" >[...mockQuestions];</span>
-<span class="cstat-no" title="statement not covered" >    if (params.status &amp;&amp; params.status !== '全て') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (params.status &amp;&amp; params.status !== '全て') {</span>
 <span class="cstat-no" title="statement not covered" >      filteredQuestions = filteredQuestions.filter(<span class="fstat-no" title="function not covered" >(q</span>: MockQuestion) =&gt; <span class="cstat-no" title="statement not covered" >q.status === params.status)</span>;</span>
     }
-<span class="cstat-no" title="statement not covered" >    if (params.project &amp;&amp; params.project !== '全て') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (params.project &amp;&amp; params.project !== '全て') {</span>
 <span class="cstat-no" title="statement not covered" >      filteredQuestions = filteredQuestions.filter(<span class="fstat-no" title="function not covered" >(q</span>: MockQuestion) =&gt; <span class="cstat-no" title="statement not covered" >q.project === params.project)</span>;</span>
     }
     
 <span class="cstat-no" title="statement not covered" >    return filteredQuestions;</span>
   }
   
-<span class="cstat-no" title="statement not covered" >  if (endpoint.startsWith('projects')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.startsWith('projects')) {</span>
     const projectsModule = <span class="cstat-no" title="statement not covered" >await getDataModule('projects') as ProjectsModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!projectsModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!projectsModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
     
     const { mockProjects } = <span class="cstat-no" title="statement not covered" >projectsModule;</span>
     
     const id = <span class="cstat-no" title="statement not covered" >extractId(endpoint);</span>
-<span class="cstat-no" title="statement not covered" >    if (id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (id) {</span>
       // 特定のプロジェクトの詳細を返す
 <span class="cstat-no" title="statement not covered" >      return mockProjects.find(<span class="fstat-no" title="function not covered" >(p</span>: MockProject) =&gt; <span class="cstat-no" title="statement not covered" >p.id === id)</span> || null;</span>
     }
     
     // フィルタリング処理
     let filteredProjects = <span class="cstat-no" title="statement not covered" >[...mockProjects];</span>
-<span class="cstat-no" title="statement not covered" >    if (params.status &amp;&amp; params.status !== '全て') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (params.status &amp;&amp; params.status !== '全て') {</span>
 <span class="cstat-no" title="statement not covered" >      filteredProjects = filteredProjects.filter(<span class="fstat-no" title="function not covered" >(p</span>: MockProject) =&gt; <span class="cstat-no" title="statement not covered" >p.status === params.status)</span>;</span>
     }
     
 <span class="cstat-no" title="statement not covered" >    return filteredProjects;</span>
   }
   
-<span class="cstat-no" title="statement not covered" >  if (endpoint === 'dashboard') {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'dashboard') {</span>
     const dashboardModule = <span class="cstat-no" title="statement not covered" >await getDataModule('dashboard') as DashboardModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!dashboardModule) <span class="cstat-no" title="statement not covered" >return {</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!dashboardModule) <span class="cstat-no" title="statement not covered" >return {</span></span>
       stats: { assignedQuestions: 0, completedQuestions: 0, nearDeadlineQuestions: 0, overdueQuestions: 0 },
       assignedQuestions: [],
       createdQuestions: [],
@@ -1556,15 +1572,15 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
 <span class="cstat-no" title="statement not covered" >    return dashboardModule.mockDashboardData;</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (endpoint.startsWith('users')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.startsWith('users')) {</span>
     const usersModule = <span class="cstat-no" title="statement not covered" >await getDataModule('users') as UsersModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!usersModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!usersModule) <span class="cstat-no" title="statement not covered" >return [];</span></span>
     
     const { mockUsers, mockMe, mockUserProjects } = <span class="cstat-no" title="statement not covered" >usersModule;</span>
     
     // 認証中のユーザー情報
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'users/me') {</span>
-<span class="cstat-no" title="statement not covered" >      if (method === 'PATCH' &amp;&amp; body) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'users/me') {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (method === 'PATCH' &amp;&amp; body) {</span>
         // ユーザー情報更新
 <span class="cstat-no" title="statement not covered" >        return { ...mockMe, ...body, success: true };</span>
       }
@@ -1572,7 +1588,7 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
     }
     
     // ユーザーのプロジェクト一覧
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'users/me/projects') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'users/me/projects') {</span>
 <span class="cstat-no" title="statement not covered" >      return mockUserProjects;</span>
     }
     
@@ -1580,14 +1596,14 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
 <span class="cstat-no" title="statement not covered" >    return mockUsers;</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (endpoint.startsWith('notifications')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.startsWith('notifications')) {</span>
     const notificationsModule = <span class="cstat-no" title="statement not covered" >await getDataModule('notifications') as NotificationsModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!notificationsModule) <span class="cstat-no" title="statement not covered" >return { notifications: [], unreadCount: 0, total: 0, page: 1, limit: 10 };</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!notificationsModule) <span class="cstat-no" title="statement not covered" >return { notifications: [], unreadCount: 0, total: 0, page: 1, limit: 10 };</span></span>
     
     const { mockNotifications, getNotificationsResponse } = <span class="cstat-no" title="statement not covered" >notificationsModule;</span>
     
     // 通知一覧
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'notifications') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'notifications') {</span>
       const page = <span class="cstat-no" title="statement not covered" >parseInt(params.page || '1');</span>
       const limit = <span class="cstat-no" title="statement not covered" >parseInt(params.limit || '10');</span>
       const unreadOnly = <span class="cstat-no" title="statement not covered" >params.unreadOnly === 'true';</span>
@@ -1596,53 +1612,53 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
     }
     
     // 通知を既読にする
-<span class="cstat-no" title="statement not covered" >    if (endpoint.match(/notifications\/(.+)\/read/) &amp;&amp; method === 'PATCH') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.match(/notifications\/(.+)\/read/) &amp;&amp; method === 'PATCH') {</span>
       const notificationId = <span class="cstat-no" title="statement not covered" >endpoint.split('/')[1];</span>
 <span class="cstat-no" title="statement not covered" >      return { success: true, id: notificationId };</span>
     }
     
     // 全て既読にする
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'notifications/read-all' &amp;&amp; method === 'POST') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'notifications/read-all' &amp;&amp; method === 'POST') {</span>
 <span class="cstat-no" title="statement not covered" >      return { success: true, updatedCount: mockNotifications.filter(<span class="fstat-no" title="function not covered" >n </span>=&gt; <span class="cstat-no" title="statement not covered" >!n.isRead)</span>.length };</span>
     }
     
 <span class="cstat-no" title="statement not covered" >    return { notifications: [], unreadCount: 0, total: 0, page: 1, limit: 10 };</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (endpoint.startsWith('auth')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint.startsWith('auth')) {</span>
     const authModule = <span class="cstat-no" title="statement not covered" >await getDataModule('auth') as AuthModule;</span>
-<span class="cstat-no" title="statement not covered" >    if (!authModule) <span class="cstat-no" title="statement not covered" >return { error: 'Auth module not available' };</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!authModule) <span class="cstat-no" title="statement not covered" >return { error: 'Auth module not available' };</span></span>
     
     const { mockLogin, mockRegister, mockRequestPasswordReset, mockResetPassword } = <span class="cstat-no" title="statement not covered" >authModule;</span>
     
     // ログイン
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/login' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/login' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
 <span class="cstat-no" title="statement not covered" >      return mockLogin(body.email, body.password);</span>
     }
     
     // 登録
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/register' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/register' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
 <span class="cstat-no" title="statement not covered" >      return mockRegister(body.email, body.password, body.name);</span>
     }
     
     // パスワードリセット要求
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/request-password-reset' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/request-password-reset' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
 <span class="cstat-no" title="statement not covered" >      return mockRequestPasswordReset(body.email);</span>
     }
     
     // パスワードリセット実行
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/reset-password' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/reset-password' &amp;&amp; method === 'POST' &amp;&amp; body) {</span>
 <span class="cstat-no" title="statement not covered" >      return mockResetPassword(body.token, body.newPassword);</span>
     }
     
     // ログイン中のユーザー情報
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/me') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/me') {</span>
       const usersModule = <span class="cstat-no" title="statement not covered" >await getDataModule('users') as UsersModule;</span>
 <span class="cstat-no" title="statement not covered" >      return usersModule?.mockMe || null;</span>
     }
     
     // ログアウト
-<span class="cstat-no" title="statement not covered" >    if (endpoint === 'auth/logout' &amp;&amp; method === 'POST') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (endpoint === 'auth/logout' &amp;&amp; method === 'POST') {</span>
 <span class="cstat-no" title="statement not covered" >      return { success: true };</span>
     }
     
@@ -1656,7 +1672,7 @@ const getMockData = <span class="cstat-no" title="statement not covered" ><span 
 /**
  * レスポンス待機中に表示するローディング状態管理用フック
  */
-export const useDataFetching = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >&lt;T</span>&gt;(</span>
+export const useDataFetching = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >&lt;T&gt;(</span></span>
   fetchFunction: () =&gt; Promise&lt;T&gt;,
   initialData: T
 ): {
@@ -1672,11 +1688,11 @@ export const useDataFetching = <span class="cstat-no" title="statement not cover
   // fetchFunctionの参照が変わらないようにする
   const stableFetchFunction = <span class="cstat-no" title="statement not covered" >React.useCallback(fetchFunction, []);</span>
   
-  const fetchData = <span class="cstat-no" title="statement not covered" >React.useCallback(<span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
+  const fetchData = <span class="cstat-no" title="statement not covered" >React.useCallback(<span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
     // モックデータ使用時は短いローディング表示か直接データ表示
     const isMockMode = <span class="cstat-no" title="statement not covered" >shouldUseMockData();</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!isMockMode) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isMockMode) {</span>
 <span class="cstat-no" title="statement not covered" >      setIsLoading(true);</span>
     }
 <span class="cstat-no" title="statement not covered" >    setError(null);</span>
@@ -1693,7 +1709,7 @@ export const useDataFetching = <span class="cstat-no" title="statement not cover
   }, [stableFetchFunction]);
   
   // 一度だけ実行されるようにする
-<span class="cstat-no" title="statement not covered" >  React.useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  React.useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    fetchData();</span>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1704,7 +1720,7 @@ export const useDataFetching = <span class="cstat-no" title="statement not cover
 /**
  * POST リクエスト用のユーティリティ関数
  */
-export const postData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync &lt;T&gt;(endpoint: string, body: any): Promise&lt;T&gt; =&gt; {</span>
+export const postData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>&lt;T&gt;(endpoint: string, body: any): Promise&lt;T&gt; =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  return fetchData&lt;T&gt;(endpoint, {</span>
     method: 'POST',
     body,
@@ -1714,7 +1730,7 @@ export const postData = <span class="cstat-no" title="statement not covered" ><s
 /**
  * PATCH リクエスト用のユーティリティ関数
  */
-export const patchData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync &lt;T&gt;(endpoint: string, body: any): Promise&lt;T&gt; =&gt; {</span>
+export const patchData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>&lt;T&gt;(endpoint: string, body: any): Promise&lt;T&gt; =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  return fetchData&lt;T&gt;(endpoint, {</span>
     method: 'PATCH',
     body,
@@ -1724,10 +1740,18 @@ export const patchData = <span class="cstat-no" title="statement not covered" ><
 /**
  * DELETE リクエスト用のユーティリティ関数
  */
-export const deleteData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync &lt;T&gt;(endpoint: string): Promise&lt;T&gt; =&gt; {</span>
+export const deleteData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>&lt;T&gt;(endpoint: string): Promise&lt;T&gt; =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >  return fetchData&lt;T&gt;(endpoint, {</span>
     method: 'DELETE',
   });
+};
+&nbsp;
+/**
+ * UPDATE (PUT) リクエスト用のユーティリティ関数
+ * patchDataのエイリアスとして提供
+ */
+export const updateData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>&lt;T&gt;(endpoint: string, body: any): Promise&lt;T&gt; =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  return patchData&lt;T&gt;(endpoint, body);</span>
 }; </pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -1735,7 +1759,7 @@ export const deleteData = <span class="cstat-no" title="statement not covered" >
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

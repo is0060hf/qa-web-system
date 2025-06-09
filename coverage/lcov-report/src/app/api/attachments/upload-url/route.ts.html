@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -150,20 +150,8 @@
 <a name='L85'></a><a href='#L85'>85</a>
 <a name='L86'></a><a href='#L86'>86</a>
 <a name='L87'></a><a href='#L87'>87</a>
-<a name='L88'></a><a href='#L88'>88</a>
-<a name='L89'></a><a href='#L89'>89</a>
-<a name='L90'></a><a href='#L90'>90</a>
-<a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a>
-<a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a>
-<a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a>
-<a name='L101'></a><a href='#L101'>101</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L88'></a><a href='#L88'>88</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -172,29 +160,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -217,6 +182,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -230,6 +200,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -242,6 +215,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -269,6 +243,7 @@ import { validateRequest } from '@/lib/utils/api';
 import { z } from 'zod';
 import { put } from '@vercel/blob';
 import crypto from 'crypto';
+import { validateFile, sanitizeFileName, getFileSizeLimit, ALL_ALLOWED_FILE_TYPES } from '@/lib/utils/fileValidation';
 &nbsp;
 // リクエストスキーマ
 const uploadUrlSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
@@ -277,48 +252,30 @@ const uploadUrlSchema = <span class="cstat-no" title="statement not covered" >z.
   answerId: z.string().optional(), // 一時的または実際の回答ID
 });
 &nbsp;
-// ファイルサイズ制限（1GB）
-const MAX_FILE_SIZE = <span class="cstat-no" title="statement not covered" >1024 * 1024 * 1024;</span> // 1GB in bytes
-&nbsp;
-// 許可されるファイルタイプ
-const ALLOWED_FILE_TYPES = <span class="cstat-no" title="statement not covered" >[</span>
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'video/mp4',
-  'video/mpeg',
-  'video/quicktime',
-  'video/webm',
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'text/plain',
-  'text/csv',
-];
-&nbsp;
 export async function <span class="fstat-no" title="function not covered" >POST(</span>req: NextRequest) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
     // リクエストのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, uploadUrlSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
     const { fileName, contentType, answerId } = <span class="cstat-no" title="statement not covered" >validation.data;</span>
 &nbsp;
-    // ファイルタイプの検証
-<span class="cstat-no" title="statement not covered" >    if (!ALLOWED_FILE_TYPES.includes(contentType)) {</span>
+    // ファイルバリデーション
+    const fileValidation = <span class="cstat-no" title="statement not covered" >await validateFile(</span>
+      { name: fileName, type: contentType, size: 0 },
+      { checkContent: false, skipSizeCheck: true } // URL生成時は内容とサイズチェックをスキップ
+    );
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!fileValidation.isValid) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
-        { error: '許可されていないファイルタイプです' },
+        { error: fileValidation.error },
         { status: 400 }
       );
     }
@@ -326,8 +283,11 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     // ユニークなファイル名を生成（衝突を避けるため）
     const timestamp = <span class="cstat-no" title="statement not covered" >Date.now();</span>
     const randomString = <span class="cstat-no" title="statement not covered" >crypto.randomBytes(8).toString('hex');</span>
-    const sanitizedFileName = <span class="cstat-no" title="statement not covered" >fileName.replace(/[^a-zA-Z0-9.-]/g, '_');</span>
+    const sanitizedFileName = <span class="cstat-no" title="statement not covered" >fileValidation.sanitizedFileName || sanitizeFileName(fileName);</span>
     const uniqueFileName = <span class="cstat-no" title="statement not covered" >`${user.id}/${timestamp}-${randomString}-${sanitizedFileName}`;</span>
+&nbsp;
+    // ファイルサイズ制限を取得
+    const maxSize = <span class="cstat-no" title="statement not covered" >getFileSizeLimit(contentType);</span>
 &nbsp;
     // Vercel Blobへのアップロード用署名付きURLを生成
     // 注: 実際の実装では、Vercel Blobの署名付きURL生成方法に従います
@@ -345,7 +305,8 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         uploadUrl,
         blobUrl,
         fileName: uniqueFileName,
-        maxSize: MAX_FILE_SIZE,
+        maxSize,
+        allowedTypes: ALL_ALLOWED_FILE_TYPES,
         // クライアントがアップロード時に使用するための一時トークン
         uploadToken: crypto.randomBytes(32).toString('hex'),
       });
@@ -359,7 +320,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    console.error('アップロードURL生成エラー:', error);</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.json(</span>
-      { error: 'アップロードURLの生成に失敗しました' },
+      { error: 'サーバーエラーが発生しました' },
       { status: 500 }
     );
   }
@@ -370,7 +331,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

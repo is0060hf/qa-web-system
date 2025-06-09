@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/35</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
@@ -284,7 +284,7 @@ type SanitizableObject = {
 // CSRFトークンの生成（Edge Runtime互換）
 export function <span class="fstat-no" title="function not covered" >generateCSRFToken(</span>): string {
   // Node.js環境の場合
-<span class="cstat-no" title="statement not covered" >  if (typeof window === 'undefined' &amp;&amp; typeof globalThis.crypto === 'undefined') {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof window === 'undefined' &amp;&amp; typeof globalThis.crypto === 'undefined') {</span>
     const crypto = <span class="cstat-no" title="statement not covered" >require('crypto');</span>
 <span class="cstat-no" title="statement not covered" >    return crypto.randomBytes(32).toString('hex');</span>
   }
@@ -292,7 +292,7 @@ export function <span class="fstat-no" title="function not covered" >generateCSR
   // ブラウザまたはEdge Runtime環境の場合
   const array = <span class="cstat-no" title="statement not covered" >new Uint8Array(32);</span>
 <span class="cstat-no" title="statement not covered" >  crypto.getRandomValues(array);</span>
-<span class="cstat-no" title="statement not covered" >  return Array.from(array, <span class="fstat-no" title="function not covered" >by</span>te =&gt; <span class="cstat-no" title="statement not covered" >byte.toString(16).padStart(2, '0'))</span>.join('');</span>
+<span class="cstat-no" title="statement not covered" >  return Array.from(array, <span class="fstat-no" title="function not covered" >byte </span>=&gt; <span class="cstat-no" title="statement not covered" >byte.toString(16).padStart(2, '0'))</span>.join('');</span>
 }
 &nbsp;
 // HTMLエスケープ用のマップ
@@ -307,22 +307,22 @@ const htmlEscapeMap: { [key: string]: string } = <span class="cstat-no" title="s
 &nbsp;
 // HTMLエスケープ処理
 export function <span class="fstat-no" title="function not covered" >escapeHtml(</span>str: string): string {
-<span class="cstat-no" title="statement not covered" >  if (typeof str !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof str !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
 <span class="cstat-no" title="statement not covered" >  return str.replace(/[&amp;&lt;&gt;"'\/]/g, <span class="fstat-no" title="function not covered" >(m</span>atch) =&gt; <span class="cstat-no" title="statement not covered" >htmlEscapeMap[match] || match)</span>;</span>
 }
 &nbsp;
 // 危険なHTMLタグやスクリプトを除去
 export function <span class="fstat-no" title="function not covered" >sanitizeInput(</span>input: string): string {
-<span class="cstat-no" title="statement not covered" >  if (typeof input !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof input !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
   
   // HTMLタグを除去（ただし一部の安全なタグは許可）
   const allowedTags = <span class="cstat-no" title="statement not covered" >['b', 'i', 'em', 'strong', 'u', 'br', 'p', 'ul', 'ol', 'li', 'a'];</span>
   const tagRegex = <span class="cstat-no" title="statement not covered" >/&lt;\/?([a-zA-Z][a-zA-Z0-9]*)\b[^&gt;]*&gt;/gi;</span>
   
   let sanitized = <span class="cstat-no" title="statement not covered" >input.replace(tagRegex, <span class="fstat-no" title="function not covered" >(m</span>atch, tag) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (allowedTags.includes(tag.toLowerCase())) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (allowedTags.includes(tag.toLowerCase())) {</span>
       // href属性のサニタイズ（aタグの場合）
-<span class="cstat-no" title="statement not covered" >      if (tag.toLowerCase() === 'a') {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (tag.toLowerCase() === 'a') {</span>
 <span class="cstat-no" title="statement not covered" >        return match.replace(/href\s*=\s*["']?javascript:[^"'&gt;]*/gi, 'href="#"');</span>
       }
 <span class="cstat-no" title="statement not covered" >      return match;</span>
@@ -351,8 +351,8 @@ export function <span class="fstat-no" title="function not covered" >sanitizeObj
 <span class="cstat-no" title="statement not covered" >      sanitized[key] = sanitizeInput(sanitized[key]);</span>
     } else <span class="cstat-no" title="statement not covered" >if (typeof sanitized[key] === 'object' &amp;&amp; sanitized[key] !== null &amp;&amp; !Array.isArray(sanitized[key])) {</span>
 <span class="cstat-no" title="statement not covered" >      sanitized[key] = sanitizeObject(sanitized[key] as SanitizableObject);</span>
-    } else <span class="cstat-no" title="statement not covered" >if (Array.isArray(sanitized[key])) {</span>
-<span class="cstat-no" title="statement not covered" >      sanitized[key] = (sanitized[key] as SanitizableValue[]).map(<span class="fstat-no" title="function not covered" >it</span>em =&gt; </span>
+    } else <span class="cstat-no" title="statement not covered" ><span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(sanitized[key])) {</span>
+<span class="cstat-no" title="statement not covered" >      sanitized[key] = (sanitized[key] as SanitizableValue[]).map(<span class="fstat-no" title="function not covered" >item </span>=&gt; </span>
 <span class="cstat-no" title="statement not covered" >        typeof item === 'string' ? sanitizeInput(item) : item</span>
       );
     }
@@ -368,7 +368,7 @@ export function <span class="fstat-no" title="function not covered" >sanitizeUrl
 &nbsp;
 // SQLインジェクション対策（Prismaを使用している場合は基本的に不要だが、念のため）
 export function <span class="fstat-no" title="function not covered" >escapeSqlString(</span>str: string): string {
-<span class="cstat-no" title="statement not covered" >  if (typeof str !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof str !== 'string') <span class="cstat-no" title="statement not covered" >return '';</span></span>
 <span class="cstat-no" title="statement not covered" >  return str.replace(/['"\\\0\n\r\x1a]/g, <span class="fstat-no" title="function not covered" >(m</span>atch) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    switch (match) {</span>
       case "'": <span class="cstat-no" title="statement not covered" >return "\\'";</span>
@@ -388,7 +388,7 @@ export function <span class="fstat-no" title="function not covered" >escapeSqlSt
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

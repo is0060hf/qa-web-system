@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -332,13 +332,13 @@ export const useNotificationStore = <span class="cstat-no" title="statement not 
   error: null,
   
   // 通知一覧を取得
-  fetchNotifications: <span class="fstat-no" title="function not covered" >as</span>ync (unreadOnly = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >20)</span> =&gt; {
+  fetchNotifications: <span class="fstat-no" title="function not covered" >async </span>(unreadOnly = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >20)</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
       const params: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
-<span class="cstat-no" title="statement not covered" >      if (unreadOnly) <span class="cstat-no" title="statement not covered" >params.unreadOnly = 'true';</span></span>
-<span class="cstat-no" title="statement not covered" >      if (limit) <span class="cstat-no" title="statement not covered" >params.limit = limit.toString();</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (unreadOnly) <span class="cstat-no" title="statement not covered" >params.unreadOnly = 'true';</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (limit) <span class="cstat-no" title="statement not covered" >params.limit = limit.toString();</span></span>
       
       const data = <span class="cstat-no" title="statement not covered" >await fetchData&lt;{</span>
         notifications: Notification[];
@@ -359,15 +359,15 @@ export const useNotificationStore = <span class="cstat-no" title="statement not 
   },
   
   // 特定の通知を既読にする
-  markAsRead: <span class="fstat-no" title="function not covered" >as</span>ync (notificationId: string) =&gt; {
+  markAsRead: <span class="fstat-no" title="function not covered" >async </span>(notificationId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;(`notifications/${notificationId}/read`, {</span>
         method: 'PATCH'
       });
       
       // 状態を更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-        notifications: state.notifications.map(<span class="fstat-no" title="function not covered" >no</span>tification =&gt;
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+        notifications: state.notifications.map(<span class="fstat-no" title="function not covered" >notification </span>=&gt;
 <span class="cstat-no" title="statement not covered" >          notification.id === notificationId</span>
             ? { ...notification, isRead: true }
             : notification
@@ -381,15 +381,15 @@ export const useNotificationStore = <span class="cstat-no" title="statement not 
   },
   
   // 全ての通知を既読にする
-  markAllAsRead: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
+  markAllAsRead: <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;('notifications/read-all', {</span>
         method: 'POST'
       });
       
       // 状態を更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-        notifications: state.notifications.map(<span class="fstat-no" title="function not covered" >no</span>tification =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+        notifications: state.notifications.map(<span class="fstat-no" title="function not covered" >notification </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           ...notification,
           isRead: true
         })),
@@ -402,7 +402,7 @@ export const useNotificationStore = <span class="cstat-no" title="statement not 
   },
   
   // 未読通知数を更新
-  refreshUnreadCount: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
+  refreshUnreadCount: <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const data = <span class="cstat-no" title="statement not covered" >await fetchData&lt;{ unreadCount: number }&gt;('notifications', {</span>
         params: { limit: '0' }
@@ -421,7 +421,7 @@ export const useNotificationStore = <span class="cstat-no" title="statement not 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

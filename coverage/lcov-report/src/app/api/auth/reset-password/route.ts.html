@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">2.77% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/36</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">2.77% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/36</span>
+                <span class='fraction'>0/36</span>
             </div>
         
             
@@ -214,7 +214,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -357,7 +357,7 @@ import { z } from 'zod';
 import crypto from 'crypto';
 &nbsp;
 // パスワードリセット実行のスキーマ
-const resetPasswordSchema = z.object({
+const resetPasswordSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   token: z.string().min(1, 'トークンは必須です'),
   newPassword: z.string().min(8, 'パスワードは8文字以上である必要があります'),
 });
@@ -367,7 +367,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // リクエストのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, resetPasswordSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -382,7 +382,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       include: { user: true },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!passwordResetToken) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!passwordResetToken) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '無効なトークンです' },
         { status: 400 }
@@ -390,7 +390,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // トークンの有効期限を確認
-<span class="cstat-no" title="statement not covered" >    if (passwordResetToken.expiresAt &lt; new Date()) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (passwordResetToken.expiresAt &lt; new Date()) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'トークンの有効期限が切れています' },
         { status: 400 }
@@ -398,7 +398,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // トークンが既に使用されているか確認
-<span class="cstat-no" title="statement not covered" >    if (passwordResetToken.usedAt) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (passwordResetToken.usedAt) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このトークンは既に使用されています' },
         { status: 400 }
@@ -409,7 +409,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     const hashedPassword = <span class="cstat-no" title="statement not covered" >await hashPassword(newPassword);</span>
 &nbsp;
     // トランザクションでパスワード更新とトークンの使用済み設定を実行
-<span class="cstat-no" title="statement not covered" >    await prisma.$transaction(<span class="fstat-no" title="function not covered" >as</span>ync (tx) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    await prisma.$transaction(<span class="fstat-no" title="function not covered" >async </span>(tx) =&gt; {</span>
       // パスワードを更新
 <span class="cstat-no" title="statement not covered" >      await tx.user.update({</span>
         where: { id: passwordResetToken.userId },
@@ -454,7 +454,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     const body = <span class="cstat-no" title="statement not covered" >await request.json();</span>
     const { email } = <span class="cstat-no" title="statement not covered" >body;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!email) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!email) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: 'メールアドレスは必須です' }, { status: 400 });</span>
     }
 &nbsp;
@@ -463,7 +463,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       where: { email },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
       // セキュリティ上、ユーザーが存在しない場合も成功レスポンスを返す
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ message: 'パスワードリセットの手順をメールで送信しました' });</span>
     }
@@ -499,7 +499,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/13</span>
             </div>
         
             
@@ -319,7 +319,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -330,7 +330,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
       where: { id: fileId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!mediaFile) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!mediaFile) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'メディアファイルが見つかりません' },
         { status: 404 }
@@ -338,7 +338,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     }
 &nbsp;
     // アクセス権のチェック (ファイルのアップロード者または管理者のみアクセス可能)
-<span class="cstat-no" title="statement not covered" >    if (mediaFile.uploaderId !== user.id &amp;&amp; user.role !== Role.ADMIN) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (mediaFile.uploaderId !== user.id &amp;&amp; user.role !== Role.ADMIN) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このファイルへのアクセス権限がありません' },
         { status: 403 }
@@ -363,7 +363,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -379,7 +379,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!mediaFile) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!mediaFile) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'メディアファイルが見つかりません' },
         { status: 404 }
@@ -387,7 +387,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // アクセス権のチェック (ファイルのアップロード者または管理者のみ削除可能)
-<span class="cstat-no" title="statement not covered" >    if (mediaFile.uploaderId !== user.id &amp;&amp; user.role !== Role.ADMIN) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (mediaFile.uploaderId !== user.id &amp;&amp; user.role !== Role.ADMIN) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このファイルを削除する権限がありません' },
         { status: 403 }
@@ -395,7 +395,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // 参照されているファイルは削除できない
-<span class="cstat-no" title="statement not covered" >    if (mediaFile.answers.length &gt; 0 || mediaFile.formData.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (mediaFile.answers.length &gt; 0 || mediaFile.formData.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このファイルは回答で使用されているため削除できません' },
         { status: 409 }
@@ -403,7 +403,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // トランザクションでファイルをデータベースから削除し、Vercel Blobからも削除
-    const result = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >as</span>ync (tx) =&gt; {</span>
+    const result = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >async </span>(tx) =&gt; {</span>
       // データベースからファイル情報を削除
 <span class="cstat-no" title="statement not covered" >      await tx.mediaFile.delete({</span>
         where: { id: fileId },
@@ -433,7 +433,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

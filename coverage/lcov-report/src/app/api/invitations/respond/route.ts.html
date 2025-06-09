@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -367,13 +367,13 @@ const respondInvitationSchema = <span class="cstat-no" title="statement not cove
 export async function <span class="fstat-no" title="function not covered" >POST(</span>req: NextRequest) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
     // リクエストのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, respondInvitationSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -394,7 +394,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!invitation) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!invitation) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '招待が見つかりません' },
         { status: 404 }
@@ -402,7 +402,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 招待のステータスチェック
-<span class="cstat-no" title="statement not covered" >    if (invitation.status !== InvitationStatus.PENDING) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (invitation.status !== InvitationStatus.PENDING) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は既に応答済みです' },
         { status: 410 }
@@ -410,7 +410,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 有効期限チェック
-<span class="cstat-no" title="statement not covered" >    if (new Date(invitation.expiresAt) &lt; new Date()) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (new Date(invitation.expiresAt) &lt; new Date()) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は期限切れです' },
         { status: 410 }
@@ -418,7 +418,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 招待メールアドレスとユーザーのメールアドレスが一致するかチェック
-<span class="cstat-no" title="statement not covered" >    if (invitation.email !== user.email) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (invitation.email !== user.email) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待はあなた宛てではありません' },
         { status: 403 }
@@ -427,7 +427,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (accept) {</span>
       // 承認の場合、トランザクションで招待ステータス更新とプロジェクトメンバー追加を行う
-      const result = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >as</span>ync (tx) =&gt; {</span>
+      const result = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >async </span>(tx) =&gt; {</span>
         // 既にプロジェクトメンバーでないかチェック
         const existingMember = <span class="cstat-no" title="statement not covered" >await tx.projectMember.findUnique({</span>
           where: {
@@ -438,7 +438,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
           },
         });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (existingMember) {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (existingMember) {</span>
 <span class="cstat-no" title="statement not covered" >          throw new Error('既にプロジェクトのメンバーです');</span>
         }
 &nbsp;
@@ -483,7 +483,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
   } catch (error: any) {
 <span class="cstat-no" title="statement not covered" >    console.error('招待応答エラー:', error);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (error.message === '既にプロジェクトのメンバーです') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (error.message === '既にプロジェクトのメンバーです') {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: error.message },
         { status: 400 }
@@ -502,7 +502,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

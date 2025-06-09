@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -406,7 +406,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -423,7 +423,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!dbUser) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!dbUser) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
@@ -452,7 +452,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -472,7 +472,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      data = updateUserSchema.parse(body);</span>
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      if (error instanceof z.ZodError) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (error instanceof z.ZodError) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'バリデーションエラー', details: error.errors },
           { status: 400 }
@@ -486,7 +486,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       where: { id: user.id },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!dbUser) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!dbUser) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'ユーザーが見つかりません' },
         { status: 404 }
@@ -497,14 +497,14 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     const updateData: any = <span class="cstat-no" title="statement not covered" >{};</span>
 &nbsp;
     // 名前の更新
-<span class="cstat-no" title="statement not covered" >    if (data.name !== undefined) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (data.name !== undefined) {</span>
 <span class="cstat-no" title="statement not covered" >      updateData.name = data.name;</span>
     }
 &nbsp;
     // パスワードの更新
-<span class="cstat-no" title="statement not covered" >    if (data.newPassword) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (data.newPassword) {</span>
       // パスワード変更時は現在のパスワードが必要
-<span class="cstat-no" title="statement not covered" >      if (!data.currentPassword) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!data.currentPassword) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: 'パスワードを変更するには現在のパスワードが必要です' },
           { status: 400 }
@@ -517,7 +517,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
         dbUser.passwordHash
       );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (!isValidPassword) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isValidPassword) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '現在のパスワードが正しくありません' },
           { status: 401 }
@@ -529,7 +529,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     }
 &nbsp;
     // 更新するデータがない場合
-<span class="cstat-no" title="statement not covered" >    if (Object.keys(updateData).length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (Object.keys(updateData).length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '更新するデータがありません' },
         { status: 400 }
@@ -568,7 +568,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

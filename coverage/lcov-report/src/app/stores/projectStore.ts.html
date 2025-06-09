@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/51</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -921,7 +921,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   error: null,
   
   // プロジェクト一覧を取得
-  fetchProjects: <span class="fstat-no" title="function not covered" >as</span>ync (page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span> search = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {
+  fetchProjects: <span class="fstat-no" title="function not covered" >async </span>(page = <span class="branch-0 cbranch-no" title="branch not covered" >1,</span> limit = <span class="branch-0 cbranch-no" title="branch not covered" >10,</span> search = <span class="branch-0 cbranch-no" title="branch not covered" >'')</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
@@ -947,7 +947,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // 特定のプロジェクト詳細を取得
-  fetchProjectById: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string) =&gt; {
+  fetchProjectById: <span class="fstat-no" title="function not covered" >async </span>(projectId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
@@ -964,7 +964,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトを作成
-  createProject: <span class="fstat-no" title="function not covered" >as</span>ync (data: ProjectFormData) =&gt; {
+  createProject: <span class="fstat-no" title="function not covered" >async </span>(data: ProjectFormData) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
@@ -974,7 +974,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // プロジェクト一覧を更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
         projects: [newProject, ...state.projects],
         totalProjects: state.totalProjects + 1,
         isLoading: false
@@ -991,7 +991,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトを更新
-  updateProject: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, data: ProjectFormData) =&gt; {
+  updateProject: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, data: ProjectFormData) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
@@ -1001,8 +1001,8 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // プロジェクト一覧とselectedProjectを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-        projects: state.projects.map(<span class="fstat-no" title="function not covered" >pr</span>oject =&gt; 
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+        projects: state.projects.map(<span class="fstat-no" title="function not covered" >project </span>=&gt; 
 <span class="cstat-no" title="statement not covered" >          project.id === projectId ? { ...project, ...updatedProject } : project</span>
         ),
         selectedProject: state.selectedProject &amp;&amp; state.selectedProject.id === projectId
@@ -1020,7 +1020,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトを削除
-  deleteProject: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string) =&gt; {
+  deleteProject: <span class="fstat-no" title="function not covered" >async </span>(projectId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      set({ isLoading: true, error: null });</span>
       
@@ -1029,8 +1029,8 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // プロジェクト一覧から削除
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-        projects: state.projects.filter(<span class="fstat-no" title="function not covered" >pr</span>oject =&gt; <span class="cstat-no" title="statement not covered" >project.id !== projectId)</span>,
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+        projects: state.projects.filter(<span class="fstat-no" title="function not covered" >project </span>=&gt; <span class="cstat-no" title="statement not covered" >project.id !== projectId)</span>,
         selectedProject: state.selectedProject?.id === projectId ? null : state.selectedProject,
         totalProjects: state.totalProjects - 1,
         isLoading: false
@@ -1045,13 +1045,13 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトのタグを取得
-  fetchProjectTags: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string) =&gt; {
+  fetchProjectTags: <span class="fstat-no" title="function not covered" >async </span>(projectId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const tags = <span class="cstat-no" title="statement not covered" >await fetchData&lt;Tag[]&gt;(`projects/${projectId}/tags`, {});</span>
       
       // selectedProjectがある場合は更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
@@ -1070,7 +1070,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトにタグを作成
-  createProjectTag: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, name: string) =&gt; {
+  createProjectTag: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, name: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const newTag = <span class="cstat-no" title="statement not covered" >await fetchData&lt;Tag&gt;(`projects/${projectId}/tags`, {</span>
         method: 'POST',
@@ -1078,8 +1078,8 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // selectedProjectのタグリストを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
@@ -1097,7 +1097,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトのタグを更新
-  updateProjectTag: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, tagId: string, name: string) =&gt; {
+  updateProjectTag: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, tagId: string, name: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const updatedTag = <span class="cstat-no" title="statement not covered" >await fetchData&lt;Tag&gt;(`projects/${projectId}/tags/${tagId}`, {</span>
         method: 'PATCH',
@@ -1105,12 +1105,12 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // selectedProjectのタグリストを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
-              tags: state.selectedProject.tags.map(<span class="fstat-no" title="function not covered" >ta</span>g =&gt; 
+              tags: state.selectedProject.tags.map(<span class="fstat-no" title="function not covered" >tag </span>=&gt; 
 <span class="cstat-no" title="statement not covered" >                tag.id === tagId ? updatedTag : tag</span>
               )
             }
@@ -1126,19 +1126,19 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトのタグを削除
-  deleteProjectTag: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, tagId: string) =&gt; {
+  deleteProjectTag: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, tagId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;(`projects/${projectId}/tags/${tagId}`, {</span>
         method: 'DELETE'
       });
       
       // selectedProjectのタグリストを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
-              tags: state.selectedProject.tags.filter(<span class="fstat-no" title="function not covered" >ta</span>g =&gt; <span class="cstat-no" title="statement not covered" >tag.id !== tagId)</span>
+              tags: state.selectedProject.tags.filter(<span class="fstat-no" title="function not covered" >tag </span>=&gt; <span class="cstat-no" title="statement not covered" >tag.id !== tagId)</span>
             }
           };
         }
@@ -1150,7 +1150,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // ユーザーをプロジェクトに招待（既存ユーザー）
-  inviteUserToProject: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, userId: string) =&gt; {
+  inviteUserToProject: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, userId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;(`projects/${projectId}/invitations`, {</span>
         method: 'POST',
@@ -1165,7 +1165,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // メールでユーザーをプロジェクトに招待（新規ユーザー）
-  inviteUserByEmail: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, email: string) =&gt; {
+  inviteUserByEmail: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, email: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;(`projects/${projectId}/invitations`, {</span>
         method: 'POST',
@@ -1180,7 +1180,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトメンバーの役割を更新
-  updateMemberRole: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, memberId: string, role: 'MANAGER' | 'MEMBER') =&gt; {
+  updateMemberRole: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, memberId: string, role: 'MANAGER' | 'MEMBER') =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;ProjectMember&gt;(`projects/${projectId}/members/${memberId}`, {</span>
         method: 'PATCH',
@@ -1188,12 +1188,12 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
       });
       
       // selectedProjectのメンバーリストを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
-              members: state.selectedProject.members.map(<span class="fstat-no" title="function not covered" >me</span>mber =&gt; 
+              members: state.selectedProject.members.map(<span class="fstat-no" title="function not covered" >member </span>=&gt; 
 <span class="cstat-no" title="statement not covered" >                member.id === memberId ? { ...member, role } : member</span>
               )
             }
@@ -1207,19 +1207,19 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
   },
   
   // プロジェクトからメンバーを削除
-  removeMember: <span class="fstat-no" title="function not covered" >as</span>ync (projectId: string, memberId: string) =&gt; {
+  removeMember: <span class="fstat-no" title="function not covered" >async </span>(projectId: string, memberId: string) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await fetchData&lt;{ success: boolean }&gt;(`projects/${projectId}/members/${memberId}`, {</span>
         method: 'DELETE'
       });
       
       // selectedProjectのメンバーリストを更新
-<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >st</span>ate =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >        if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
+<span class="cstat-no" title="statement not covered" >      set(<span class="fstat-no" title="function not covered" >state </span>=&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (state.selectedProject &amp;&amp; state.selectedProject.id === projectId) {</span>
 <span class="cstat-no" title="statement not covered" >          return {</span>
             selectedProject: {
               ...state.selectedProject,
-              members: state.selectedProject.members.filter(<span class="fstat-no" title="function not covered" >me</span>mber =&gt; <span class="cstat-no" title="statement not covered" >member.id !== memberId)</span>,
+              members: state.selectedProject.members.filter(<span class="fstat-no" title="function not covered" >member </span>=&gt; <span class="cstat-no" title="statement not covered" >member.id !== memberId)</span>,
               memberCount: state.selectedProject.memberCount - 1
             }
           };
@@ -1237,7 +1237,7 @@ export const useProjectStore = <span class="cstat-no" title="statement not cover
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

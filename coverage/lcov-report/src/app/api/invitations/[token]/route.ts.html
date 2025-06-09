@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/32</span>
+                <span class='fraction'>0/19</span>
             </div>
         
             
@@ -561,7 +561,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!invitation) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!invitation) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '招待が見つかりません' },
         { status: 404 }
@@ -569,7 +569,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     }
 &nbsp;
     // 有効期限チェック
-<span class="cstat-no" title="statement not covered" >    if (new Date(invitation.expiresAt) &lt; new Date()) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (new Date(invitation.expiresAt) &lt; new Date()) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は期限切れです' },
         { status: 410 }
@@ -577,7 +577,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     }
 &nbsp;
     // 既に応答済みかチェック
-<span class="cstat-no" title="statement not covered" >    if (invitation.status !== InvitationStatus.PENDING) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (invitation.status !== InvitationStatus.PENDING) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は既に応答済みです' },
         { status: 410 }
@@ -586,7 +586,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 &nbsp;
     // 認証済みの場合、招待メールアドレスとの一致をチェック
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (user &amp;&amp; user.email !== invitation.email) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (user &amp;&amp; user.email !== invitation.email) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待はあなた宛てではありません' },
         { status: 403 }
@@ -625,15 +625,15 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 // 招待への応答（承認/拒否）
 export async function <span class="fstat-no" title="function not covered" >POST(</span>
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise&lt;{ token: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-    const token = <span class="cstat-no" title="statement not covered" >params.token;</span>
+    const { token } = <span class="cstat-no" title="statement not covered" >await params;</span>
     const { action } = <span class="cstat-no" title="statement not covered" >await req.json();</span>
 &nbsp;
     // アクションのバリデーション
-<span class="cstat-no" title="statement not covered" >    if (action !== 'accept' &amp;&amp; action !== 'reject') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (action !== 'accept' &amp;&amp; action !== 'reject') {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '無効なアクション。"accept" または "reject" を指定してください' },
         { status: 400 }
@@ -648,7 +648,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!invitation) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!invitation) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '招待が見つかりません' },
         { status: 404 }
@@ -656,7 +656,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 招待の有効期限切れチェック
-<span class="cstat-no" title="statement not covered" >    if (invitation.expiresAt &lt; new Date()) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (invitation.expiresAt &lt; new Date()) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '招待の有効期限が切れています' },
         { status: 410 }
@@ -664,7 +664,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 既に応答済みの招待かチェック
-<span class="cstat-no" title="statement not covered" >    if (invitation.status !== InvitationStatus.PENDING) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (invitation.status !== InvitationStatus.PENDING) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は既に応答済みです' },
         { status: 410 }
@@ -673,7 +673,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 &nbsp;
     // 招待のメールアドレスと現在のユーザーのメールアドレスが一致するか確認
     // 認証が必要な場合はここでチェック
-<span class="cstat-no" title="statement not covered" >    if (user &amp;&amp; user.email !== invitation.email) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (user &amp;&amp; user.email !== invitation.email) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この招待は別のメールアドレス宛てに送信されています' },
         { status: 403 }
@@ -681,9 +681,9 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 招待を承認
-<span class="cstat-no" title="statement not covered" >    if (action === 'accept') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'accept') {</span>
       // ユーザーが存在するか確認
-<span class="cstat-no" title="statement not covered" >      if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '招待を承認するには、まずログインしてください' },
           { status: 401 }
@@ -700,7 +700,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (existingMember) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (existingMember) {</span>
         // 招待を承認済みにする
 <span class="cstat-no" title="statement not covered" >        await prisma.invitation.update({</span>
           where: { id: invitation.id },
@@ -738,7 +738,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // 招待を拒否
-<span class="cstat-no" title="statement not covered" >    if (action === 'reject') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (action === 'reject') {</span>
       // 招待ステータスを拒否に更新
 <span class="cstat-no" title="statement not covered" >      await prisma.invitation.update({</span>
         where: { id: invitation.id },
@@ -763,7 +763,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

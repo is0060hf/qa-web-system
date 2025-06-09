@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/84</span>
+                <span class='fraction'>0/65</span>
             </div>
         
             
@@ -750,7 +750,7 @@ const PUBLIC_PATHS = <span class="cstat-no" title="statement not covered" >[</sp
 ];
 &nbsp;
 // CORS設定（環境変数の検証を含む）
-const ALLOWED_ORIGINS = <span class="cstat-no" title="statement not covered" >(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+const ALLOWED_ORIGINS = <span class="cstat-no" title="statement not covered" >(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
   const origins = <span class="cstat-no" title="statement not covered" >process.env.ALLOWED_ORIGINS?.split(',').filter(Boolean) || [];</span>
 <span class="cstat-no" title="statement not covered" >  return origins.length &gt; 0 ? origins : ['http://localhost:3000'];</span>
 })();
@@ -767,7 +767,7 @@ const RATE_LIMIT_MAX_REQUESTS = <span class="cstat-no" title="statement not cove
 const CSRF_METHODS = <span class="cstat-no" title="statement not covered" >['POST', 'PUT', 'DELETE', 'PATCH'];</span>
 &nbsp;
 // CSPヘッダーの設定（環境に応じて調整）
-const getCSPDirectives = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+const getCSPDirectives = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
   const isDevelopment = <span class="cstat-no" title="statement not covered" >process.env.NODE_ENV === 'development';</span>
   
   // 本番環境ではより厳格なCSPを適用
@@ -786,7 +786,7 @@ const getCSPDirectives = <span class="cstat-no" title="statement not covered" ><
   ];
   
   // 開発環境でのみReact DevToolsを許可
-<span class="cstat-no" title="statement not covered" >  if (isDevelopment) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (isDevelopment) {</span>
 <span class="cstat-no" title="statement not covered" >    directives.push("script-src-elem 'self' 'unsafe-inline'");</span>
   }
   
@@ -798,18 +798,18 @@ function <span class="fstat-no" title="function not covered" >checkRateLimit(</s
   const now = <span class="cstat-no" title="statement not covered" >Date.now();</span>
   
   // 定期的にクリーンアップを実行（100リクエストごと）
-<span class="cstat-no" title="statement not covered" >  if (Math.random() &lt; 0.01) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (Math.random() &lt; 0.01) {</span>
 <span class="cstat-no" title="statement not covered" >    cleanupRateLimitMap();</span>
   }
   
   const userLimit = <span class="cstat-no" title="statement not covered" >rateLimitMap.get(identifier);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!userLimit || userLimit.resetTime &lt; now) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!userLimit || userLimit.resetTime &lt; now) {</span>
 <span class="cstat-no" title="statement not covered" >    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });</span>
 <span class="cstat-no" title="statement not covered" >    return true;</span>
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (userLimit.count &gt;= RATE_LIMIT_MAX_REQUESTS) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (userLimit.count &gt;= RATE_LIMIT_MAX_REQUESTS) {</span>
 <span class="cstat-no" title="statement not covered" >    return false;</span>
   }
 &nbsp;
@@ -822,7 +822,7 @@ function <span class="fstat-no" title="function not covered" >cleanupRateLimitMa
   const now = <span class="cstat-no" title="statement not covered" >Date.now();</span>
   
   // エントリ数が多すぎる場合は古いものから削除（LRU風）
-<span class="cstat-no" title="statement not covered" >  if (rateLimitMap.size &gt; MAX_RATE_LIMIT_ENTRIES) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (rateLimitMap.size &gt; MAX_RATE_LIMIT_ENTRIES) {</span>
     const entries = <span class="cstat-no" title="statement not covered" >Array.from(rateLimitMap.entries())</span>
       .sort(<span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >a[1].resetTime - b[1].resetTime)</span>;
     
@@ -836,13 +836,13 @@ function <span class="fstat-no" title="function not covered" >cleanupRateLimitMa
   // 期限切れのエントリを削除
   const expiredKeys: string[] = <span class="cstat-no" title="statement not covered" >[];</span>
 <span class="cstat-no" title="statement not covered" >  for (const [key, value] of rateLimitMap.entries()) {</span>
-<span class="cstat-no" title="statement not covered" >    if (value.resetTime &lt; now) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (value.resetTime &lt; now) {</span>
 <span class="cstat-no" title="statement not covered" >      expiredKeys.push(key);</span>
     }
   }
   
   // バッチで削除（パフォーマンス向上）
-<span class="cstat-no" title="statement not covered" >  expiredKeys.forEach(<span class="fstat-no" title="function not covered" >ke</span>y =&gt; <span class="cstat-no" title="statement not covered" >rateLimitMap.delete(key))</span>;</span>
+<span class="cstat-no" title="statement not covered" >  expiredKeys.forEach(<span class="fstat-no" title="function not covered" >key </span>=&gt; <span class="cstat-no" title="statement not covered" >rateLimitMap.delete(key))</span>;</span>
 }
 &nbsp;
 export async function <span class="fstat-no" title="function not covered" >middleware(</span>request: NextRequest) {
@@ -856,7 +856,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
   const responseHeaders = <span class="cstat-no" title="statement not covered" >new Headers();</span>
 &nbsp;
   // CORS設定
-<span class="cstat-no" title="statement not covered" >  if (origin &amp;&amp; ALLOWED_ORIGINS.includes(origin)) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (origin &amp;&amp; ALLOWED_ORIGINS.includes(origin)) {</span>
 <span class="cstat-no" title="statement not covered" >    responseHeaders.set('Access-Control-Allow-Origin', origin);</span>
 <span class="cstat-no" title="statement not covered" >    responseHeaders.set('Access-Control-Allow-Methods', ALLOWED_METHODS.join(', '));</span>
 <span class="cstat-no" title="statement not covered" >    responseHeaders.set('Access-Control-Allow-Headers', ALLOWED_HEADERS.join(', '));</span>
@@ -864,7 +864,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
   }
 &nbsp;
   // プリフライトリクエストの処理
-<span class="cstat-no" title="statement not covered" >  if (method === 'OPTIONS') {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (method === 'OPTIONS') {</span>
 <span class="cstat-no" title="statement not covered" >    return new NextResponse(null, { status: 200, headers: responseHeaders });</span>
   }
 &nbsp;
@@ -875,7 +875,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
 <span class="cstat-no" title="statement not covered" >  responseHeaders.set('X-XSS-Protection', '1; mode=block');</span>
 &nbsp;
   // APIエンドポイントでない場合はスキップ
-<span class="cstat-no" title="statement not covered" >  if (!pathname.startsWith('/api/')) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!pathname.startsWith('/api/')) {</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] Not an API endpoint: ${pathname}`);</span>
 <span class="cstat-no" title="statement not covered" >    return NextResponse.next({</span>
       headers: responseHeaders,
@@ -886,7 +886,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
   const clientIp = <span class="cstat-no" title="statement not covered" >request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';</span>
   const rateLimitIdentifier = <span class="cstat-no" title="statement not covered" >`${clientIp}-${pathname}`;</span>
   
-<span class="cstat-no" title="statement not covered" >  if (!checkRateLimit(rateLimitIdentifier)) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (!checkRateLimit(rateLimitIdentifier)) {</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] Rate limit exceeded for: ${rateLimitIdentifier}`);</span>
 <span class="cstat-no" title="statement not covered" >    return new NextResponse(</span>
       JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
@@ -902,11 +902,11 @@ export async function <span class="fstat-no" title="function not covered" >middl
   }
 &nbsp;
   // CSRF保護（APIエンドポイントかつ状態を変更するメソッドの場合）
-<span class="cstat-no" title="statement not covered" >  if (CSRF_METHODS.includes(method) &amp;&amp; !PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >pa</span>th =&gt; <span class="cstat-no" title="statement not covered" >pathname === path || pathname.startsWith(path + '/'))</span>) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (CSRF_METHODS.includes(method) &amp;&amp; !PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; <span class="cstat-no" title="statement not covered" >pathname === path || pathname.startsWith(path + '/'))</span>) {</span>
     const csrfToken = <span class="cstat-no" title="statement not covered" >request.headers.get('x-csrf-token');</span>
     const sessionCsrfToken = <span class="cstat-no" title="statement not covered" >request.cookies.get('csrf-token-session')?.value;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!csrfToken || !sessionCsrfToken || csrfToken !== sessionCsrfToken) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!csrfToken || !sessionCsrfToken || csrfToken !== sessionCsrfToken) {</span>
 <span class="cstat-no" title="statement not covered" >      console.log(`[Middleware] CSRF token validation failed for: ${pathname}`);</span>
 <span class="cstat-no" title="statement not covered" >      return new NextResponse(</span>
         JSON.stringify({ error: 'Invalid CSRF token' }),
@@ -922,7 +922,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
   }
 &nbsp;
   // 認証不要なパスの場合はスキップ（完全一致または末尾がスラッシュの場合のみ）
-<span class="cstat-no" title="statement not covered" >  if (PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >pa</span>th =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (PUBLIC_PATHS.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; {</span>
     // 完全一致、またはパスの後にスラッシュが続く場合のみマッチ
 <span class="cstat-no" title="statement not covered" >    return pathname === path || pathname.startsWith(path + '/');</span>
   })) {
@@ -939,10 +939,10 @@ export async function <span class="fstat-no" title="function not covered" >middl
 <span class="cstat-no" title="statement not covered" >  console.log(`[Middleware] Token extracted: ${token ? 'Valid format' : 'Missing or invalid format'}`);</span>
 &nbsp;
   // auth/meエンドポイントの特殊処理：トークンがなくても401ではなくnullを返す
-<span class="cstat-no" title="statement not covered" >  if (pathname === '/api/auth/me') {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (pathname === '/api/auth/me') {</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] /api/auth/me special handling`);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!token) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!token) {</span>
 <span class="cstat-no" title="statement not covered" >      console.log(`[Middleware] /api/auth/me called without token, returning null`);</span>
 <span class="cstat-no" title="statement not covered" >      return new NextResponse(JSON.stringify(null), { </span>
         status: 200,
@@ -957,7 +957,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
     const payload = <span class="cstat-no" title="statement not covered" >await verifyTokenEdge(token);</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] /api/auth/me token verification: ${payload ? 'Valid' : 'Invalid'}`);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!payload) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!payload) {</span>
       // 無効なトークンの場合はnull
 <span class="cstat-no" title="statement not covered" >      console.log(`[Middleware] /api/auth/me invalid token, returning null`);</span>
 <span class="cstat-no" title="statement not covered" >      return new NextResponse(JSON.stringify(null), { </span>
@@ -989,10 +989,10 @@ export async function <span class="fstat-no" title="function not covered" >middl
   }
   
   // auth/me以外の認証が必要なパスの場合はトークン必須
-<span class="cstat-no" title="statement not covered" >  if (AUTH_REQUIRED_PATHS.some(<span class="fstat-no" title="function not covered" >pa</span>th =&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path))</span>) {</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (AUTH_REQUIRED_PATHS.some(<span class="fstat-no" title="function not covered" >path </span>=&gt; <span class="cstat-no" title="statement not covered" >pathname.startsWith(path))</span>) {</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] Protected path detected: ${pathname}`);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!token) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!token) {</span>
 <span class="cstat-no" title="statement not covered" >      console.log(`[Middleware] Protected path: ${pathname} called without token, returning 401`);</span>
 <span class="cstat-no" title="statement not covered" >      return new NextResponse(</span>
         JSON.stringify({ error: 'Authentication required' }),
@@ -1010,7 +1010,7 @@ export async function <span class="fstat-no" title="function not covered" >middl
     const payload = <span class="cstat-no" title="statement not covered" >await verifyTokenEdge(token);</span>
 <span class="cstat-no" title="statement not covered" >    console.log(`[Middleware] Token verification for ${pathname}: ${payload ? 'Valid' : 'Invalid'}`);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!payload) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!payload) {</span>
       // トークンが無効
 <span class="cstat-no" title="statement not covered" >      console.log(`[Middleware] Invalid token for protected path: ${pathname}`);</span>
 <span class="cstat-no" title="statement not covered" >      return new NextResponse(</span>
@@ -1060,7 +1060,7 @@ export const config = <span class="cstat-no" title="statement not covered" >{</s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../prettify.js"></script>
         <script>

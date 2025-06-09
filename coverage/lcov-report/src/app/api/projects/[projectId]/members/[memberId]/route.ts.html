@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
@@ -377,26 +377,26 @@ import { canManageProject } from '@/lib/utils/auth';
 // メンバーロール更新
 export async function <span class="fstat-no" title="function not covered" >PATCH(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string; memberId: string } }
+  { params }: { params: Promise&lt;{ projectId: string; memberId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { projectId, memberId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { projectId, memberId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // リクエストデータのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, updateProjectMemberRoleSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -410,7 +410,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingMember) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingMember) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'プロジェクトメンバーが見つかりません' },
         { status: 404 }
@@ -419,7 +419,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 &nbsp;
     // プロジェクト作成者のロールは変更不可
     const project = <span class="cstat-no" title="statement not covered" >accessCheck.project;</span>
-<span class="cstat-no" title="statement not covered" >    if (existingMember.user.id === project.creatorId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingMember.user.id === project.creatorId) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'プロジェクト作成者のロールは変更できません' },
         { status: 403 }
@@ -454,20 +454,20 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 // メンバー削除
 export async function <span class="fstat-no" title="function not covered" >DELETE(</span>
   req: NextRequest,
-  { params }: { params: { projectId: string; memberId: string } }
+  { params }: { params: Promise&lt;{ projectId: string; memberId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
     
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { projectId, memberId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { projectId, memberId } = <span class="cstat-no" title="statement not covered" >await params;</span>
     
     // プロジェクト管理権限をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canManageProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
@@ -479,7 +479,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingMember) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingMember) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'プロジェクトメンバーが見つかりません' },
         { status: 404 }
@@ -488,7 +488,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
 &nbsp;
     // プロジェクト作成者は削除不可
     const project = <span class="cstat-no" title="statement not covered" >accessCheck.project;</span>
-<span class="cstat-no" title="statement not covered" >    if (existingMember.user.id === project.creatorId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingMember.user.id === project.creatorId) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'プロジェクト作成者をプロジェクトから削除することはできません' },
         { status: 403 }
@@ -496,7 +496,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // 自分自身の削除は不可（これは管理者自身による自分の削除を防ぐため）
-<span class="cstat-no" title="statement not covered" >    if (existingMember.userId === user.id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingMember.userId === user.id) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '自分自身をプロジェクトから削除することはできません' },
         { status: 403 }
@@ -526,7 +526,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../../../prettify.js"></script>
         <script>

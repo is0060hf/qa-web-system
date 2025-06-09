@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/17</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -195,7 +195,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { UserRole, ProjectRole } from '../components/auth/withRoleCheck';
 &nbsp;
 // 認証関連のカスタムフック
-export const useAuth = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
+export const useAuth = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
   const { user, isLoading, error, token, login, logout, register, checkProjectRole } = <span class="cstat-no" title="statement not covered" >useAuthStore();</span>
   const router = <span class="cstat-no" title="statement not covered" >useRouter();</span>
   const pathname = <span class="cstat-no" title="statement not covered" >usePathname();</span>
@@ -205,22 +205,22 @@ export const useAuth = <span class="cstat-no" title="statement not covered" ><sp
   
   // 現在のユーザーが特定のロールを持っているかどうか
   const hasRole = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(r</span>ole: UserRole): boolean =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) <span class="cstat-no" title="statement not covered" >return false;</span></span>
 <span class="cstat-no" title="statement not covered" >    return user.role === role;</span>
   };
   
   // 現在のユーザーが特定のプロジェクトに対して特定のロールを持っているかどうか
   const hasProjectRole = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>rojectId: string, role: ProjectRole): boolean =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) <span class="cstat-no" title="statement not covered" >return false;</span></span>
     // ADMINは全てのプロジェクトに対して全ての権限を持つ
-<span class="cstat-no" title="statement not covered" >    if (user.role === 'ADMIN') <span class="cstat-no" title="statement not covered" >return true;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (user.role === 'ADMIN') <span class="cstat-no" title="statement not covered" >return true;</span></span>
 <span class="cstat-no" title="statement not covered" >    return checkProjectRole(projectId, role);</span>
   };
   
   // プロテクトされたルートへのリダイレクト（未認証の場合）
-  const requireAuth = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (!isLoading &amp;&amp; !isAuthenticated) {</span>
+  const requireAuth = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isLoading &amp;&amp; !isAuthenticated) {</span>
 <span class="cstat-no" title="statement not covered" >        router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);</span>
       }
     }, [isLoading, isAuthenticated]);
@@ -230,8 +230,8 @@ export const useAuth = <span class="cstat-no" title="statement not covered" ><sp
   
   // 認証済みユーザー向けのルートへのリダイレクト（認証済みの場合）
   const redirectIfAuthenticated = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(p</span>ath = <span class="branch-0 cbranch-no" title="branch not covered" >'/')</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      if (!isLoading &amp;&amp; isAuthenticated) {</span>
+<span class="cstat-no" title="statement not covered" >    useEffect(<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isLoading &amp;&amp; isAuthenticated) {</span>
 <span class="cstat-no" title="statement not covered" >        router.replace(path);</span>
       }
     }, [isLoading, isAuthenticated]);
@@ -259,7 +259,7 @@ export const useAuth = <span class="cstat-no" title="statement not covered" ><sp
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

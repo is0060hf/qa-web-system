@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/64</span>
+                <span class='fraction'>0/49</span>
             </div>
         
             
@@ -473,7 +473,33 @@
 <a name='L408'></a><a href='#L408'>408</a>
 <a name='L409'></a><a href='#L409'>409</a>
 <a name='L410'></a><a href='#L410'>410</a>
-<a name='L411'></a><a href='#L411'>411</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L411'></a><a href='#L411'>411</a>
+<a name='L412'></a><a href='#L412'>412</a>
+<a name='L413'></a><a href='#L413'>413</a>
+<a name='L414'></a><a href='#L414'>414</a>
+<a name='L415'></a><a href='#L415'>415</a>
+<a name='L416'></a><a href='#L416'>416</a>
+<a name='L417'></a><a href='#L417'>417</a>
+<a name='L418'></a><a href='#L418'>418</a>
+<a name='L419'></a><a href='#L419'>419</a>
+<a name='L420'></a><a href='#L420'>420</a>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a>
+<a name='L432'></a><a href='#L432'>432</a>
+<a name='L433'></a><a href='#L433'>433</a>
+<a name='L434'></a><a href='#L434'>434</a>
+<a name='L435'></a><a href='#L435'>435</a>
+<a name='L436'></a><a href='#L436'>436</a>
+<a name='L437'></a><a href='#L437'>437</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -559,6 +585,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -579,6 +623,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -884,7 +936,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 &nbsp;
 // 質問詳細取得
@@ -895,7 +947,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -919,6 +971,12 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
         assignee: {
@@ -926,6 +984,12 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
             id: true,
             name: true,
             email: true,
+            profileImage: {
+              select: {
+                id: true,
+                storageUrl: true,
+              },
+            },
           },
         },
         tags: {
@@ -949,6 +1013,12 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
                 id: true,
                 name: true,
                 email: true,
+                profileImage: {
+                  select: {
+                    id: true,
+                    storageUrl: true,
+                  },
+                },
               },
             },
             formData: {
@@ -969,7 +1039,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!question) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!question) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '質問が見つかりません' }, { status: 404 });</span>
     }
 &nbsp;
@@ -980,7 +1050,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     const isAssignee = <span class="cstat-no" title="statement not covered" >question.assigneeId === user.id;</span>
     const isProjectMember = <span class="cstat-no" title="statement not covered" >question.project.members.length &gt; 0;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isAssignee &amp;&amp; !isProjectMember) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isAssignee &amp;&amp; !isProjectMember) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この質問を閲覧する権限がありません' },
         { status: 403 }
@@ -1006,19 +1076,27 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
         id: question.creator.id,
         name: question.creator.name || question.creator.email,
         email: question.creator.email,
+        profileImage: question.creator.profileImage ? {
+          id: question.creator.profileImage.id,
+          storageUrl: question.creator.profileImage.storageUrl,
+        } : null,
       },
       assignee: {
         id: question.assignee.id,
         name: question.assignee.name || question.assignee.email,
         email: question.assignee.email,
+        profileImage: question.assignee.profileImage ? {
+          id: question.assignee.profileImage.id,
+          storageUrl: question.assignee.profileImage.storageUrl,
+        } : null,
       },
-      tags: question.tags.map(<span class="fstat-no" title="function not covered" >qt</span> =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      tags: question.tags.map(<span class="fstat-no" title="function not covered" >qt </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
         id: qt.tag.id,
         name: qt.tag.name,
       })),
       answerForm: question.answerForm ? {
         id: question.answerForm.id,
-        fields: question.answerForm.fields.map(<span class="fstat-no" title="function not covered" >fi</span>eld =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+        fields: question.answerForm.fields.map(<span class="fstat-no" title="function not covered" >field </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           id: field.id,
           label: field.label,
           fieldType: field.fieldType,
@@ -1027,7 +1105,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
           order: field.order,
         })),
       } : null,
-      answers: question.answers.map(<span class="fstat-no" title="function not covered" >an</span>swer =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      answers: question.answers.map(<span class="fstat-no" title="function not covered" >answer </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
         id: answer.id,
         content: answer.content,
         createdAt: answer.createdAt,
@@ -1037,14 +1115,14 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
           name: answer.creator.name || answer.creator.email,
           email: answer.creator.email,
         },
-        formResponses: answer.formData.map(<span class="fstat-no" title="function not covered" >re</span>sponse =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+        formResponses: answer.formData.map(<span class="fstat-no" title="function not covered" >response </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           id: response.id,
           formFieldId: response.formFieldId,
           formFieldLabel: response.formField.label,
           value: response.value,
           mediaFileId: response.mediaFileId,
         })),
-        attachments: answer.mediaFiles.map(<span class="fstat-no" title="function not covered" >at</span>tachment =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+        attachments: answer.mediaFiles.map(<span class="fstat-no" title="function not covered" >attachment </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
           id: attachment.mediaFile.id,
           fileName: attachment.mediaFile.fileName,
           fileSize: attachment.mediaFile.fileSize,
@@ -1073,7 +1151,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -1097,7 +1175,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingQuestion) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingQuestion) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '質問が見つかりません' }, { status: 404 });</span>
     }
 &nbsp;
@@ -1106,7 +1184,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     const isCreator = <span class="cstat-no" title="statement not covered" >existingQuestion.creatorId === user.id;</span>
     const isProjectManager = <span class="cstat-no" title="statement not covered" >existingQuestion.project.members.length &gt; 0;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isProjectManager) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isProjectManager) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この質問を更新する権限がありません' },
         { status: 403 }
@@ -1114,7 +1192,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     }
 &nbsp;
     // ステータスがCLOSEDの質問は更新不可
-<span class="cstat-no" title="statement not covered" >    if (existingQuestion.status === 'CLOSED') {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (existingQuestion.status === 'CLOSED') {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'クローズされた質問は更新できません' },
         { status: 400 }
@@ -1124,14 +1202,14 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     // 更新データの準備
     const updateData: any = <span class="cstat-no" title="statement not covered" >{};</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (body.title) <span class="cstat-no" title="statement not covered" >updateData.title = body.title;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (body.content !== undefined) <span class="cstat-no" title="statement not covered" >updateData.content = body.content;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (body.assigneeId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.title) <span class="cstat-no" title="statement not covered" >updateData.title = body.title;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.content !== undefined) <span class="cstat-no" title="statement not covered" >updateData.content = body.content;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.assigneeId) {</span>
       // 担当者の存在確認
       const assignee = <span class="cstat-no" title="statement not covered" >await prisma.user.findUnique({</span>
         where: { id: body.assigneeId },
       });
-<span class="cstat-no" title="statement not covered" >      if (!assignee) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!assignee) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '指定された担当者が存在しません' },
           { status: 400 }
@@ -1139,18 +1217,18 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
       }
 <span class="cstat-no" title="statement not covered" >      updateData.assigneeId = body.assigneeId;</span>
     }
-<span class="cstat-no" title="statement not covered" >    if (body.deadline !== undefined) <span class="cstat-no" title="statement not covered" >updateData.deadline = body.deadline ? new Date(body.deadline) : null;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (body.priority) <span class="cstat-no" title="statement not covered" >updateData.priority = body.priority;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.deadline !== undefined) <span class="cstat-no" title="statement not covered" >updateData.deadline = body.deadline ? new Date(body.deadline) : null;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.priority) <span class="cstat-no" title="statement not covered" >updateData.priority = body.priority;</span></span>
 &nbsp;
     // タグの更新
-<span class="cstat-no" title="statement not covered" >    if (body.tagIds !== undefined) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.tagIds !== undefined) {</span>
       // 既存のタグ関連を削除
 <span class="cstat-no" title="statement not covered" >      await prisma.questionTag.deleteMany({</span>
         where: { questionId },
       });
 &nbsp;
       // 新しいタグ関連を作成
-<span class="cstat-no" title="statement not covered" >      if (body.tagIds.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (body.tagIds.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >        await prisma.questionTag.createMany({</span>
           data: body.tagIds.map(<span class="fstat-no" title="function not covered" >(t</span>agId: string) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
             questionId,
@@ -1189,7 +1267,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     });
 &nbsp;
     // 担当者が変更された場合、通知を作成
-<span class="cstat-no" title="statement not covered" >    if (body.assigneeId &amp;&amp; body.assigneeId !== existingQuestion.assigneeId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (body.assigneeId &amp;&amp; body.assigneeId !== existingQuestion.assigneeId) {</span>
 <span class="cstat-no" title="statement not covered" >      await prisma.notification.create({</span>
         data: {
           userId: body.assigneeId,
@@ -1217,7 +1295,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
         id: updatedQuestion.assignee.id,
         name: updatedQuestion.assignee.name || updatedQuestion.assignee.email,
       },
-      tags: updatedQuestion.tags.map(<span class="fstat-no" title="function not covered" >qt</span> =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+      tags: updatedQuestion.tags.map(<span class="fstat-no" title="function not covered" >qt </span>=&gt; (<span class="cstat-no" title="statement not covered" >{</span>
         id: qt.tag.id,
         name: qt.tag.name,
       })),
@@ -1241,7 +1319,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -1264,7 +1342,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!existingQuestion) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!existingQuestion) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '質問が見つかりません' }, { status: 404 });</span>
     }
 &nbsp;
@@ -1273,7 +1351,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     const isCreator = <span class="cstat-no" title="statement not covered" >existingQuestion.creatorId === user.id;</span>
     const isProjectManager = <span class="cstat-no" title="statement not covered" >existingQuestion.project.members.length &gt; 0;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isProjectManager) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isAdmin &amp;&amp; !isCreator &amp;&amp; !isProjectManager) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'この質問を削除する権限がありません' },
         { status: 403 }
@@ -1300,7 +1378,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

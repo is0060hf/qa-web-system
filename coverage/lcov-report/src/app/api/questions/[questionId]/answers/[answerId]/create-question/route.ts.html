@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/37</span>
+                <span class='fraction'>0/24</span>
             </div>
         
             
@@ -631,7 +631,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
@@ -657,14 +657,14 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!originalQuestion) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!originalQuestion) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '質問が見つかりません' },
         { status: 404 }
       );
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (originalQuestion.answers.length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (originalQuestion.answers.length === 0) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '回答が見つかりません' },
         { status: 404 }
@@ -675,13 +675,13 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 &nbsp;
     // プロジェクトへのアクセス権をチェック
     const accessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(originalQuestion.projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >    if (!accessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return accessCheck.error;</span>
     }
 &nbsp;
     // リクエストのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, createQuestionFromAnswerSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -697,9 +697,9 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     } = <span class="cstat-no" title="statement not covered" >validation.data;</span>
 &nbsp;
     // 対象プロジェクトへのアクセス権をチェック（異なるプロジェクトの場合）
-<span class="cstat-no" title="statement not covered" >    if (projectId !== originalQuestion.projectId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (projectId !== originalQuestion.projectId) {</span>
       const targetAccessCheck = <span class="cstat-no" title="statement not covered" >await canAccessProject(projectId, user);</span>
-<span class="cstat-no" title="statement not covered" >      if (!targetAccessCheck.success) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!targetAccessCheck.success) {</span>
 <span class="cstat-no" title="statement not covered" >        return targetAccessCheck.error;</span>
       }
     }
@@ -709,7 +709,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       where: { id: assigneeId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!assignee) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!assignee) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '指定された担当者が見つかりません' },
         { status: 400 }
@@ -726,7 +726,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!assigneeMembership) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!assigneeMembership) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: '指定された担当者はプロジェクトのメンバーではありません' },
         { status: 400 }
@@ -734,7 +734,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // タグの存在確認
-<span class="cstat-no" title="statement not covered" >    if (tagIds &amp;&amp; tagIds.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (tagIds &amp;&amp; tagIds.length &gt; 0) {</span>
       const tags = <span class="cstat-no" title="statement not covered" >await prisma.projectTag.findMany({</span>
         where: {
           id: { in: tagIds },
@@ -742,7 +742,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
         },
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      if (tags.length !== tagIds.length) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (tags.length !== tagIds.length) {</span>
 <span class="cstat-no" title="statement not covered" >        return NextResponse.json(</span>
           { error: '無効なタグIDが含まれています' },
           { status: 400 }
@@ -752,7 +752,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
 &nbsp;
     // 引用コンテンツの準備
     let finalContent = <span class="cstat-no" title="statement not covered" >content || '';</span>
-<span class="cstat-no" title="statement not covered" >    if (includeOriginalContent) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (includeOriginalContent) {</span>
       const quotedContent = <span class="cstat-no" title="statement not covered" >`&gt; 元の質問: ${originalQuestion.title}\n` +</span>
         `&gt; 回答者: ${originalAnswer.creator.name || originalAnswer.creator.email}\n` +
         `&gt; 回答日時: ${originalAnswer.createdAt.toLocaleString('ja-JP')}\n` +
@@ -763,7 +763,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
     }
 &nbsp;
     // トランザクションで質問とタグの関連を作成
-    const newQuestion = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >as</span>ync (tx) =&gt; {</span>
+    const newQuestion = <span class="cstat-no" title="statement not covered" >await prisma.$transaction(<span class="fstat-no" title="function not covered" >async </span>(tx) =&gt; {</span>
       // 質問を作成
       const question = <span class="cstat-no" title="statement not covered" >await tx.question.create({</span>
         data: {
@@ -801,7 +801,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
       });
 &nbsp;
       // タグを関連付け
-<span class="cstat-no" title="statement not covered" >      if (tagIds &amp;&amp; tagIds.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (tagIds &amp;&amp; tagIds.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >        await Promise.all(</span>
           tagIds.map(<span class="fstat-no" title="function not covered" >(t</span>agId) =&gt;
 <span class="cstat-no" title="statement not covered" >            tx.questionTag.create({</span>
@@ -883,7 +883,7 @@ export async function <span class="fstat-no" title="function not covered" >POST(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../../../../prettify.js"></script>
         <script>

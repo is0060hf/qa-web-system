@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>0/37</span>
             </div>
         
             
@@ -359,9 +359,7 @@
 <a name='L294'></a><a href='#L294'>294</a>
 <a name='L295'></a><a href='#L295'>295</a>
 <a name='L296'></a><a href='#L296'>296</a>
-<a name='L297'></a><a href='#L297'>297</a>
-<a name='L298'></a><a href='#L298'>298</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L297'></a><a href='#L297'>297</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -664,7 +662,6 @@ import {
   Box,
   TextField,
   Button,
-  Grid,
   MenuItem,
   FormControlLabel,
   Checkbox,
@@ -854,14 +851,14 @@ export default function <span class="fstat-no" title="function not covered" >Sea
         
         {/* 詳細検索フィルター */}
         &lt;Collapse in={showAdvanced}&gt;
-          &lt;Grid container spacing={2} sx={{ mb: 2 }}&gt;
+          &lt;Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 2 }}&gt;
             {/* プロジェクト */}
-            &lt;Grid item xs={12} md={6}&gt;
+            &lt;Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}&gt;
               &lt;FormSelectField
                 name="projectId"
                 label="プロジェクト"
-                value={searchParams.projectId}
-                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('projectId', e.target.value)}</span>
+                value={searchParams.projectId || ''}
+                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('projectId', e.target.value as string)}</span>
                 options={[
                   { value: '', label: 'すべてのプロジェクト' },
                   ...projects
@@ -870,15 +867,15 @@ export default function <span class="fstat-no" title="function not covered" >Sea
                 size="small"
                 disabled={isLoading}
               /&gt;
-            &lt;/Grid&gt;
+            &lt;/Box&gt;
             
             {/* 担当者 */}
-            &lt;Grid item xs={12} md={6}&gt;
+            &lt;Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}&gt;
               &lt;FormSelectField
                 name="assigneeId"
                 label="担当者"
-                value={searchParams.assigneeId}
-                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('assigneeId', e.target.value)}</span>
+                value={searchParams.assigneeId || ''}
+                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('assigneeId', e.target.value as string)}</span>
                 options={[
                   { value: '', label: 'すべての担当者' },
                   ...assignees
@@ -887,44 +884,44 @@ export default function <span class="fstat-no" title="function not covered" >Sea
                 size="small"
                 disabled={isLoading}
               /&gt;
-            &lt;/Grid&gt;
+            &lt;/Box&gt;
             
             {/* ステータス */}
-            &lt;Grid item xs={12} md={6}&gt;
+            &lt;Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}&gt;
               &lt;FormSelectField
                 name="status"
                 label="ステータス"
-                value={searchParams.status}
-                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('status', e.target.value)}</span>
+                value={searchParams.status || ''}
+                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('status', e.target.value as string)}</span>
                 options={STATUS_OPTIONS}
                 fullWidth
                 size="small"
                 disabled={isLoading}
               /&gt;
-            &lt;/Grid&gt;
+            &lt;/Box&gt;
             
             {/* 優先度 */}
-            &lt;Grid item xs={12} md={6}&gt;
+            &lt;Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}&gt;
               &lt;FormSelectField
                 name="priority"
                 label="優先度"
-                value={searchParams.priority}
-                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('priority', e.target.value)}</span>
+                value={searchParams.priority || ''}
+                onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('priority', e.target.value as string)}</span>
                 options={PRIORITY_OPTIONS}
                 fullWidth
                 size="small"
                 disabled={isLoading}
               /&gt;
-            &lt;/Grid&gt;
+            &lt;/Box&gt;
             
             {/* タグ */}
             {tags.length &gt; 0 &amp;&amp; (
-              &lt;Grid item xs={12} md={6}&gt;
+              &lt;Box sx={{ flex: '1 1 calc(50% - 8px)', minWidth: '250px' }}&gt;
                 &lt;FormSelectField
                   name="tagId"
                   label="タグ"
-                  value={searchParams.tagId}
-                  onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('tagId', e.target.value)}</span>
+                  value={searchParams.tagId || ''}
+                  onChange={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >handleChange('tagId', e.target.value as string)}</span>
                   options={[
                     { value: '', label: 'すべてのタグ' },
                     ...tags
@@ -933,11 +930,11 @@ export default function <span class="fstat-no" title="function not covered" >Sea
                   size="small"
                   disabled={isLoading}
                 /&gt;
-              &lt;/Grid&gt;
+              &lt;/Box&gt;
             )}
             
             {/* 期限切れフラグ */}
-            &lt;Grid item xs={12}&gt;
+            &lt;Box sx={{ flex: '1 1 100%' }}&gt;
               &lt;FormControlLabel
                 control={
                   &lt;Checkbox
@@ -948,8 +945,8 @@ export default function <span class="fstat-no" title="function not covered" >Sea
                 }
                 label="期限切れの質問のみ表示"
               /&gt;
-            &lt;/Grid&gt;
-          &lt;/Grid&gt;
+            &lt;/Box&gt;
+          &lt;/Box&gt;
         &lt;/Collapse&gt;
       &lt;/Box&gt;
     &lt;/Paper&gt;
@@ -961,7 +958,7 @@ export default function <span class="fstat-no" title="function not covered" >Sea
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:15:41.060Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

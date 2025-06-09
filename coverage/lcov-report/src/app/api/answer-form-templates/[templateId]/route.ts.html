@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/28</span>
+                <span class='fraction'>0/15</span>
             </div>
         
             
@@ -462,22 +462,22 @@ const updateTemplateSchema = <span class="cstat-no" title="statement not covered
 // テンプレート詳細取得（GET）
 export async function <span class="fstat-no" title="function not covered" >GET(</span>
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise&lt;{ templateId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { templateId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { templateId } = <span class="cstat-no" title="statement not covered" >await params;</span>
 &nbsp;
     // テンプレートを取得
     const template = <span class="cstat-no" title="statement not covered" >await prisma.answerFormTemplate.findUnique({</span>
       where: { id: templateId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!template) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!template) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'テンプレートが見つかりません' },
         { status: 404 }
@@ -485,7 +485,7 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
     }
 &nbsp;
     // 作成者本人かチェック
-<span class="cstat-no" title="statement not covered" >    if (template.creatorId !== user.id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (template.creatorId !== user.id) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このテンプレートへのアクセス権限がありません' },
         { status: 403 }
@@ -508,22 +508,22 @@ export async function <span class="fstat-no" title="function not covered" >GET(<
 // テンプレート更新（PATCH）
 export async function <span class="fstat-no" title="function not covered" >PATCH(</span>
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise&lt;{ templateId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { templateId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { templateId } = <span class="cstat-no" title="statement not covered" >await params;</span>
 &nbsp;
     // テンプレートの存在確認
     const template = <span class="cstat-no" title="statement not covered" >await prisma.answerFormTemplate.findUnique({</span>
       where: { id: templateId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!template) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!template) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'テンプレートが見つかりません' },
         { status: 404 }
@@ -531,7 +531,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
     }
 &nbsp;
     // 作成者本人かチェック
-<span class="cstat-no" title="statement not covered" >    if (template.creatorId !== user.id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (template.creatorId !== user.id) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このテンプレートを更新する権限がありません' },
         { status: 403 }
@@ -540,7 +540,7 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 &nbsp;
     // リクエストのバリデーション
     const validation = <span class="cstat-no" title="statement not covered" >await validateRequest(req, updateTemplateSchema);</span>
-<span class="cstat-no" title="statement not covered" >    if (!validation.success) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!validation.success) {</span>
 <span class="cstat-no" title="statement not covered" >      return validation.error;</span>
     }
 &nbsp;
@@ -548,9 +548,9 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 &nbsp;
     // 更新データの準備
     const updateData: any = <span class="cstat-no" title="statement not covered" >{};</span>
-<span class="cstat-no" title="statement not covered" >    if (name !== undefined) <span class="cstat-no" title="statement not covered" >updateData.name = name;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (description !== undefined) <span class="cstat-no" title="statement not covered" >updateData.description = description;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (fields !== undefined) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (name !== undefined) <span class="cstat-no" title="statement not covered" >updateData.name = name;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (description !== undefined) <span class="cstat-no" title="statement not covered" >updateData.description = description;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (fields !== undefined) {</span>
       // フィールドにorder番号を設定
       const fieldsWithOrder = <span class="cstat-no" title="statement not covered" >fields.map(<span class="fstat-no" title="function not covered" >(f</span>ield, index) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
         ...field,
@@ -581,22 +581,22 @@ export async function <span class="fstat-no" title="function not covered" >PATCH
 // テンプレート削除（DELETE）
 export async function <span class="fstat-no" title="function not covered" >DELETE(</span>
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise&lt;{ templateId: string }&gt; }
 ) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const user = <span class="cstat-no" title="statement not covered" >getUserFromRequest(req);</span>
-<span class="cstat-no" title="statement not covered" >    if (!user) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });</span>
     }
 &nbsp;
-    const { templateId } = <span class="cstat-no" title="statement not covered" >params;</span>
+    const { templateId } = <span class="cstat-no" title="statement not covered" >await params;</span>
 &nbsp;
     // テンプレートの存在確認
     const template = <span class="cstat-no" title="statement not covered" >await prisma.answerFormTemplate.findUnique({</span>
       where: { id: templateId },
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!template) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!template) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'テンプレートが見つかりません' },
         { status: 404 }
@@ -604,7 +604,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
     }
 &nbsp;
     // 作成者本人かチェック
-<span class="cstat-no" title="statement not covered" >    if (template.creatorId !== user.id) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (template.creatorId !== user.id) {</span>
 <span class="cstat-no" title="statement not covered" >      return NextResponse.json(</span>
         { error: 'このテンプレートを削除する権限がありません' },
         { status: 403 }
@@ -631,7 +631,7 @@ export async function <span class="fstat-no" title="function not covered" >DELET
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../../../prettify.js"></script>
         <script>

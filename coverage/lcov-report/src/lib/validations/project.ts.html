@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -119,39 +119,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,39 +171,39 @@
 import { ProjectRole } from '@prisma/client';
 &nbsp;
 // プロジェクト作成スキーマ
-export const createProjectSchema = z.object({
+export const createProjectSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   name: z.string().min(1, '名前は必須です').max(100, '名前は100文字以内で入力してください'),
   description: z.string().max(1000, '説明は1000文字以内で入力してください').optional(),
 });
 &nbsp;
 // プロジェクト更新スキーマ
-export const updateProjectSchema = z.object({
+export const updateProjectSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   name: z.string().min(1, '名前は必須です').max(100, '名前は100文字以内で入力してください').optional(),
   description: z.string().max(1000, '説明は1000文字以内で入力してください').optional(),
 });
 &nbsp;
 // プロジェクトメンバー追加スキーマ
-export const addProjectMemberSchema = z.object({
+export const addProjectMemberSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   userId: z.string().min(1, 'ユーザーIDは必須です'),
   role: z.nativeEnum(ProjectRole, {
-    errorMap: () =&gt; ({ message: 'ロールは MANAGER または MEMBER のいずれかを指定してください' }),
+    errorMap: <span class="fstat-no" title="function not covered" >() =</span>&gt; (<span class="cstat-no" title="statement not covered" >{ message: 'ロールは MANAGER または MEMBER のいずれかを指定してください' })</span>,
   }),
 });
 &nbsp;
 // プロジェクトメンバーロール更新スキーマ
-export const updateProjectMemberRoleSchema = z.object({
+export const updateProjectMemberRoleSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   role: z.nativeEnum(ProjectRole, {
-    errorMap: () =&gt; ({ message: 'ロールは MANAGER または MEMBER のいずれかを指定してください' }),
+    errorMap: <span class="fstat-no" title="function not covered" >() =</span>&gt; (<span class="cstat-no" title="statement not covered" >{ message: 'ロールは MANAGER または MEMBER のいずれかを指定してください' })</span>,
   }),
 });
 &nbsp;
 // プロジェクトタグ作成スキーマ
-export const createProjectTagSchema = z.object({
+export const createProjectTagSchema = <span class="cstat-no" title="statement not covered" >z.object({</span>
   name: z.string().min(1, 'タグ名は必須です').max(50, 'タグ名は50文字以内で入力してください'),
 });
 &nbsp;
 // プロジェクト招待スキーマ
-export const inviteToProjectSchema = z.discriminatedUnion('type', [
+export const inviteToProjectSchema = <span class="cstat-no" title="statement not covered" >z.discriminatedUnion('type', [</span>
   z.object({
     type: z.literal('email'),
     email: z.string().email('有効なメールアドレスを入力してください'),
@@ -226,7 +226,7 @@ export type InviteToProjectInput = z.infer&lt;typeof inviteToProjectSchema&gt;; 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-06-07T00:25:12.916Z
+                at 2025-06-09T14:22:18.180Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
