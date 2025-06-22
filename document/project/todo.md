@@ -474,3 +474,16 @@
   - `/api/projects/route.ts`
   - `/api/users/me/route.ts`
   - 認証が必要でユーザー固有のデータを返すエンドポイントの一貫性確保
+
+### コードクリーンアップ（2025/01/19 Claudeレビューより）
+- [ ] 未使用インポートの削除
+  - src/app/api/dashboard/route.ts: getUserFromRequestが未使用
+  - src/app/api/questions/route.ts: validateRequest、createQuestionSchema、QuestionStatus、QuestionPriorityが未使用
+- [ ] dashboard APIの認証処理改善
+  - 手動JWT認証の代わりにgetUserFromRequest関数を使用
+  - JWT_SECRETのフォールバック値（'fallback_secret'）を削除し、環境変数未設定時はエラーをスロー
+- [ ] インポート文の統合
+  - 同一モジュールからの複数インポートを1つにまとめる
+- [ ] 型定義の重複解消
+  - ProjectAPIResponseとMockProjectAPIResponseの共通化
+  - src/types/project.tsに共通型定義を作成
