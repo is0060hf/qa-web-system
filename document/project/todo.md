@@ -453,21 +453,21 @@
   - APIレスポンス型の修正のみ実施
 
 ### プロジェクト一覧画面の改善（2025/01/19 Claudeレビューより）
-- [ ] 型安全性の改善
+- [x] 型安全性の改善
   - APIレスポンス用の型定義を追加（ProjectAPIResponse）
   - 変換後のデータ型を明確化（ProjectWithCounts）
   - rawProjectsの型を明示的に指定
-- [ ] データ構造の整理
+- [x] データ構造の整理
   - MockProjectインターフェースをAPI用と表示用に分離
   - MockProjectAPIResponseとMockProjectDisplayの型定義
-- [ ] エラーハンドリングの強化
+- [x] エラーハンドリングの強化
   - `project._count?.questions` のundefined処理を `??` 演算子に変更
-- [ ] パフォーマンス最適化
+- [x] パフォーマンス最適化
   - データ変換処理をuseMemoでメモ化
   - 不要な再レンダリングを防止
 
 ### APIエンドポイントの動的レンダリング設定（2025/01/19 Claudeレビューより）
-- [ ] ユーザー固有データを返す他のAPIエンドポイントにも`force-dynamic`設定を追加
+- [x] ユーザー固有データを返す他のAPIエンドポイントにも`force-dynamic`設定を追加
   - `/api/notifications/route.ts`
   - `/api/dashboard/route.ts`
   - `/api/questions/route.ts`

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
+
 // 通知一覧取得
 export async function GET(req: NextRequest) {
   try {

@@ -4,6 +4,9 @@ import prisma from '@/lib/db';
 import { hashPassword, verifyPassword } from '@/lib/auth';
 import { z } from 'zod';
 
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
+
 // ユーザー自身の情報を取得
 export async function GET(req: NextRequest) {
   try {

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 import { QuestionStatus } from '@prisma/client';
+import { getUserFromRequest } from '@/lib/utils/api';
+
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {

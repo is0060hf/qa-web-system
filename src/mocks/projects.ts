@@ -1,7 +1,11 @@
-export interface MockProject {
+// APIレスポンス用の型
+export interface MockProjectAPIResponse {
   id: string;
   name: string;
   description: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
   members?: Array<{
     id: string;
     name: string;
@@ -20,11 +24,6 @@ export interface MockProject {
     createdBy: string;
     createdAt: string;
   }>;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  members_count?: number;
-  questions_count?: number;
   _count?: {
     questions: number;
   };
@@ -34,6 +33,44 @@ export interface MockProject {
     email: string;
   };
 }
+
+// 画面表示用の型（変換後）
+export interface MockProjectDisplay {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  members?: Array<{
+    id: string;
+    name: string;
+    role: string;
+    avatar: string;
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+  questions?: Array<{
+    id: string;
+    title: string;
+    status: string;
+    createdBy: string;
+    createdAt: string;
+  }>;
+  members_count: number;
+  questions_count: number;
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+// 後方互換性のため、MockProjectを残す
+export type MockProject = MockProjectAPIResponse;
 
 // モックプロジェクトデータ
 export const mockProjects = [

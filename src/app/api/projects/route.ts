@@ -6,6 +6,9 @@ import { createProjectSchema } from '@/lib/validations/project';
 import { Role } from '@prisma/client';
 import { withLogging, logAuditEvent, logError } from '@/lib/utils/logger';
 
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
+
 // プロジェクト一覧を取得
 const _GET = async (req: NextRequest) => {
   try {

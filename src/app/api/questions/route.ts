@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { Role } from '@prisma/client';
+import { validateRequest } from '@/lib/utils/api';
+import { createQuestionSchema } from '@/lib/validations/question';
+import { QuestionStatus, QuestionPriority } from '@prisma/client';
+
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
 
 // 質問一覧を取得
 export async function GET(req: NextRequest) {

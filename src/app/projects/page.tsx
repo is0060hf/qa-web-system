@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -24,6 +24,38 @@ import DataTable from '../components/common/DataTable';
 import { fetchData, useDataFetching } from '@/lib/utils/fetchData';
 import { MockProject } from '@/mocks/projects';
 import { getProjectStatusChipColor } from '@/lib/utils/muiHelpers';
+
+// APIレスポンスの型定義
+interface ProjectAPIResponse {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  members?: Array<{
+    id: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }>;
+  _count?: {
+    questions: number;
+  };
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+// 変換後のデータ型
+interface ProjectWithCounts extends Omit<ProjectAPIResponse, '_count'> {
+  members_count: number;
+  questions_count: number;
+}
 
 // テーブルのカラム定義
 const columns = [
@@ -73,17 +105,19 @@ export default function ProjectsPage() {
     isLoading, 
     error, 
     refetch 
-  } = useDataFetching<MockProject[]>(
-    () => fetchData<MockProject[]>('projects', { params: getQueryParams() }),
+  } = useDataFetching<ProjectAPIResponse[]>(
+    () => fetchData<ProjectAPIResponse[]>('projects', { params: getQueryParams() }),
     []
   );
   
-  // APIレスポンスのデータを画面用に変換
-  const projects = rawProjects?.map((project) => ({
-    ...project,
-    members_count: project.members?.length || 0,
-    questions_count: project._count?.questions || 0,
-  })) || [];
+  // APIレスポンスのデータを画面用に変換（メモ化）
+  const projects: ProjectWithCounts[] = useMemo(() => 
+    rawProjects?.map((project) => ({
+      ...project,
+      members_count: project.members?.length ?? 0,
+      questions_count: project._count?.questions ?? 0,
+    })) ?? []
+  , [rawProjects]);
   
   const handleStatusFilterChange = (event: SelectChangeEvent) => {
     setStatusFilter(event.target.value);
