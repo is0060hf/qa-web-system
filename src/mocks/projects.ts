@@ -7,6 +7,11 @@ export interface MockProject {
     name: string;
     role: string;
     avatar: string;
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+    };
   }>;
   questions?: Array<{
     id: string;
@@ -20,6 +25,14 @@ export interface MockProject {
   updatedAt: string;
   members_count?: number;
   questions_count?: number;
+  _count?: {
+    questions: number;
+  };
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 // モックプロジェクトデータ

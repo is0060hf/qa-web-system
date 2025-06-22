@@ -69,7 +69,7 @@ export default function ProjectsPage() {
 
   // プロジェクトデータの取得
   const { 
-    data: projects, 
+    data: rawProjects, 
     isLoading, 
     error, 
     refetch 
@@ -77,6 +77,13 @@ export default function ProjectsPage() {
     () => fetchData<MockProject[]>('projects', { params: getQueryParams() }),
     []
   );
+  
+  // APIレスポンスのデータを画面用に変換
+  const projects = rawProjects?.map((project) => ({
+    ...project,
+    members_count: project.members?.length || 0,
+    questions_count: project._count?.questions || 0,
+  })) || [];
   
   const handleStatusFilterChange = (event: SelectChangeEvent) => {
     setStatusFilter(event.target.value);
