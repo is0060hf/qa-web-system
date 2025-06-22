@@ -465,3 +465,12 @@
 - [ ] パフォーマンス最適化
   - データ変換処理をuseMemoでメモ化
   - 不要な再レンダリングを防止
+
+### APIエンドポイントの動的レンダリング設定（2025/01/19 Claudeレビューより）
+- [ ] ユーザー固有データを返す他のAPIエンドポイントにも`force-dynamic`設定を追加
+  - `/api/notifications/route.ts`
+  - `/api/dashboard/route.ts`
+  - `/api/questions/route.ts`
+  - `/api/projects/route.ts`
+  - `/api/users/me/route.ts`
+  - 認証が必要でユーザー固有のデータを返すエンドポイントの一貫性確保
