@@ -3,6 +3,9 @@ import prisma from '@/lib/db';
 import { getUserFromRequest } from '@/lib/utils/api';
 import { QuestionStatus } from '@prisma/client';
 
+// APIエンドポイントを動的レンダリングに強制
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const user = getUserFromRequest(req);

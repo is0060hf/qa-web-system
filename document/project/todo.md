@@ -451,3 +451,17 @@
   - APIレスポンス型を最新のものに更新（`totalUnread`フィールド）
 - [x] サイドバーの通知メニューバッジ表示（既に実装済み）
   - APIレスポンス型の修正のみ実施
+
+### プロジェクト一覧画面の改善（2025/01/19 Claudeレビューより）
+- [ ] 型安全性の改善
+  - APIレスポンス用の型定義を追加（ProjectAPIResponse）
+  - 変換後のデータ型を明確化（ProjectWithCounts）
+  - rawProjectsの型を明示的に指定
+- [ ] データ構造の整理
+  - MockProjectインターフェースをAPI用と表示用に分離
+  - MockProjectAPIResponseとMockProjectDisplayの型定義
+- [ ] エラーハンドリングの強化
+  - `project._count?.questions` のundefined処理を `??` 演算子に変更
+- [ ] パフォーマンス最適化
+  - データ変換処理をuseMemoでメモ化
+  - 不要な再レンダリングを防止
